@@ -31,6 +31,13 @@ class NewsArticleRef(BaseModel):
     def validate_traceability(self) -> "NewsArticleRef":
         if self.source_reference.source_id != self.source_id:
             raise ValueError("source_reference.source_id must match source_id")
+        source_reference_url = (
+            str(self.source_reference.url) if self.source_reference.url is not None else None
+        )
+        if self.url != source_reference_url:
+            raise ValueError("url must match source_reference.url")
+        if self.provider_key != self.source_reference.provider_key:
+            raise ValueError("provider_key must match source_reference.provider_key")
         if self.url is None and self.provider_key is None:
             raise ValueError("article reference requires url or provider_key")
         return self

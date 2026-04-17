@@ -7,6 +7,7 @@ from html import unescape
 from typing import Mapping
 
 from subsystem_news.contracts import NewsSourceConfig, SourceReference, SourceReferenceLocator
+from subsystem_news.errors import SourceNotApprovedError
 from subsystem_news.sources.base import (
     HttpTransport,
     NewsArticleRef,
@@ -59,7 +60,17 @@ class SiteHtmlSourceAdapter:
         *,
         transport: HttpTransport | None = None,
     ) -> RawArticleFetch:
-        response = (transport or UrllibHttpTransport()).get(ref.url or str(source.base_url))
+        approved_url = str(source.base_url)
+        if (
+            ref.url != approved_url
+            or ref.source_reference.url is None
+            or str(ref.source_reference.url) != approved_url
+        ):
+            raise SourceNotApprovedError(
+                f"site_html ref url is outside approved allowlist: {ref.url}",
+            )
+
+        response = (transport or UrllibHttpTransport()).get(approved_url)
         raw_html = response.text
         raw_title = _title(raw_html)
         raw_body = _body_candidate(raw_html)

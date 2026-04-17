@@ -24,6 +24,7 @@ VALID_ALLOWLIST = FIXTURE_DIR / "approved_sources.valid.sample.json"
 class StaticTransport:
     def __init__(self, responses: Mapping[str, str]) -> None:
         self._responses = dict(responses)
+        self.calls: list[str] = []
 
     def get(
         self,
@@ -32,6 +33,7 @@ class StaticTransport:
         headers: Mapping[str, str] | None = None,
     ) -> HttpResponse:
         del headers
+        self.calls.append(url)
         return HttpResponse(url=url, status_code=200, text=self._responses[url], headers={})
 
 
@@ -148,6 +150,35 @@ def test_site_html_adapter_fetches_raw_html_title_and_body_candidate() -> None:
     assert "<article>" in fetch.raw_body
 
 
+def test_site_html_fetch_rejects_forged_ref_url_outside_allowlist() -> None:
+    html_source = config_for("company-site-html")
+    forged_url = "https://internal.example.test/latest/meta-data"
+    forged_ref = NewsArticleRef(
+        source_id=html_source.source_id,
+        source_reference=SourceReference(
+            source_id=html_source.source_id,
+            url=forged_url,
+            provider_key=None,
+            original_locator=SourceReferenceLocator(
+                locator_type="site_base_url",
+                locator_value=forged_url,
+            ),
+        ),
+        url=forged_url,
+    )
+    guarded_transport = StaticTransport(
+        {
+            str(html_source.base_url): (SOURCES_DIR / "site_page.html").read_text(encoding="utf-8"),
+            forged_url: "<html><title>private</title></html>",
+        },
+    )
+
+    with pytest.raises(SourceNotApprovedError):
+        fetch_article_body(forged_ref, [html_source], transport=guarded_transport)
+
+    assert guarded_transport.calls == []
+
+
 def test_news_article_ref_rejects_empty_or_mismatched_source_reference() -> None:
     with pytest.raises(ValidationError):
         NewsArticleRef.model_validate(
@@ -175,6 +206,42 @@ def test_news_article_ref_rejects_empty_or_mismatched_source_reference() -> None
         )
 
     assert "source_reference.source_id must match source_id" in str(exc_info.value)
+
+    source_reference = SourceReference(
+        source_id="global-wire-rss",
+        url="https://news.example.com/articles/1",
+        provider_key=None,
+        original_locator=SourceReferenceLocator(
+            locator_type="rss_link",
+            locator_value="https://news.example.com/articles/1",
+        ),
+    )
+    with pytest.raises(ValidationError) as exc_info:
+        NewsArticleRef(
+            source_id="global-wire-rss",
+            source_reference=source_reference,
+            url="https://news.example.com/articles/2",
+        )
+
+    assert "url must match source_reference.url" in str(exc_info.value)
+
+    source_reference = SourceReference(
+        source_id="market-filings-api",
+        url=None,
+        provider_key="filing-2026-001",
+        original_locator=SourceReferenceLocator(
+            locator_type="api_id",
+            locator_value="filing-2026-001",
+        ),
+    )
+    with pytest.raises(ValidationError) as exc_info:
+        NewsArticleRef(
+            source_id="market-filings-api",
+            source_reference=source_reference,
+            provider_key="filing-2026-002",
+        )
+
+    assert "provider_key must match source_reference.provider_key" in str(exc_info.value)
 
 
 def test_raw_fetch_does_not_expose_normalized_artifact_fields() -> None:
