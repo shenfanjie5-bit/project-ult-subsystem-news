@@ -349,6 +349,55 @@ def test_involved_entity_valid_sample_passes() -> None:
     assert entity.canonical_id == "entity:acme-corp"
 
 
+@pytest.mark.parametrize(
+    ("resolution_status", "canonical_id"),
+    [
+        ("resolved", "entity:acme-corp"),
+        ("unresolved", None),
+        ("ambiguous", None),
+    ],
+)
+def test_involved_entity_accepts_valid_resolution_states(
+    resolution_status: str,
+    canonical_id: str | None,
+) -> None:
+    payload = entity_payload()
+    payload["resolution_status"] = resolution_status
+    payload["canonical_id"] = canonical_id
+
+    entity = InvolvedEntity.model_validate(payload)
+
+    assert entity.resolution_status == resolution_status
+    assert entity.canonical_id == canonical_id
+
+
+@pytest.mark.parametrize(
+    ("resolution_status", "canonical_id", "message"),
+    [
+        ("resolved", None, "resolved entity requires non-empty canonical_id"),
+        ("resolved", "", "resolved entity requires non-empty canonical_id"),
+        ("resolved", "   ", "resolved entity requires non-empty canonical_id"),
+        ("unresolved", "entity:acme-corp", "unresolved entity requires canonical_id to be null"),
+        ("unresolved", "", "unresolved entity requires canonical_id to be null"),
+        ("ambiguous", "entity:acme-corp", "ambiguous entity requires canonical_id to be null"),
+        ("ambiguous", "", "ambiguous entity requires canonical_id to be null"),
+    ],
+)
+def test_involved_entity_rejects_invalid_resolution_states(
+    resolution_status: str,
+    canonical_id: str | None,
+    message: str,
+) -> None:
+    payload = entity_payload()
+    payload["resolution_status"] = resolution_status
+    payload["canonical_id"] = canonical_id
+
+    with pytest.raises(ValidationError) as exc_info:
+        InvolvedEntity.model_validate(payload)
+
+    assert message in str(exc_info.value)
+
+
 def test_involved_entity_missing_required_field_rejected() -> None:
     payload = entity_payload()
     del payload["mention_text"]

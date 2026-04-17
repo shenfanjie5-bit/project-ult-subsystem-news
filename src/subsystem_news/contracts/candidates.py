@@ -31,6 +31,18 @@ class InvolvedEntity(BaseModel):
     resolution_status: Literal["resolved", "unresolved", "ambiguous"]
     type_hint: str
 
+    @model_validator(mode="after")
+    def validate_resolution_consistency(self) -> "InvolvedEntity":
+        if self.resolution_status == "resolved":
+            if self.canonical_id is None or not self.canonical_id.strip():
+                raise ValueError("resolved entity requires non-empty canonical_id")
+            return self
+
+        if self.canonical_id is not None:
+            raise ValueError(f"{self.resolution_status} entity requires canonical_id to be null")
+
+        return self
+
 
 class _EvidenceRequiredModel(BaseModel):
     """Shared evidence guard for Ex candidates."""
