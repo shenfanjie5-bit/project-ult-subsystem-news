@@ -16,6 +16,7 @@ from subsystem_news.sources.base import (
     content_hash_for,
     trace_id_for,
     utc_now,
+    validate_final_url,
 )
 
 
@@ -33,6 +34,7 @@ class ApiSourceAdapter:
     ) -> list[NewsArticleRef]:
         del cursor
         response = (transport or UrllibHttpTransport()).get(str(source.base_url))
+        validate_final_url(response, source)
         return [_article_ref(source, article) for article in _articles(response.text)]
 
     def fetch(
@@ -43,6 +45,7 @@ class ApiSourceAdapter:
         transport: HttpTransport | None = None,
     ) -> RawArticleFetch:
         response = (transport or UrllibHttpTransport()).get(str(source.base_url))
+        validate_final_url(response, source)
         for article in _articles(response.text):
             candidate = _article_ref(source, article)
             if _same_ref(candidate, ref):

@@ -16,6 +16,7 @@ from subsystem_news.sources.base import (
     content_hash_for,
     trace_id_for,
     utc_now,
+    validate_final_url,
 )
 
 
@@ -71,6 +72,7 @@ class SiteHtmlSourceAdapter:
             )
 
         response = (transport or UrllibHttpTransport()).get(approved_url)
+        validate_final_url(response, source)
         raw_html = response.text
         raw_title = _title(raw_html)
         raw_body = _body_candidate(raw_html)

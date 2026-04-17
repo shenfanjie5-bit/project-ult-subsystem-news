@@ -22,8 +22,14 @@ VALID_ALLOWLIST = FIXTURE_DIR / "approved_sources.valid.sample.json"
 
 
 class StaticTransport:
-    def __init__(self, responses: Mapping[str, str]) -> None:
+    def __init__(
+        self,
+        responses: Mapping[str, str],
+        *,
+        final_urls: Mapping[str, str] | None = None,
+    ) -> None:
         self._responses = dict(responses)
+        self._final_urls = dict(final_urls or {})
         self.calls: list[str] = []
 
     def get(
@@ -34,7 +40,12 @@ class StaticTransport:
     ) -> HttpResponse:
         del headers
         self.calls.append(url)
-        return HttpResponse(url=url, status_code=200, text=self._responses[url], headers={})
+        return HttpResponse(
+            url=self._final_urls.get(url, url),
+            status_code=200,
+            text=self._responses[url],
+            headers={},
+        )
 
 
 def load_configs() -> list[NewsSourceConfig]:
@@ -46,6 +57,7 @@ def transport(
     rss: str | None = None,
     api: str | None = None,
     html: str | None = None,
+    final_urls: Mapping[str, str] | None = None,
 ) -> StaticTransport:
     configs = {config.source_id: config for config in load_configs()}
     return StaticTransport(
@@ -60,6 +72,7 @@ def transport(
             if html is not None
             else (SOURCES_DIR / "site_page.html").read_text(encoding="utf-8"),
         },
+        final_urls=final_urls,
     )
 
 
@@ -177,6 +190,36 @@ def test_site_html_fetch_rejects_forged_ref_url_outside_allowlist() -> None:
         fetch_article_body(forged_ref, [html_source], transport=guarded_transport)
 
     assert guarded_transport.calls == []
+
+
+@pytest.mark.parametrize(
+    ("source_id", "operation"),
+    [
+        ("global-wire-rss", "discover"),
+        ("global-wire-rss", "fetch"),
+        ("market-filings-api", "discover"),
+        ("market-filings-api", "fetch"),
+        ("company-site-html", "fetch"),
+    ],
+)
+def test_adapters_reject_redirected_final_url_outside_allowlist(
+    source_id: str,
+    operation: str,
+) -> None:
+    source = config_for(source_id)
+    approved_url = str(source.base_url)
+    redirected_url = "https://internal.example.test/latest/meta-data"
+    redirected_transport = transport(final_urls={approved_url: redirected_url})
+
+    if operation == "discover":
+        with pytest.raises(SourceNotApprovedError):
+            discover_articles([source], transport=redirected_transport)
+    else:
+        ref = discover_articles([source], transport=transport())[0]
+        with pytest.raises(SourceNotApprovedError):
+            fetch_article_body(ref, [source], transport=redirected_transport)
+
+    assert redirected_transport.calls == [approved_url]
 
 
 def test_news_article_ref_rejects_empty_or_mismatched_source_reference() -> None:

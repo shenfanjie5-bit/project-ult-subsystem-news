@@ -12,6 +12,7 @@ from urllib.request import Request, urlopen
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 from subsystem_news.contracts import NewsSourceConfig, SourceReference
+from subsystem_news.errors import SourceNotApprovedError
 
 
 class NewsArticleRef(BaseModel):
@@ -199,3 +200,13 @@ def trace_id_for(ref: NewsArticleRef, content_hash: str, fetched_at: datetime) -
     }
     encoded = json.dumps(payload, separators=(",", ":"), sort_keys=True).encode("utf-8")
     return hashlib.sha256(encoded).hexdigest()
+
+
+def validate_final_url(response: HttpResponse, source: NewsSourceConfig) -> None:
+    """Reject redirected responses outside the approved source URL."""
+
+    approved_url = str(source.base_url)
+    if response.url != approved_url:
+        raise SourceNotApprovedError(
+            f"response final url is outside approved allowlist: {response.url}",
+        )

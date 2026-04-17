@@ -17,6 +17,7 @@ from subsystem_news.sources.base import (
     content_hash_for,
     trace_id_for,
     utc_now,
+    validate_final_url,
 )
 
 
@@ -34,6 +35,7 @@ class RssSourceAdapter:
     ) -> list[NewsArticleRef]:
         del cursor
         response = (transport or UrllibHttpTransport()).get(str(source.base_url))
+        validate_final_url(response, source)
         entries = _feed_entries(response.text)
         return [_entry_ref(source, entry, index) for index, entry in enumerate(entries)]
 
@@ -45,6 +47,7 @@ class RssSourceAdapter:
         transport: HttpTransport | None = None,
     ) -> RawArticleFetch:
         response = (transport or UrllibHttpTransport()).get(str(source.base_url))
+        validate_final_url(response, source)
         for index, entry in enumerate(_feed_entries(response.text)):
             candidate = _entry_ref(source, entry, index)
             if _same_ref(candidate, ref):
