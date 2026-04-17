@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import json
+import threading
+from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
 import pytest
@@ -54,6 +56,46 @@ def test_artifact_store_rejects_content_drift_for_existing_article_id(tmp_path: 
 
     assert store.load(artifact.article_id) == artifact
     assert "Corrected copy" not in store.path_for(artifact.article_id).read_text(encoding="utf-8")
+
+
+def test_artifact_store_concurrent_content_drift_does_not_replace_first_writer(
+    tmp_path: Path,
+) -> None:
+    artifact = load_artifact("chinese_rss_summary.json")
+    store = ArtifactStore(tmp_path)
+    changed_body = f"{artifact.body_text}\nCorrected copy from concurrent refetch."
+    drifted_artifact = artifact.model_copy(
+        update={
+            "body_text": changed_body,
+            "content_hash": content_hash(changed_body),
+        }
+    )
+    barrier = threading.Barrier(2)
+
+    def save_candidate(candidate: NewsArticleArtifact) -> tuple[str, str]:
+        barrier.wait()
+        try:
+            store.save(candidate)
+        except ContractViolationError as exc:
+            return "rejected", str(exc)
+        return "saved", candidate.content_hash
+
+    with ThreadPoolExecutor(max_workers=2) as executor:
+        results = list(executor.map(save_candidate, [artifact, drifted_artifact]))
+
+    saved = [detail for status, detail in results if status == "saved"]
+    rejected = [detail for status, detail in results if status == "rejected"]
+    assert len(saved) == 1
+    assert len(rejected) == 1
+    assert "different content_hash" in rejected[0]
+
+    stored_artifact = store.load(artifact.article_id)
+    stored_metadata = store.load_metadata(artifact.article_id)
+    assert stored_artifact.content_hash == saved[0]
+    assert stored_metadata.content_hash == stored_artifact.content_hash
+    assert stored_metadata.text_quality == "summary_only"
+    assert len(list(tmp_path.glob(f"{artifact.article_id}.json"))) == 1
+    assert len(list(tmp_path.glob(f"{artifact.article_id}.metadata.json"))) == 1
 
 
 def test_artifact_store_persists_summary_only_metadata_sidecar(tmp_path: Path) -> None:

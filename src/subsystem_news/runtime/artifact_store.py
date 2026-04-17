@@ -4,8 +4,14 @@ from __future__ import annotations
 
 import os
 import tempfile
+from contextlib import contextmanager
 from pathlib import Path
-from typing import Literal
+from typing import Iterator, Literal
+
+try:
+    import fcntl
+except ImportError:  # pragma: no cover - fcntl is available on supported POSIX runtimes.
+    fcntl = None  # type: ignore[assignment]
 
 from pydantic import BaseModel, ConfigDict, ValidationError, model_validator
 
@@ -54,18 +60,17 @@ class ArtifactStore:
         path = self.path_for(artifact.article_id)
         path.parent.mkdir(parents=True, exist_ok=True)
         payload = artifact.model_dump_json(indent=2) + "\n"
-        if path.exists():
-            self._require_idempotent_artifact(path, artifact)
-
         metadata = self._metadata_from_artifact(artifact)
-        if metadata is not None:
-            self._require_idempotent_metadata(metadata)
+        metadata_payload = metadata.model_dump_json(indent=2) + "\n" if metadata is not None else None
 
-        if not path.exists():
-            self._atomic_write(path, payload)
-
-        if metadata is not None:
-            self._save_metadata(metadata)
+        with self._article_lock(artifact.article_id):
+            if path.exists():
+                self._require_idempotent_artifact(path, artifact)
+            elif metadata is not None and self.metadata_path_for(metadata.article_id).exists():
+                self._require_idempotent_metadata(metadata)
+            self._create_or_require_idempotent_artifact(path, artifact, payload)
+            if metadata is not None and metadata_payload is not None:
+                self._create_or_require_idempotent_metadata(metadata, metadata_payload)
         return path
 
     def load(self, article_id: str) -> NewsArticleArtifact:
@@ -134,11 +139,28 @@ class ArtifactStore:
             ) from exc
 
     def _save_metadata(self, metadata: ArticleArtifactMetadata) -> None:
-        path = self.metadata_path_for(metadata.article_id)
         payload = metadata.model_dump_json(indent=2) + "\n"
-        if self._require_idempotent_metadata(metadata):
+        self._create_or_require_idempotent_metadata(metadata, payload)
+
+    def _create_or_require_idempotent_artifact(
+        self,
+        path: Path,
+        artifact: NewsArticleArtifact,
+        payload: str,
+    ) -> None:
+        if self._publish_exclusive(path, payload):
             return
-        self._atomic_write(path, payload)
+        self._require_idempotent_artifact(path, artifact)
+
+    def _create_or_require_idempotent_metadata(
+        self,
+        metadata: ArticleArtifactMetadata,
+        payload: str,
+    ) -> None:
+        path = self.metadata_path_for(metadata.article_id)
+        if self._publish_exclusive(path, payload):
+            return
+        self._require_idempotent_metadata(metadata)
 
     def _require_idempotent_metadata(self, metadata: ArticleArtifactMetadata) -> bool:
         path = self.metadata_path_for(metadata.article_id)
@@ -156,7 +178,21 @@ class ArtifactStore:
             )
         return True
 
-    def _atomic_write(self, path: Path, payload: str) -> None:
+    @contextmanager
+    def _article_lock(self, article_id: str) -> Iterator[None]:
+        lock_path = self.root / f".{self._safe_article_id(article_id)}.lock"
+        lock_path.parent.mkdir(parents=True, exist_ok=True)
+        with lock_path.open("a+b") as lock_file:
+            if fcntl is None:
+                yield
+                return
+            fcntl.flock(lock_file.fileno(), fcntl.LOCK_EX)
+            try:
+                yield
+            finally:
+                fcntl.flock(lock_file.fileno(), fcntl.LOCK_UN)
+
+    def _publish_exclusive(self, path: Path, payload: str) -> bool:
         temp_path: Path | None = None
         try:
             with tempfile.NamedTemporaryFile(
@@ -172,10 +208,22 @@ class ArtifactStore:
                 temp_file.flush()
                 os.fsync(temp_file.fileno())
 
-            if path.exists():
-                raise ContractViolationError("artifact path appeared during atomic write")
-            os.replace(temp_path, path)
-            temp_path = None
+            try:
+                os.link(temp_path, path)
+            except FileExistsError:
+                return False
+            self._fsync_directory(path.parent)
+            return True
         finally:
             if temp_path is not None:
                 temp_path.unlink(missing_ok=True)
+
+    def _fsync_directory(self, directory: Path) -> None:
+        try:
+            directory_fd = os.open(directory, os.O_RDONLY)
+        except OSError:
+            return
+        try:
+            os.fsync(directory_fd)
+        finally:
+            os.close(directory_fd)
