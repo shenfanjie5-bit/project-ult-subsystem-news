@@ -1,0 +1,13 @@
+{
+  "articles": [
+    {
+      "id": "filing-2026-001",
+      "url": "https://filings.example.com/articles/filing-2026-001",
+      "title": "Globex files merger update",
+      "published_at": "2026-01-15T12:00:00Z",
+      "body": "Globex filed an update describing the pending merger review.",
+      "summary": "Globex filed a merger update.",
+      "author": "Market Filings Desk"
+    }
+  ]
+}

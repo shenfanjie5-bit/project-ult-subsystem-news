@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>Global Wire RSS</title>
+    <item>
+      <guid>wire-article-1</guid>
+      <link>https://news.example.com/articles/acme-contract</link>
+      <title>Acme signs supply contract</title>
+      <pubDate>Thu, 15 Jan 2026 10:30:00 GMT</pubDate>
+      <description>Acme announced a supply agreement summary.</description>
+      <content:encoded>Acme Corp announced a supply contract with Globex Inc.</content:encoded>
+    </item>
+    <item>
+      <guid>wire-article-2</guid>
+      <link>https://news.example.com/articles/zenith-guidance</link>
+      <title>Zenith updates revenue guidance</title>
+      <pubDate>Thu, 15 Jan 2026 11:00:00 GMT</pubDate>
+      <description>Zenith provided an updated outlook.</description>
+      <content:encoded>Zenith Ltd raised its revenue guidance for the fiscal year.</content:encoded>
+    </item>
+  </channel>
+</rss>
