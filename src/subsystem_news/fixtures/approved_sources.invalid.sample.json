@@ -1,0 +1,24 @@
+[
+  {
+    "source_id": "unapproved-blog",
+    "display_name": "Unapproved Blog",
+    "access_mode": "site_html",
+    "base_url": "https://blog.example.com/article",
+    "approved": false,
+    "reliability_tier": "C",
+    "license_tag": "unknown",
+    "language": "en",
+    "credential_ref": null
+  },
+  {
+    "source_id": "raw-credential-api",
+    "display_name": "Raw Credential API",
+    "access_mode": "api",
+    "base_url": "https://raw-credentials.example.com/api",
+    "approved": true,
+    "reliability_tier": "B",
+    "license_tag": "licensed-api",
+    "language": "en",
+    "credential_ref": "plain-token-value"
+  }
+]

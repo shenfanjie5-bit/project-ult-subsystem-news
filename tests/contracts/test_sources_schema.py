@@ -65,6 +65,23 @@ def test_load_allowlist_returns_approved_configs(tmp_path: Path) -> None:
     assert configs[0].source_id == "global-wire-rss"
 
 
+def test_load_allowlist_returns_checked_in_valid_fixture() -> None:
+    fixture_path = Path("src/subsystem_news/fixtures/approved_sources.valid.sample.json")
+
+    configs = load_allowlist(fixture_path)
+
+    assert {config.source_id for config in configs} == {
+        "global-wire-rss",
+        "market-filings-api",
+        "site-html",
+    }
+    assert all(config.approved is True for config in configs)
+    assert all(
+        config.credential_ref is None or config.credential_ref.startswith("secret://")
+        for config in configs
+    )
+
+
 def test_load_allowlist_rejects_unapproved_sample_fixture() -> None:
     fixture_path = Path("src/subsystem_news/fixtures/approved_sources.sample.json")
 
@@ -72,6 +89,35 @@ def test_load_allowlist_rejects_unapproved_sample_fixture() -> None:
         load_allowlist(fixture_path)
 
     assert "unapproved-blog" in str(exc_info.value)
+
+
+def test_invalid_allowlist_fixture_covers_unapproved_source(tmp_path: Path) -> None:
+    payloads = json.loads(
+        Path("src/subsystem_news/fixtures/approved_sources.invalid.sample.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    path = tmp_path / "unapproved.json"
+    path.write_text(json.dumps([payloads[0]]), encoding="utf-8")
+
+    with pytest.raises(SourceNotApprovedError, match="unapproved-blog"):
+        load_allowlist(path)
+
+
+def test_invalid_allowlist_fixture_rejects_raw_credential_ref(tmp_path: Path) -> None:
+    payloads = json.loads(
+        Path("src/subsystem_news/fixtures/approved_sources.invalid.sample.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    path = tmp_path / "raw_credential.json"
+    path.write_text(json.dumps([payloads[1]]), encoding="utf-8")
+
+    with pytest.raises(ContractViolationError) as exc_info:
+        load_allowlist(path)
+
+    assert isinstance(exc_info.value.__cause__, ValidationError)
+    assert "credential_ref" in str(exc_info.value.__cause__)
 
 
 def test_load_allowlist_wraps_schema_violation(tmp_path: Path) -> None:

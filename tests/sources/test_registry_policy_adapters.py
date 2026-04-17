@@ -1,0 +1,221 @@
+from __future__ import annotations
+
+from pathlib import Path
+from typing import Mapping
+
+import pytest
+
+from subsystem_news.contracts import NewsSourceConfig, SourceReference, load_allowlist
+from subsystem_news.errors import ContractViolationError, SourceNotApprovedError
+from subsystem_news.sources import (
+    AdapterRegistry,
+    HttpResponse,
+    NewsArticleRef,
+    default_registry,
+    discover_articles,
+    fetch_article_body,
+)
+from subsystem_news.sources.base import HttpTransport
+from subsystem_news.sources.trace import load_fetch_trace, write_fetch_trace
+
+
+FIXTURE_ROOT = Path("src/subsystem_news/fixtures")
+SOURCE_FIXTURE_ROOT = FIXTURE_ROOT / "sources"
+
+
+class StaticTransport:
+    def __init__(self, responses: Mapping[str, str]) -> None:
+        self._responses = responses
+
+    def get(
+        self,
+        url: str,
+        *,
+        headers: Mapping[str, str] | None = None,
+    ) -> HttpResponse:
+        del headers
+        try:
+            text = self._responses[url]
+        except KeyError as exc:
+            raise AssertionError(f"unexpected network URL: {url}") from exc
+        return HttpResponse(url=url, status_code=200, text=text, headers={})
+
+
+class DuplicateAdapter:
+    access_mode = "rss"
+
+    def discover(
+        self,
+        source: NewsSourceConfig,
+        cursor: Mapping[str, str] | None = None,
+        *,
+        transport: HttpTransport | None = None,
+    ) -> list[NewsArticleRef]:
+        del source, cursor, transport
+        return []
+
+    def fetch(
+        self,
+        ref: NewsArticleRef,
+        source: NewsSourceConfig,
+        *,
+        transport: HttpTransport | None = None,
+    ):
+        del ref, source, transport
+        raise NotImplementedError
+
+
+def load_configs() -> list[NewsSourceConfig]:
+    return load_allowlist(FIXTURE_ROOT / "approved_sources.valid.sample.json")
+
+
+def transport() -> StaticTransport:
+    return StaticTransport(
+        {
+            "https://news.example.com/rss": (
+                SOURCE_FIXTURE_ROOT / "rss_feed.xml"
+            ).read_text(encoding="utf-8"),
+            "https://filings.example.com/api/news": (
+                SOURCE_FIXTURE_ROOT / "api_response.json"
+            ).read_text(encoding="utf-8"),
+            "https://site.example.com/markets/plant-update": (
+                SOURCE_FIXTURE_ROOT / "site_page.html"
+            ).read_text(encoding="utf-8"),
+        }
+    )
+
+
+def config_by_id(configs: list[NewsSourceConfig], source_id: str) -> NewsSourceConfig:
+    for config in configs:
+        if config.source_id == source_id:
+            return config
+    raise AssertionError(source_id)
+
+
+def test_default_registry_resolves_known_adapters_and_rejects_unknown() -> None:
+    registry = default_registry()
+
+    assert registry.get("rss").access_mode == "rss"
+    assert registry.get("api").access_mode == "api"
+    assert registry.get("site_html").access_mode == "site_html"
+    with pytest.raises(ContractViolationError, match="no source adapter"):
+        registry.get("crawler")
+
+
+def test_registry_rejects_duplicate_access_mode() -> None:
+    registry = AdapterRegistry()
+    registry.register(DuplicateAdapter())
+
+    with pytest.raises(ContractViolationError, match="already registered"):
+        registry.register(DuplicateAdapter())
+
+
+def test_discover_articles_rejects_unapproved_config_even_without_loader() -> None:
+    payload = config_by_id(load_configs(), "site-html").model_dump(mode="json")
+    payload["approved"] = False
+    unapproved = NewsSourceConfig.model_validate(payload)
+
+    with pytest.raises(SourceNotApprovedError, match="site-html"):
+        discover_articles([unapproved], transport=transport())
+
+
+def test_fetch_article_body_rejects_source_outside_current_allowlist() -> None:
+    configs = load_configs()
+    refs = discover_articles(configs, transport=transport())
+    api_ref = next(ref for ref in refs if ref.source_id == "market-filings-api")
+    rss_only = [config_by_id(configs, "global-wire-rss")]
+
+    with pytest.raises(SourceNotApprovedError, match="market-filings-api"):
+        fetch_article_body(api_ref, rss_only, transport=transport())
+
+
+def test_rss_adapter_discovers_and_fetches_fixture_articles() -> None:
+    configs = [config_by_id(load_configs(), "global-wire-rss")]
+    refs = discover_articles(configs, transport=transport())
+
+    assert len(refs) == 2
+    first = refs[0]
+    assert first.provider_key == "wire-acme-contract"
+    assert first.url == "https://news.example.com/articles/acme-contract"
+    assert first.title_hint == "Acme signs a supply contract"
+    assert first.published_at_hint is not None
+    assert first.source_reference.original_locator.locator_type == "rss_guid"
+
+    fetch = fetch_article_body(first, configs, transport=transport())
+
+    assert fetch.raw_title == "Acme signs a supply contract"
+    assert fetch.raw_body == "Acme Corp announced a new supply contract with Globex Inc."
+    assert fetch.summary == "Acme Corp announced a new supply agreement with Globex."
+    assert fetch.published_at_raw == "Thu, 15 Jan 2026 10:30:00 GMT"
+    assert fetch.content_hash == fetch_article_body(first, configs, transport=transport()).content_hash
+
+
+def test_api_adapter_discovers_and_fetches_provider_key_article() -> None:
+    configs = [config_by_id(load_configs(), "market-filings-api")]
+    refs = discover_articles(configs, transport=transport())
+
+    assert len(refs) == 1
+    ref = refs[0]
+    assert ref.provider_key == "filing-2026-0001"
+    assert ref.source_reference.provider_key == "filing-2026-0001"
+
+    fetch = fetch_article_body(ref, configs, transport=transport())
+
+    assert fetch.raw_body.startswith("Globex Inc filed a notice")
+    assert fetch.summary == "Globex filed a proposed acquisition notice."
+    assert fetch.author_or_channel == "Filings API"
+
+
+def test_site_html_adapter_fetches_raw_html_and_title_hint() -> None:
+    configs = [config_by_id(load_configs(), "site-html")]
+    refs = discover_articles(configs, transport=transport())
+
+    assert len(refs) == 1
+    ref = refs[0]
+    assert ref.url == "https://site.example.com/markets/plant-update"
+    assert ref.source_reference.url is not None
+
+    fetch = fetch_article_body(ref, configs, transport=transport())
+
+    assert "<title>Plant restart update</title>" in fetch.raw_html
+    assert fetch.raw_title == "Plant restart update"
+    assert "North River Metals restarted its nickel plant" in (fetch.raw_body or "")
+
+
+def test_fetch_trace_round_trip_excludes_body_text(tmp_path: Path) -> None:
+    configs = [config_by_id(load_configs(), "market-filings-api")]
+    ref = discover_articles(configs, transport=transport())[0]
+    fetch = fetch_article_body(ref, configs, transport=transport())
+
+    path = write_fetch_trace(fetch, tmp_path)
+    restored = load_fetch_trace(path)
+    trace_json = path.read_text(encoding="utf-8")
+
+    assert restored.trace_id == fetch.trace_id
+    assert restored.source_reference == fetch.ref.source_reference
+    assert restored.content_hash == fetch.content_hash
+    assert "Globex Inc filed a notice" not in trace_json
+    assert "summary" not in trace_json
+
+
+def test_fetch_article_body_rejects_adapter_source_reference_drift() -> None:
+    configs = [config_by_id(load_configs(), "global-wire-rss")]
+    ref = discover_articles(configs, transport=transport())[0]
+    mismatched_reference = SourceReference.model_validate(
+        {
+            "source_id": ref.source_id,
+            "url": "https://news.example.com/articles/other",
+            "provider_key": "wire-other",
+            "original_locator": {
+                "locator_type": "rss_guid",
+                "locator_value": "wire-other",
+            },
+        }
+    )
+    mismatched_ref = NewsArticleRef(
+        source_id=ref.source_id,
+        source_reference=mismatched_reference,
+    )
+
+    with pytest.raises(ContractViolationError, match="not found"):
+        fetch_article_body(mismatched_ref, configs, transport=transport())

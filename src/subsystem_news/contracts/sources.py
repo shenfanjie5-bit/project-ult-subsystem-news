@@ -6,7 +6,7 @@ import json
 from pathlib import Path
 from typing import Literal
 
-from pydantic import BaseModel, ConfigDict, HttpUrl, ValidationError
+from pydantic import BaseModel, ConfigDict, HttpUrl, ValidationError, field_validator
 
 from subsystem_news.errors import ContractViolationError, SourceNotApprovedError
 
@@ -14,7 +14,7 @@ from subsystem_news.errors import ContractViolationError, SourceNotApprovedError
 class NewsSourceConfig(BaseModel):
     """Frozen config entry for an approved source."""
 
-    model_config = ConfigDict(frozen=True, extra="forbid")
+    model_config = ConfigDict(frozen=True, extra="forbid", str_strip_whitespace=True)
 
     source_id: str
     display_name: str
@@ -25,6 +25,15 @@ class NewsSourceConfig(BaseModel):
     license_tag: str
     language: str
     credential_ref: str | None
+
+    @field_validator("credential_ref")
+    @classmethod
+    def validate_credential_ref(cls, value: str | None) -> str | None:
+        if value is None:
+            return None
+        if not value.startswith("secret://"):
+            raise ValueError("credential_ref must be None or a secret:// reference")
+        return value
 
 
 def load_allowlist(path: Path) -> list[NewsSourceConfig]:

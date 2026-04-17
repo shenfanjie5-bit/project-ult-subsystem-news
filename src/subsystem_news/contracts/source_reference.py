@@ -8,7 +8,7 @@ from pydantic import BaseModel, ConfigDict, Field, HttpUrl, model_validator
 class SourceReferenceLocator(BaseModel):
     """Original provider locator metadata for a fetched article."""
 
-    model_config = ConfigDict(frozen=True, extra="forbid")
+    model_config = ConfigDict(frozen=True, extra="forbid", str_strip_whitespace=True)
 
     locator_type: str = Field(min_length=1)
     locator_value: str = Field(min_length=1)
@@ -17,7 +17,7 @@ class SourceReferenceLocator(BaseModel):
 class SourceReference(BaseModel):
     """Frozen reference that keeps artifacts traceable to their source."""
 
-    model_config = ConfigDict(frozen=True, extra="forbid")
+    model_config = ConfigDict(frozen=True, extra="forbid", str_strip_whitespace=True)
 
     source_id: str = Field(min_length=1)
     url: HttpUrl | None = None
