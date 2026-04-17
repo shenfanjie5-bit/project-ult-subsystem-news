@@ -7,6 +7,7 @@ import pytest
 
 from subsystem_news.contracts.article import NewsArticleArtifact
 from subsystem_news.errors import ContractViolationError
+from subsystem_news.normalize.fingerprint_seed import content_hash
 from subsystem_news.normalize.pipeline import normalize_article
 from subsystem_news.runtime.artifact_store import ArtifactStore
 from subsystem_news.sources.base import RawArticleFetch
@@ -15,9 +16,9 @@ from subsystem_news.sources.base import RawArticleFetch
 FIXTURE_ROOT = Path("src/subsystem_news/fixtures/normalize")
 
 
-def load_artifact() -> NewsArticleArtifact:
+def load_artifact(name: str = "single_source_en.json") -> NewsArticleArtifact:
     raw = RawArticleFetch.model_validate(
-        json.loads((FIXTURE_ROOT / "single_source_en.json").read_text())
+        json.loads((FIXTURE_ROOT / name).read_text())
     )
     return normalize_article(raw)
 
@@ -31,9 +32,43 @@ def test_artifact_store_saves_and_loads_contract_model(tmp_path: Path) -> None:
 
     assert first_path == second_path
     assert first_path == store.path_for(artifact.article_id)
-    assert len(list(tmp_path.glob("*.json"))) == 1
+    assert len(list(tmp_path.glob(f"{artifact.article_id}.json"))) == 1
     assert store.exists(artifact.article_id)
     assert store.load(artifact.article_id) == artifact
+
+
+def test_artifact_store_rejects_content_drift_for_existing_article_id(tmp_path: Path) -> None:
+    artifact = load_artifact()
+    store = ArtifactStore(tmp_path)
+    store.save(artifact)
+    changed_body = f"{artifact.body_text}\nCorrected copy from refetch."
+    drifted_artifact = artifact.model_copy(
+        update={
+            "body_text": changed_body,
+            "content_hash": content_hash(changed_body),
+        }
+    )
+
+    with pytest.raises(ContractViolationError, match="different content_hash"):
+        store.save(drifted_artifact)
+
+    assert store.load(artifact.article_id) == artifact
+    assert "Corrected copy" not in store.path_for(artifact.article_id).read_text(encoding="utf-8")
+
+
+def test_artifact_store_persists_summary_only_metadata_sidecar(tmp_path: Path) -> None:
+    artifact = load_artifact("chinese_rss_summary.json")
+    store = ArtifactStore(tmp_path)
+
+    store.save(artifact)
+    loaded = store.load(artifact.article_id)
+    metadata = store.load_metadata(artifact.article_id)
+
+    assert loaded == artifact
+    assert metadata.article_id == artifact.article_id
+    assert metadata.content_hash == artifact.content_hash
+    assert metadata.body_text_source == "summary"
+    assert metadata.text_quality == "summary_only"
 
 
 def test_artifact_store_load_rejects_bad_json(tmp_path: Path) -> None:

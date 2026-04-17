@@ -41,6 +41,9 @@ class ParsedNewsArticle(BaseModel):
     text_quality: Literal["full_text", "summary_only"] = "full_text"
 
 
+_NORMALIZATION_METADATA_ATTR = "_normalization_metadata"
+
+
 def _clean_optional(value: str | None) -> str:
     if value is None:
         return ""
@@ -120,7 +123,7 @@ def parse_article(raw: RawArticleFetch) -> ParsedNewsArticle:
 def to_artifact(parsed: ParsedNewsArticle) -> NewsArticleArtifact:
     """Validate parsed article data against the frozen artifact contract."""
 
-    return NewsArticleArtifact.model_validate(
+    artifact = NewsArticleArtifact.model_validate(
         parsed.model_dump(
             include={
                 "article_id",
@@ -140,6 +143,15 @@ def to_artifact(parsed: ParsedNewsArticle) -> NewsArticleArtifact:
             }
         )
     )
+    object.__setattr__(
+        artifact,
+        _NORMALIZATION_METADATA_ATTR,
+        {
+            "body_text_source": parsed.body_text_source,
+            "text_quality": parsed.text_quality,
+        },
+    )
+    return artifact
 
 
 def normalize_article(raw: RawArticleFetch) -> NewsArticleArtifact:
