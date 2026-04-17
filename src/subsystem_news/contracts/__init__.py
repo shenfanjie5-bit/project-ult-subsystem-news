@@ -11,6 +11,7 @@ from subsystem_news.contracts.candidates import (
 )
 from subsystem_news.contracts.cluster import NewsDedupeCluster
 from subsystem_news.contracts.evidence import EvidenceSpan
+from subsystem_news.contracts.source_reference import SourceReference, SourceReferenceLocator
 from subsystem_news.contracts.sources import NewsSourceConfig, load_allowlist
 from subsystem_news.contracts.taxonomy import (
     DeltaAction,
@@ -37,6 +38,8 @@ __all__ = [
     "NewsSourceConfig",
     "RelationType",
     "SignalType",
+    "SourceReference",
+    "SourceReferenceLocator",
     "TimeHorizon",
     "load_allowlist",
 ]

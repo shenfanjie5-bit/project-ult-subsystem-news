@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from datetime import datetime, timezone
-from typing import Any
+from typing import Any, Callable
 
 import pytest
 from pydantic import ValidationError
@@ -15,14 +15,20 @@ from subsystem_news.contracts.candidates import (
 )
 from subsystem_news.contracts.cluster import NewsDedupeCluster
 from subsystem_news.contracts.evidence import EvidenceSpan
+from subsystem_news.contracts.source_reference import SourceReference
 from subsystem_news.errors import EvidenceMissingError
 
 
 PUBLISHED_AT = datetime(2026, 1, 15, 10, 30, tzinfo=timezone.utc)
 FETCHED_AT = datetime(2026, 1, 15, 10, 35, tzinfo=timezone.utc)
 SOURCE_REFERENCE = {
+    "source_id": "global-wire-rss",
     "url": "https://news.example.com/articles/1",
     "provider_key": "wire-article-1",
+    "original_locator": {
+        "locator_type": "rss_guid",
+        "locator_value": "wire-article-1",
+    },
 }
 
 
@@ -137,11 +143,75 @@ def assert_round_trip(model: object) -> None:
     assert restored == model
 
 
+def malformed_source_reference_payload() -> dict[str, Any]:
+    return {
+        "source_id": "global-wire-rss",
+        "url": "not a url",
+        "provider_key": "wire-article-1",
+        "original_locator": {
+            "locator_type": "rss_guid",
+            "locator_value": "wire-article-1",
+        },
+    }
+
+
+def test_source_reference_valid_sample_passes() -> None:
+    source_reference = SourceReference.model_validate(SOURCE_REFERENCE)
+
+    assert source_reference.source_id == "global-wire-rss"
+    assert source_reference.provider_key == "wire-article-1"
+    assert source_reference.original_locator.locator_value == "wire-article-1"
+
+
+def test_source_reference_valid_provider_key_only_sample_passes() -> None:
+    payload = dict(SOURCE_REFERENCE)
+    del payload["url"]
+
+    source_reference = SourceReference.model_validate(payload)
+
+    assert source_reference.url is None
+    assert source_reference.provider_key == "wire-article-1"
+
+
+@pytest.mark.parametrize(
+    "source_reference",
+    [
+        {},
+        {
+            "source_id": "global-wire-rss",
+            "original_locator": {
+                "locator_type": "rss_guid",
+                "locator_value": "wire-article-1",
+            },
+        },
+        {
+            "source_id": "global-wire-rss",
+            "url": "not a url",
+            "original_locator": {
+                "locator_type": "rss_guid",
+                "locator_value": "wire-article-1",
+            },
+        },
+        {
+            "source_id": "global-wire-rss",
+            "url": "https://news.example.com/articles/1",
+            "original_locator": {},
+        },
+    ],
+)
+def test_source_reference_empty_or_malformed_payloads_are_rejected(
+    source_reference: dict[str, Any],
+) -> None:
+    with pytest.raises(ValidationError):
+        SourceReference.model_validate(source_reference)
+
+
 def test_article_artifact_valid_sample_passes() -> None:
     article = NewsArticleArtifact.model_validate(article_payload())
 
     assert article.article_id == "article-1"
     assert article.cluster_id == "cluster-1"
+    assert isinstance(article.source_reference, SourceReference)
 
 
 def test_article_artifact_missing_required_field_rejected() -> None:
@@ -150,6 +220,45 @@ def test_article_artifact_missing_required_field_rejected() -> None:
 
     with pytest.raises(ValidationError) as exc_info:
         NewsArticleArtifact.model_validate(payload)
+
+    assert "source_reference" in str(exc_info.value)
+
+
+def test_article_artifact_source_reference_must_match_source_id() -> None:
+    payload = article_payload()
+    payload["source_reference"] = {
+        **SOURCE_REFERENCE,
+        "source_id": "other-source",
+    }
+
+    with pytest.raises(ValidationError) as exc_info:
+        NewsArticleArtifact.model_validate(payload)
+
+    assert "source_reference.source_id must match source_id" in str(exc_info.value)
+
+
+@pytest.mark.parametrize(
+    "model_type,payload_factory",
+    [
+        (NewsArticleArtifact, article_payload),
+        (NewsFactCandidate, fact_payload),
+        (NewsSignalCandidate, signal_payload),
+        (NewsGraphDeltaCandidate, graph_payload),
+    ],
+)
+@pytest.mark.parametrize("source_reference", [{}, malformed_source_reference_payload()])
+def test_contract_models_reject_empty_or_malformed_source_reference(
+    model_type: type[
+        NewsArticleArtifact | NewsFactCandidate | NewsSignalCandidate | NewsGraphDeltaCandidate
+    ],
+    payload_factory: Callable[[], dict[str, Any]],
+    source_reference: dict[str, Any],
+) -> None:
+    payload = payload_factory()
+    payload["source_reference"] = source_reference
+
+    with pytest.raises(ValidationError) as exc_info:
+        model_type.model_validate(payload)
 
     assert "source_reference" in str(exc_info.value)
 

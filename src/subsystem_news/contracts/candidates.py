@@ -3,11 +3,12 @@
 from __future__ import annotations
 
 from datetime import datetime
-from typing import Any, Literal
+from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 from subsystem_news.contracts.evidence import EvidenceSpan
+from subsystem_news.contracts.source_reference import SourceReference
 from subsystem_news.contracts.taxonomy import (
     DeltaAction,
     Direction,
@@ -65,7 +66,7 @@ class NewsFactCandidate(_EvidenceRequiredModel):
     candidate_id: str
     article_id: str
     cluster_id: str | None
-    source_reference: dict[str, Any]
+    source_reference: SourceReference
     fact_type: FactType
     summary: str
     involved_entities: list[InvolvedEntity]
@@ -83,7 +84,7 @@ class NewsSignalCandidate(_EvidenceRequiredModel):
     candidate_id: str
     article_id: str
     cluster_id: str | None
-    source_reference: dict[str, Any]
+    source_reference: SourceReference
     signal_type: SignalType
     direction: Direction
     magnitude: str | float
@@ -102,7 +103,7 @@ class NewsGraphDeltaCandidate(_EvidenceRequiredModel):
 
     candidate_id: str
     article_id: str
-    source_reference: dict[str, Any]
+    source_reference: SourceReference
     subject_entity: InvolvedEntity
     relation_type: RelationType
     object_entity: InvolvedEntity
