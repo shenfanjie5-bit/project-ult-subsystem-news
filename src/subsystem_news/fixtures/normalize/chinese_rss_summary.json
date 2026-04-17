@@ -1,0 +1,19 @@
+{
+  "source_reference": {
+    "source_id": "china-rss",
+    "url": "https://cn.example.com/rss/article-88",
+    "provider_key": "cn-rss-88",
+    "original_locator": {
+      "locator_type": "rss_guid",
+      "locator_value": "cn-rss-88"
+    }
+  },
+  "title": "  宁德时代发布新储能订单  ",
+  "summary": "宁德时代公告称，公司获得一份新的储能系统订单，交付将从今年下半年开始。",
+  "published_at": "Thu, 15 Jan 2026 10:30:00 GMT",
+  "fetched_at": "2026-01-15T10:40:00Z",
+  "author_or_channel": "财经频道",
+  "license_tag": "rss-summary",
+  "reliability_tier": "B",
+  "source_language": "zh"
+}

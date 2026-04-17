@@ -1,0 +1,21 @@
+{
+  "source_reference": {
+    "source_id": "global-wire-rss",
+    "url": "https://news.example.com/articles/acme-contract",
+    "provider_key": "wire-acme-contract",
+    "original_locator": {
+      "locator_type": "rss_guid",
+      "locator_value": "wire-acme-contract"
+    }
+  },
+  "title": " Acme &amp; Globex sign a supply contract ",
+  "raw_body": "Acme Corp announced a new supply contract with Globex Inc.\n\nThe agreement expands battery module shipments in 2026.",
+  "raw_html": "<article><p>This HTML copy must not be selected.</p></article>",
+  "summary": "A shorter summary that must not be selected.",
+  "published_at": "2026-01-15T10:30:00Z",
+  "fetched_at": "2026-01-15T10:35:00Z",
+  "author_or_channel": " Markets Desk ",
+  "license_tag": "licensed-wire",
+  "reliability_tier": "A",
+  "source_language": "en"
+}
