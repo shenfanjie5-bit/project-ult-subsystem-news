@@ -1,0 +1,13 @@
+{
+  "articles": [
+    {
+      "id": "filing-2026-0001",
+      "url": "https://filings.example.com/articles/filing-2026-0001",
+      "title": "Globex files acquisition notice",
+      "published_at": "2026-01-17T13:20:00Z",
+      "body": "Globex Inc filed a notice for a proposed acquisition of a battery software supplier.",
+      "summary": "Globex filed a proposed acquisition notice.",
+      "author_or_channel": "Filings API"
+    }
+  ]
+}

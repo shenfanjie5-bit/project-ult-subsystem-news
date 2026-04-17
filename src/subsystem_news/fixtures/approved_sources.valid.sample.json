@@ -1,0 +1,35 @@
+[
+  {
+    "source_id": "global-wire-rss",
+    "display_name": "Global Wire RSS",
+    "access_mode": "rss",
+    "base_url": "https://news.example.com/rss",
+    "approved": true,
+    "reliability_tier": "A",
+    "license_tag": "licensed-wire",
+    "language": "en",
+    "credential_ref": null
+  },
+  {
+    "source_id": "market-filings-api",
+    "display_name": "Market Filings API",
+    "access_mode": "api",
+    "base_url": "https://filings.example.com/api/news",
+    "approved": true,
+    "reliability_tier": "A",
+    "license_tag": "licensed-api",
+    "language": "en",
+    "credential_ref": "secret://news/market-filings"
+  },
+  {
+    "source_id": "site-html",
+    "display_name": "Static Market Site",
+    "access_mode": "site_html",
+    "base_url": "https://site.example.com/markets/plant-update",
+    "approved": true,
+    "reliability_tier": "B",
+    "license_tag": "site-terms",
+    "language": "en",
+    "credential_ref": null
+  }
+]

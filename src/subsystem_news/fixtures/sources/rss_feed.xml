@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>Global Wire</title>
+    <item>
+      <guid>wire-acme-contract</guid>
+      <link>https://news.example.com/articles/acme-contract</link>
+      <title>Acme signs a supply contract</title>
+      <pubDate>Thu, 15 Jan 2026 10:30:00 GMT</pubDate>
+      <description>Acme Corp announced a new supply agreement with Globex.</description>
+      <content:encoded>Acme Corp announced a new supply contract with Globex Inc.</content:encoded>
+      <dc:creator>Markets Desk</dc:creator>
+    </item>
+    <item>
+      <guid>wire-north-river-restart</guid>
+      <link>https://news.example.com/articles/north-river-restart</link>
+      <title>North River Metals restarts nickel plant</title>
+      <pubDate>Fri, 16 Jan 2026 09:00:00 GMT</pubDate>
+      <description>North River Metals restarted its nickel plant.</description>
+      <content:encoded>Management said output should recover this quarter.</content:encoded>
+      <dc:creator>Commodities Desk</dc:creator>
+    </item>
+  </channel>
+</rss>
