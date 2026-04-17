@@ -8,10 +8,22 @@ version = "0.1.0"
 description = "Scaffold workspace for subsystem-news."
 readme = "README.md"
 requires-python = ">=3.11"
-dependencies = []
+dependencies = [
+    "pydantic>=2.6",
+]
 
 [tool.setuptools]
-packages = []
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["subsystem_news*"]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8",
+    "pytest-cov>=5",
+]
 
 [tool.pytest.ini_options]
 addopts = "-q"
