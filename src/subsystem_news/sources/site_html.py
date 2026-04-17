@@ -103,13 +103,15 @@ class SiteHtmlSourceAdapter:
         *,
         transport: HttpTransport | None = None,
     ) -> RawArticleFetch:
-        if ref.url is None:
-            raise ContractViolationError("site_html reference requires url")
+        approved_url = _approved_page_url(source)
+        _validate_approved_reference(ref, source, approved_url)
 
         http = transport or UrllibHttpTransport()
-        response = http.get(ref.url)
+        response = http.get(approved_url)
         if response.status_code >= 400:
             raise ContractViolationError(f"site_html source returned status {response.status_code}")
+        if response.url != approved_url:
+            raise ContractViolationError("site_html redirect target must match approved base_url")
 
         parser = _TitleAndBodyParser()
         parser.feed(response.text)
@@ -140,3 +142,25 @@ class SiteHtmlSourceAdapter:
             content_hash=content_hash,
             trace_id=trace_id_for(source.source_id, content_hash, fetched_at),
         )
+
+
+def _approved_page_url(source: NewsSourceConfig) -> str:
+    return str(source.base_url)
+
+
+def _validate_approved_reference(
+    ref: NewsArticleRef,
+    source: NewsSourceConfig,
+    approved_url: str,
+) -> None:
+    if ref.source_id != source.source_id:
+        raise ContractViolationError("site_html reference source_id must match source")
+    if ref.url is None:
+        raise ContractViolationError("site_html reference requires url")
+    if ref.url != approved_url:
+        raise ContractViolationError("site_html reference url must match approved base_url")
+    if ref.source_reference.url is None or str(ref.source_reference.url) != approved_url:
+        raise ContractViolationError("site_html source_reference url must match approved base_url")
+    locator = ref.source_reference.original_locator
+    if locator.locator_type != "page_url" or locator.locator_value != approved_url:
+        raise ContractViolationError("site_html original locator must match approved base_url")

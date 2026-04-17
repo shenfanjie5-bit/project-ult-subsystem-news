@@ -65,6 +65,17 @@ class DuplicateAdapter:
         raise NotImplementedError
 
 
+class RejectingTransport:
+    def get(
+        self,
+        url: str,
+        *,
+        headers: Mapping[str, str] | None = None,
+    ) -> HttpResponse:
+        del url, headers
+        raise AssertionError("transport should not be called")
+
+
 def load_configs() -> list[NewsSourceConfig]:
     return load_allowlist(FIXTURE_ROOT / "approved_sources.valid.sample.json")
 
@@ -182,6 +193,53 @@ def test_site_html_adapter_fetches_raw_html_and_title_hint() -> None:
     assert "North River Metals restarted its nickel plant" in (fetch.raw_body or "")
 
 
+def test_site_html_adapter_rejects_url_outside_approved_base_before_network() -> None:
+    configs = [config_by_id(load_configs(), "site-html")]
+    unapproved_url = "https://evil.example.com/markets/plant-update"
+    source_reference = SourceReference.model_validate(
+        {
+            "source_id": "site-html",
+            "url": unapproved_url,
+            "provider_key": None,
+            "original_locator": {
+                "locator_type": "page_url",
+                "locator_value": unapproved_url,
+            },
+        }
+    )
+    ref = NewsArticleRef(
+        source_id="site-html",
+        source_reference=source_reference,
+        url=unapproved_url,
+    )
+
+    with pytest.raises(ContractViolationError, match="approved base_url"):
+        fetch_article_body(ref, configs, transport=RejectingTransport())
+
+
+def test_site_html_adapter_rejects_redirect_outside_approved_base_url() -> None:
+    configs = [config_by_id(load_configs(), "site-html")]
+    ref = discover_articles(configs, transport=transport())[0]
+
+    class RedirectTransport:
+        def get(
+            self,
+            url: str,
+            *,
+            headers: Mapping[str, str] | None = None,
+        ) -> HttpResponse:
+            del url, headers
+            return HttpResponse(
+                url="https://evil.example.com/redirected",
+                status_code=200,
+                text=(SOURCE_FIXTURE_ROOT / "site_page.html").read_text(encoding="utf-8"),
+                headers={},
+            )
+
+    with pytest.raises(ContractViolationError, match="redirect target"):
+        fetch_article_body(ref, configs, transport=RedirectTransport())
+
+
 def test_fetch_trace_round_trip_excludes_body_text(tmp_path: Path) -> None:
     configs = [config_by_id(load_configs(), "market-filings-api")]
     ref = discover_articles(configs, transport=transport())[0]
@@ -196,6 +254,19 @@ def test_fetch_trace_round_trip_excludes_body_text(tmp_path: Path) -> None:
     assert restored.content_hash == fetch.content_hash
     assert "Globex Inc filed a notice" not in trace_json
     assert "summary" not in trace_json
+
+
+def test_write_fetch_trace_rejects_path_traversal_trace_id(tmp_path: Path) -> None:
+    configs = [config_by_id(load_configs(), "market-filings-api")]
+    ref = discover_articles(configs, transport=transport())[0]
+    fetch = fetch_article_body(ref, configs, transport=transport())
+    malformed_fetch = fetch.model_copy(update={"trace_id": "../outside"})
+    trace_dir = tmp_path / "traces"
+
+    with pytest.raises(ContractViolationError, match="unsafe fetch trace_id"):
+        write_fetch_trace(malformed_fetch, trace_dir)
+
+    assert not (tmp_path / "outside.json").exists()
 
 
 def test_fetch_article_body_rejects_adapter_source_reference_drift() -> None:
