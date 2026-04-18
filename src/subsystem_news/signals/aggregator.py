@@ -2,12 +2,18 @@
 
 from __future__ import annotations
 
+import hashlib
+import json
 from collections import OrderedDict
 from collections.abc import Sequence
 
 from pydantic import ValidationError
 
-from subsystem_news.contracts.candidates import NewsFactCandidate, NewsSignalCandidate
+from subsystem_news.contracts.candidates import (
+    InvolvedEntity,
+    NewsFactCandidate,
+    NewsSignalCandidate,
+)
 from subsystem_news.errors import ContractViolationError
 from subsystem_news.extract.runtime_client import ReasonerRuntimeClient
 from subsystem_news.extract.schema_pin import SchemaPin
@@ -64,15 +70,12 @@ def aggregate_cluster_signals(
     *,
     max_per_cluster_signal_type: int = 1,
 ) -> list[NewsSignalCandidate]:
-    """Keep the highest-confidence signals per cluster and signal type."""
+    """Keep the highest-confidence semantic duplicates per cluster."""
 
     if max_per_cluster_signal_type < 1:
         raise ValueError("max_per_cluster_signal_type must be at least 1")
 
-    grouped: OrderedDict[
-        tuple[str, str, str],
-        list[NewsSignalCandidate],
-    ] = OrderedDict()
+    grouped: OrderedDict[tuple[object, ...], list[NewsSignalCandidate]] = OrderedDict()
     for signal in signals:
         group_key = _aggregation_key(signal)
         grouped.setdefault(group_key, []).append(signal)
@@ -130,10 +133,49 @@ def _signal_candidate_id(
     return f"signal:{fact.candidate_id}:{judgement.signal_type}"
 
 
-def _aggregation_key(signal: NewsSignalCandidate) -> tuple[str, str, str]:
+def _aggregation_key(signal: NewsSignalCandidate) -> tuple[object, ...]:
     if signal.cluster_id is None:
-        return ("article", signal.article_id, signal.signal_type)
-    return ("cluster", signal.cluster_id, signal.signal_type)
+        identity_scope = ("article", signal.article_id)
+    else:
+        identity_scope = ("cluster", signal.cluster_id)
+
+    return (
+        *identity_scope,
+        signal.signal_type,
+        signal.direction,
+        _affected_entities_key(signal.affected_entities),
+        _evidence_key(signal),
+    )
+
+
+def _affected_entities_key(
+    affected_entities: Sequence[InvolvedEntity],
+) -> tuple[tuple[str, str, str], ...]:
+    return tuple(sorted(_entity_key(entity) for entity in affected_entities))
+
+
+def _entity_key(entity: InvolvedEntity) -> tuple[str, str, str]:
+    type_hint = _normalize_key_text(entity.type_hint)
+    if entity.canonical_id is not None:
+        return ("canonical", _normalize_key_text(entity.canonical_id), type_hint)
+    return (
+        entity.resolution_status,
+        _normalize_key_text(entity.mention_text),
+        type_hint,
+    )
+
+
+def _evidence_key(signal: NewsSignalCandidate) -> str:
+    evidence_payload = sorted(
+        (span.locator, _normalize_key_text(span.quote))
+        for span in signal.evidence_spans
+    )
+    encoded = json.dumps(evidence_payload, ensure_ascii=True, separators=(",", ":"))
+    return hashlib.sha256(encoded.encode("utf-8")).hexdigest()
+
+
+def _normalize_key_text(value: str) -> str:
+    return " ".join(value.split()).casefold()
 
 
 __all__ = [
