@@ -1,10 +1,11 @@
 from __future__ import annotations
 
+import json
 from collections.abc import Mapping, Sequence
 from pathlib import Path
 from typing import Any
 
-from subsystem_news.contracts import load_allowlist
+from subsystem_news.contracts import NewsSourceConfig, load_allowlist
 from subsystem_news.dedupe.store import DedupeStore
 from subsystem_news.entities.resolver_client import RegistryLookup, StubEntityRegistryClient
 from subsystem_news.extract.runtime_client import StructuredGenerationRequest
@@ -127,6 +128,19 @@ class FakeReasonerRuntimeClient:
         }
 
 
+class HighConfidenceUnresolvedBoundaryReasoner(FakeReasonerRuntimeClient):
+    def _fact_payload(self, request: StructuredGenerationRequest) -> dict[str, object]:
+        payload = super()._fact_payload(request)
+        payload.update(
+            {
+                "candidate_id": "fact:north-river-unresolved-boundary",
+                "fact_type": "product",
+                "confidence": 0.82,
+            }
+        )
+        return payload
+
+
 class FakeSdkClient:
     def __init__(self) -> None:
         self.calls: list[list[CandidatePayload]] = []
@@ -196,6 +210,77 @@ def test_milestone3_pipeline_runs_sources_to_submit_and_trace(tmp_path: Path) ->
 
     trace_path = Path(result.trace_path or "")
     assert load_pipeline_trace(trace_path) == result
+
+
+def test_pipeline_submits_unresolved_ex1_only_without_ex2_promotion(
+    tmp_path: Path,
+) -> None:
+    source = NewsSourceConfig.model_validate(
+        {
+            "source_id": "runtime-unresolved-api",
+            "display_name": "Runtime Unresolved API",
+            "access_mode": "api",
+            "base_url": "https://runtime.example.com/api/unresolved",
+            "approved": True,
+            "reliability_tier": "A",
+            "license_tag": "runtime-fixture",
+            "language": "en",
+            "credential_ref": None,
+        }
+    )
+    sdk_client = FakeSdkClient()
+    reasoner_client = HighConfidenceUnresolvedBoundaryReasoner()
+    pipeline = Pipeline(
+        configs=[source],
+        artifact_store=ArtifactStore(tmp_path / "artifacts"),
+        dedupe_store=DedupeStore(tmp_path / "dedupe"),
+        entity_client=StubEntityRegistryClient(),
+        reasoner_client=reasoner_client,
+        sdk_client=sdk_client,
+        trace_dir=tmp_path / "trace",
+        transport=StaticTransport(
+            {
+                str(source.base_url): json.dumps(
+                    {
+                        "articles": [
+                            {
+                                "id": "runtime-north-river-unresolved",
+                                "url": "https://runtime.example.com/articles/north-river-unresolved",
+                                "title": "North River Metals schedules maintenance",
+                                "published_at": "2026-02-01T10:00:00Z",
+                                "body": (
+                                    "North River Metals scheduled routine maintenance "
+                                    "at its nickel plant next month."
+                                ),
+                                "summary": "North River scheduled maintenance.",
+                                "author_or_channel": "Runtime Desk",
+                            }
+                        ]
+                    }
+                )
+            }
+        ),
+    )
+
+    result = pipeline.run()
+
+    assert result.error_count == 0
+    assert len(sdk_client.calls) == 1
+    submitted = sdk_client.calls[0]
+    facts = [candidate for candidate in submitted if candidate.export_contract == "Ex-1"]
+    signals = [candidate for candidate in submitted if candidate.export_contract == "Ex-2"]
+    assert len(facts) == 1
+    assert signals == []
+    assert all(
+        entity.resolution_status == "unresolved"
+        for entity in facts[0].involved_entities
+    )
+
+    context = result.article_results[0].context
+    assert context is not None
+    assert context.extract_metadata["fact_count"] == 1
+    assert context.signal_metadata == {"signal_count": 0}
+    assert {request.contract for request in reasoner_client.requests} == {"Ex-1", "Ex-3"}
 
 
 def test_pipeline_idempotency_skips_candidates_submitted_by_previous_trace(

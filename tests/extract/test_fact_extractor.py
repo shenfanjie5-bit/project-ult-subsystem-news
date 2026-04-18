@@ -255,6 +255,29 @@ def test_extract_facts_returns_empty_without_calling_runtime_when_entities_are_e
     assert client.requests == []
 
 
+def test_extract_facts_accepts_explicit_empty_facts_list() -> None:
+    article, cluster, entity_resolution, _ = load_fact_input()
+    client = FakeReasonerRuntimeClient({"facts": []})
+
+    assert extract_facts(article, cluster, entity_resolution, client) == []
+    assert client.requests
+
+
+@pytest.mark.parametrize("response", [{}, {"facts": None}])
+def test_extract_facts_rejects_missing_or_null_runtime_facts(
+    response: Mapping[str, object],
+) -> None:
+    article, cluster, entity_resolution, _ = load_fact_input()
+
+    with pytest.raises(ContractViolationError, match="facts"):
+        extract_facts(
+            article,
+            cluster,
+            entity_resolution,
+            FakeReasonerRuntimeClient(response),
+        )
+
+
 def test_extract_facts_rejects_runtime_extra_fields_and_fabricated_entities() -> None:
     article, cluster, entity_resolution, response = load_fact_input()
     extra_field = copy.deepcopy(response)
@@ -316,11 +339,22 @@ def test_extract_facts_rejects_non_representative_article_cluster_mismatch() -> 
         )
 
 
-def test_all_unresolved_boundary_does_not_emit_high_confidence_fact() -> None:
+def test_all_unresolved_boundary_emits_traceable_ex1_fact() -> None:
     article, cluster, entity_resolution, response = load_fact_input(
         "all_unresolved_boundary.json"
     )
     client = FakeReasonerRuntimeClient(response)
 
-    assert extract_facts(article, cluster, entity_resolution, client) == []
+    candidates = extract_facts(article, cluster, entity_resolution, client)
+
+    assert len(candidates) == 1
+    candidate = candidates[0]
+    assert candidate.export_contract == "Ex-1"
+    assert candidate.source_reference == article.source_reference
+    assert candidate.evidence_spans[0].quote == article.body_text
+    assert candidate.involved_entities == [
+        entity_resolution.resolved_mentions[0].entity
+    ]
+    assert candidate.involved_entities[0].resolution_status == "unresolved"
+    assert candidate.involved_entities[0].canonical_id is None
     assert client.requests

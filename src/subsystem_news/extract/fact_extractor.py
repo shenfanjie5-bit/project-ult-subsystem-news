@@ -74,11 +74,6 @@ def extract_facts(
     request = build_fact_extraction_request(extraction_input, schema_pin=schema_pin)
     response = client.generate_structured(request)
     drafts = _candidate_drafts(response)
-    has_resolved_entity = any(
-        resolved.entity.resolution_status == "resolved"
-        for resolved in entity_resolution.resolved_mentions
-        if _entity_key(resolved.entity) in allowed_entities
-    )
 
     candidates: list[NewsFactCandidate] = []
     for draft in drafts:
@@ -87,8 +82,6 @@ def extract_facts(
 
         confidence = _coerce_confidence(draft.get("confidence"))
         if confidence < min_confidence:
-            continue
-        if not has_resolved_entity and confidence >= 0.45:
             continue
 
         raw_spans = draft.get("evidence_spans")
@@ -125,16 +118,12 @@ def extract_facts(
 
 
 def _candidate_drafts(response: Mapping[str, object]) -> list[object]:
-    for key in ("facts", "fact_candidates", "candidates"):
-        if key not in response:
-            continue
-        raw = response[key]
-        if raw is None:
-            return []
-        if not isinstance(raw, Sequence) or isinstance(raw, str | bytes):
-            raise ContractViolationError(f"runtime response field {key} must be a list")
-        return list(raw)
-    return []
+    if "facts" not in response:
+        raise ContractViolationError("runtime response must include facts list")
+    raw = response["facts"]
+    if raw is None or not isinstance(raw, Sequence) or isinstance(raw, str | bytes):
+        raise ContractViolationError("runtime response field facts must be a list")
+    return list(raw)
 
 
 def _coerce_confidence(raw_confidence: object) -> float:
