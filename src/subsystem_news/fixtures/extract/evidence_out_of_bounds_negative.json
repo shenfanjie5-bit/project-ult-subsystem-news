@@ -1,0 +1,30 @@
+{
+  "runtime_response": {
+    "facts": [
+      {
+        "candidate_id": "fact-bad-evidence-1",
+        "fact_type": "contract",
+        "summary": "Acme Corp signed a supply contract.",
+        "involved_entities": [
+          {
+            "mention_text": "Acme Corp",
+            "canonical_id": "entity:acme",
+            "resolution_status": "resolved",
+            "type_hint": "company"
+          }
+        ],
+        "event_time": null,
+        "evidence_spans": [
+          {
+            "article_id": "article-acme-1",
+            "start_char": 0,
+            "end_char": 999,
+            "quote": "Acme Corp signed a supply contract.",
+            "locator": "body"
+          }
+        ],
+        "confidence": 0.82
+      }
+    ]
+  }
+}

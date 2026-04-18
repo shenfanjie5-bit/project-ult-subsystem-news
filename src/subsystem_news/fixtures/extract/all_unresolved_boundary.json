@@ -1,0 +1,176 @@
+{
+  "article": {
+    "article_id": "article-mercury-1",
+    "source_id": "topic-wire-rss",
+    "source_reference": {
+      "source_id": "topic-wire-rss",
+      "url": "https://topic.example.com/mercury-storage-update",
+      "provider_key": "topic-mercury-storage",
+      "original_locator": {
+        "locator_type": "rss_guid",
+        "locator_value": "topic-mercury-storage"
+      }
+    },
+    "title": "Mercury Energy posts storage update",
+    "body_text": "Mercury Energy announced an update about energy storage systems without naming a customer.",
+    "published_at": "2026-05-02T14:00:00Z",
+    "fetched_at": "2026-05-02T14:01:00Z",
+    "language": "en",
+    "author_or_channel": "Topic Desk",
+    "content_hash": "sha256:mercury-storage",
+    "article_fingerprint": "sha256:mercury-storage-fp",
+    "license_tag": "licensed-wire",
+    "reliability_tier": "C",
+    "cluster_id": "cluster-mercury-storage"
+  },
+  "cluster": {
+    "cluster_id": "cluster-mercury-storage",
+    "representative_article_id": "article-mercury-1",
+    "member_article_ids": ["article-mercury-1"],
+    "canonical_headline": "Mercury Energy posts storage update",
+    "first_published_at": "2026-05-02T14:00:00Z",
+    "source_count": 1,
+    "fingerprint_family": "sha256:mercury-storage-family",
+    "cluster_confidence": 1.0
+  },
+  "entity_resolution": {
+    "mentions": [
+      {
+        "article_id": "article-mercury-1",
+        "text": "Mercury Energy",
+        "start_char": 0,
+        "end_char": 14,
+        "locator": "body",
+        "type_hint": "company",
+        "context": "Mercury Energy announced an update about energy storage systems without naming a customer.",
+        "source_reference": {
+          "source_id": "topic-wire-rss",
+          "url": "https://topic.example.com/mercury-storage-update",
+          "provider_key": "topic-mercury-storage",
+          "original_locator": {
+            "locator_type": "rss_guid",
+            "locator_value": "topic-mercury-storage"
+          }
+        }
+      },
+      {
+        "article_id": "article-mercury-1",
+        "text": "energy storage systems",
+        "start_char": 41,
+        "end_char": 63,
+        "locator": "body",
+        "type_hint": "market_theme",
+        "context": "Mercury Energy announced an update about energy storage systems without naming a customer.",
+        "source_reference": {
+          "source_id": "topic-wire-rss",
+          "url": "https://topic.example.com/mercury-storage-update",
+          "provider_key": "topic-mercury-storage",
+          "original_locator": {
+            "locator_type": "rss_guid",
+            "locator_value": "topic-mercury-storage"
+          }
+        }
+      }
+    ],
+    "resolved_mentions": [
+      {
+        "mention": {
+          "article_id": "article-mercury-1",
+          "text": "Mercury Energy",
+          "start_char": 0,
+          "end_char": 14,
+          "locator": "body",
+          "type_hint": "company",
+          "context": "Mercury Energy announced an update about energy storage systems without naming a customer.",
+          "source_reference": {
+            "source_id": "topic-wire-rss",
+            "url": "https://topic.example.com/mercury-storage-update",
+            "provider_key": "topic-mercury-storage",
+            "original_locator": {
+              "locator_type": "rss_guid",
+              "locator_value": "topic-mercury-storage"
+            }
+          }
+        },
+        "entity": {
+          "mention_text": "Mercury Energy",
+          "canonical_id": null,
+          "resolution_status": "unresolved",
+          "type_hint": "company"
+        },
+        "resolution_source": "fallback",
+        "registry_resolution": null
+      },
+      {
+        "mention": {
+          "article_id": "article-mercury-1",
+          "text": "energy storage systems",
+          "start_char": 41,
+          "end_char": 63,
+          "locator": "body",
+          "type_hint": "market_theme",
+          "context": "Mercury Energy announced an update about energy storage systems without naming a customer.",
+          "source_reference": {
+            "source_id": "topic-wire-rss",
+            "url": "https://topic.example.com/mercury-storage-update",
+            "provider_key": "topic-mercury-storage",
+            "original_locator": {
+              "locator_type": "rss_guid",
+              "locator_value": "topic-mercury-storage"
+            }
+          }
+        },
+        "entity": {
+          "mention_text": "energy storage systems",
+          "canonical_id": null,
+          "resolution_status": "unresolved",
+          "type_hint": "market_theme"
+        },
+        "resolution_source": "fallback",
+        "registry_resolution": null
+      }
+    ],
+    "entities": [
+      {
+        "mention_text": "Mercury Energy",
+        "canonical_id": null,
+        "resolution_status": "unresolved",
+        "type_hint": "company"
+      },
+      {
+        "mention_text": "energy storage systems",
+        "canonical_id": null,
+        "resolution_status": "unresolved",
+        "type_hint": "market_theme"
+      }
+    ]
+  },
+  "runtime_response": {
+    "facts": [
+      {
+        "candidate_id": "fact-mercury-boundary-1",
+        "fact_type": "product",
+        "summary": "Mercury Energy announced an update about energy storage systems.",
+        "involved_entities": [
+          {
+            "mention_text": "Mercury Energy",
+            "canonical_id": null,
+            "resolution_status": "unresolved",
+            "type_hint": "company"
+          }
+        ],
+        "event_time": null,
+        "evidence_spans": [
+          {
+            "article_id": "article-mercury-1",
+            "start_char": 0,
+            "end_char": 90,
+            "quote": "Mercury Energy announced an update about energy storage systems without naming a customer.",
+            "locator": "body"
+          }
+        ],
+        "confidence": 0.81
+      }
+    ]
+  }
+}

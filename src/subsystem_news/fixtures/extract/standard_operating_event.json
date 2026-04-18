@@ -1,0 +1,234 @@
+{
+  "article": {
+    "article_id": "article-acme-1",
+    "source_id": "global-wire-rss",
+    "source_reference": {
+      "source_id": "global-wire-rss",
+      "url": "https://news.example.com/acme-contract",
+      "provider_key": "wire-acme-contract",
+      "original_locator": {
+        "locator_type": "rss_guid",
+        "locator_value": "wire-acme-contract"
+      }
+    },
+    "title": "Acme signs battery supply contract",
+    "body_text": "Acme Corp signed a three-year battery module supply contract with Globex Inc. Deliveries begin in May.",
+    "published_at": "2026-01-15T10:00:00Z",
+    "fetched_at": "2026-01-15T10:05:00Z",
+    "language": "en",
+    "author_or_channel": "Markets Desk",
+    "content_hash": "sha256:acme-contract",
+    "article_fingerprint": "sha256:acme-contract-fp",
+    "license_tag": "licensed-wire",
+    "reliability_tier": "A",
+    "cluster_id": "cluster-acme-contract"
+  },
+  "cluster": {
+    "cluster_id": "cluster-acme-contract",
+    "representative_article_id": "article-acme-1",
+    "member_article_ids": ["article-acme-1", "article-acme-copy"],
+    "canonical_headline": "Acme signs battery supply contract",
+    "first_published_at": "2026-01-15T10:00:00Z",
+    "source_count": 2,
+    "fingerprint_family": "sha256:acme-contract-family",
+    "cluster_confidence": 0.94
+  },
+  "entity_resolution": {
+    "mentions": [
+      {
+        "article_id": "article-acme-1",
+        "text": "Acme Corp",
+        "start_char": 0,
+        "end_char": 9,
+        "locator": "body",
+        "type_hint": "company",
+        "context": "Acme Corp signed a three-year battery module supply contract with Globex Inc.",
+        "source_reference": {
+          "source_id": "global-wire-rss",
+          "url": "https://news.example.com/acme-contract",
+          "provider_key": "wire-acme-contract",
+          "original_locator": {
+            "locator_type": "rss_guid",
+            "locator_value": "wire-acme-contract"
+          }
+        }
+      },
+      {
+        "article_id": "article-acme-1",
+        "text": "battery module supply contract",
+        "start_char": 30,
+        "end_char": 60,
+        "locator": "body",
+        "type_hint": "market_theme",
+        "context": "Acme Corp signed a three-year battery module supply contract with Globex Inc.",
+        "source_reference": {
+          "source_id": "global-wire-rss",
+          "url": "https://news.example.com/acme-contract",
+          "provider_key": "wire-acme-contract",
+          "original_locator": {
+            "locator_type": "rss_guid",
+            "locator_value": "wire-acme-contract"
+          }
+        }
+      },
+      {
+        "article_id": "article-acme-1",
+        "text": "Globex Inc",
+        "start_char": 66,
+        "end_char": 76,
+        "locator": "body",
+        "type_hint": "company",
+        "context": "Acme Corp signed a three-year battery module supply contract with Globex Inc.",
+        "source_reference": {
+          "source_id": "global-wire-rss",
+          "url": "https://news.example.com/acme-contract",
+          "provider_key": "wire-acme-contract",
+          "original_locator": {
+            "locator_type": "rss_guid",
+            "locator_value": "wire-acme-contract"
+          }
+        }
+      }
+    ],
+    "resolved_mentions": [
+      {
+        "mention": {
+          "article_id": "article-acme-1",
+          "text": "Acme Corp",
+          "start_char": 0,
+          "end_char": 9,
+          "locator": "body",
+          "type_hint": "company",
+          "context": "Acme Corp signed a three-year battery module supply contract with Globex Inc.",
+          "source_reference": {
+            "source_id": "global-wire-rss",
+            "url": "https://news.example.com/acme-contract",
+            "provider_key": "wire-acme-contract",
+            "original_locator": {
+              "locator_type": "rss_guid",
+              "locator_value": "wire-acme-contract"
+            }
+          }
+        },
+        "entity": {
+          "mention_text": "Acme Corp",
+          "canonical_id": "entity:acme",
+          "resolution_status": "resolved",
+          "type_hint": "company"
+        },
+        "resolution_source": "quick_path",
+        "registry_resolution": null
+      },
+      {
+        "mention": {
+          "article_id": "article-acme-1",
+          "text": "battery module supply contract",
+          "start_char": 30,
+          "end_char": 60,
+          "locator": "body",
+          "type_hint": "market_theme",
+          "context": "Acme Corp signed a three-year battery module supply contract with Globex Inc.",
+          "source_reference": {
+            "source_id": "global-wire-rss",
+            "url": "https://news.example.com/acme-contract",
+            "provider_key": "wire-acme-contract",
+            "original_locator": {
+              "locator_type": "rss_guid",
+              "locator_value": "wire-acme-contract"
+            }
+          }
+        },
+        "entity": {
+          "mention_text": "battery module supply contract",
+          "canonical_id": null,
+          "resolution_status": "unresolved",
+          "type_hint": "market_theme"
+        },
+        "resolution_source": "fallback",
+        "registry_resolution": null
+      },
+      {
+        "mention": {
+          "article_id": "article-acme-1",
+          "text": "Globex Inc",
+          "start_char": 66,
+          "end_char": 76,
+          "locator": "body",
+          "type_hint": "company",
+          "context": "Acme Corp signed a three-year battery module supply contract with Globex Inc.",
+          "source_reference": {
+            "source_id": "global-wire-rss",
+            "url": "https://news.example.com/acme-contract",
+            "provider_key": "wire-acme-contract",
+            "original_locator": {
+              "locator_type": "rss_guid",
+              "locator_value": "wire-acme-contract"
+            }
+          }
+        },
+        "entity": {
+          "mention_text": "Globex Inc",
+          "canonical_id": "entity:globex",
+          "resolution_status": "resolved",
+          "type_hint": "company"
+        },
+        "resolution_source": "quick_path",
+        "registry_resolution": null
+      }
+    ],
+    "entities": [
+      {
+        "mention_text": "Acme Corp",
+        "canonical_id": "entity:acme",
+        "resolution_status": "resolved",
+        "type_hint": "company"
+      },
+      {
+        "mention_text": "battery module supply contract",
+        "canonical_id": null,
+        "resolution_status": "unresolved",
+        "type_hint": "market_theme"
+      },
+      {
+        "mention_text": "Globex Inc",
+        "canonical_id": "entity:globex",
+        "resolution_status": "resolved",
+        "type_hint": "company"
+      }
+    ]
+  },
+  "runtime_response": {
+    "facts": [
+      {
+        "candidate_id": "fact-acme-contract-1",
+        "fact_type": "contract",
+        "summary": "Acme Corp signed a three-year battery module supply contract with Globex Inc.",
+        "involved_entities": [
+          {
+            "mention_text": "Acme Corp",
+            "canonical_id": "entity:acme",
+            "resolution_status": "resolved",
+            "type_hint": "company"
+          },
+          {
+            "mention_text": "Globex Inc",
+            "canonical_id": "entity:globex",
+            "resolution_status": "resolved",
+            "type_hint": "company"
+          }
+        ],
+        "event_time": null,
+        "evidence_spans": [
+          {
+            "article_id": "article-acme-1",
+            "start_char": 0,
+            "end_char": 77,
+            "quote": "Acme Corp signed a three-year battery module supply contract with Globex Inc.",
+            "locator": "body"
+          }
+        ],
+        "confidence": 0.86
+      }
+    ]
+  }
+}

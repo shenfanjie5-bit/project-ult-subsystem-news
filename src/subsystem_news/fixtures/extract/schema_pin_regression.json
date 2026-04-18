@@ -1,0 +1,8 @@
+{
+  "expected_schema_pin": {
+    "schema_name": "news_fact_candidate",
+    "schema_version": "news_fact_candidate.v1",
+    "contract": "Ex-1",
+    "model_output_version": "news_fact_candidate.output.v1"
+  }
+}

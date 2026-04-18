@@ -1,0 +1,77 @@
+{
+  "article": {
+    "article_id": "article-contoso-1",
+    "source_id": "global-wire-rss",
+    "source_reference": {
+      "source_id": "global-wire-rss",
+      "url": "https://news.example.com/contoso-components",
+      "provider_key": "wire-contoso-components",
+      "original_locator": {
+        "locator_type": "rss_guid",
+        "locator_value": "wire-contoso-components"
+      }
+    },
+    "title": "Contoso signs component supply agreement",
+    "body_text": "Contoso Corp said it signed a long-term component supply agreement with Fabrikam Ltd. The agreement covers battery modules from 2026.",
+    "published_at": "2026-03-11T12:00:00Z",
+    "fetched_at": "2026-03-11T12:03:00Z",
+    "language": "en",
+    "author_or_channel": "Markets Desk",
+    "content_hash": "sha256:contoso-components",
+    "article_fingerprint": "sha256:contoso-components-fp",
+    "license_tag": "licensed-wire",
+    "reliability_tier": "A",
+    "cluster_id": "cluster-contoso-components"
+  },
+  "cluster": {
+    "cluster_id": "cluster-contoso-components",
+    "representative_article_id": "article-contoso-1",
+    "member_article_ids": ["article-contoso-1"],
+    "canonical_headline": "Contoso signs component supply agreement",
+    "first_published_at": "2026-03-11T12:00:00Z",
+    "source_count": 1,
+    "fingerprint_family": "sha256:contoso-components-family",
+    "cluster_confidence": 1.0
+  },
+  "runtime_response": {
+    "facts": [
+      {
+        "candidate_id": "fact-contoso-contract-1",
+        "fact_type": "contract",
+        "summary": "Contoso Corp signed a long-term component supply agreement with Fabrikam Ltd covering battery modules from 2026.",
+        "involved_entities": [
+          {
+            "mention_text": "Contoso Corp",
+            "canonical_id": "entity:contoso",
+            "resolution_status": "resolved",
+            "type_hint": "company"
+          },
+          {
+            "mention_text": "Fabrikam Ltd",
+            "canonical_id": "entity:fabrikam",
+            "resolution_status": "resolved",
+            "type_hint": "company"
+          }
+        ],
+        "event_time": null,
+        "evidence_spans": [
+          {
+            "article_id": "article-contoso-1",
+            "start_char": 0,
+            "end_char": 85,
+            "quote": "Contoso Corp said it signed a long-term component supply agreement with Fabrikam Ltd.",
+            "locator": "body"
+          },
+          {
+            "article_id": "article-contoso-1",
+            "start_char": 86,
+            "end_char": 133,
+            "quote": "The agreement covers battery modules from 2026.",
+            "locator": "body"
+          }
+        ],
+        "confidence": 0.79
+      }
+    ]
+  }
+}
