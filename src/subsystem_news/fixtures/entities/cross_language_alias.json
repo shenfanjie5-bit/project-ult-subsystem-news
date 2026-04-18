@@ -1,0 +1,24 @@
+{
+  "article_id": "article-entity-cross-language",
+  "source_id": "china-rss",
+  "source_reference": {
+    "source_id": "china-rss",
+    "url": "https://cn.example.com/rss/cross-language",
+    "provider_key": "cross-language",
+    "original_locator": {
+      "locator_type": "rss_guid",
+      "locator_value": "cross-language"
+    }
+  },
+  "title": "宁德时代获得储能系统订单",
+  "body_text": "宁德时代公告称，公司获得一份新的储能系统订单，交付将从今年下半年开始。",
+  "published_at": "2026-01-18T10:30:00Z",
+  "fetched_at": "2026-01-18T10:40:00Z",
+  "language": "zh",
+  "author_or_channel": "财经频道",
+  "content_hash": "sha256:entity-cross-language",
+  "article_fingerprint": "sha256:entity-cross-language-fingerprint",
+  "license_tag": "rss-summary",
+  "reliability_tier": "B",
+  "cluster_id": null
+}

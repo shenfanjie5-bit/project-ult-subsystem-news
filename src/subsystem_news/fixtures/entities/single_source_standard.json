@@ -1,0 +1,24 @@
+{
+  "article_id": "article-entity-standard",
+  "source_id": "global-wire-rss",
+  "source_reference": {
+    "source_id": "global-wire-rss",
+    "url": "https://news.example.com/articles/entity-standard",
+    "provider_key": "entity-standard",
+    "original_locator": {
+      "locator_type": "rss_guid",
+      "locator_value": "entity-standard"
+    }
+  },
+  "title": "Acme Corp and Globex Inc expand battery module shipments",
+  "body_text": "Acme Corp (NASDAQ:ACME) signed a supply contract with Globex Inc. CATL will provide battery modules.",
+  "published_at": "2026-01-15T10:30:00Z",
+  "fetched_at": "2026-01-15T10:35:00Z",
+  "language": "en",
+  "author_or_channel": "Markets Desk",
+  "content_hash": "sha256:entity-standard",
+  "article_fingerprint": "sha256:entity-standard-fingerprint",
+  "license_tag": "licensed-wire",
+  "reliability_tier": "A",
+  "cluster_id": null
+}
