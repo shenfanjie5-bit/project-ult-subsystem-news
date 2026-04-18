@@ -1,4 +1,4 @@
-"""Schema/version pinning for Ex-1 fact extraction."""
+"""Schema/version pinning for structured extraction requests."""
 
 from __future__ import annotations
 
@@ -8,13 +8,13 @@ from pydantic import BaseModel, ConfigDict, Field
 
 
 class SchemaPin(BaseModel):
-    """Version metadata sent with every structured Ex-1 extraction request."""
+    """Version metadata sent with every structured generation request."""
 
     model_config = ConfigDict(frozen=True, extra="forbid", str_strip_whitespace=True)
 
     schema_name: str = Field(min_length=1)
     schema_version: str = Field(min_length=1)
-    contract: Literal["Ex-1"]
+    contract: Literal["Ex-1", "Ex-2"]
     model_output_version: str = Field(min_length=1)
 
 

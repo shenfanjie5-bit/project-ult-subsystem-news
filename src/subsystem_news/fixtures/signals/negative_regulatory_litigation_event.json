@@ -1,0 +1,47 @@
+{
+  "fact": {
+    "candidate_id": "fact-northwind-litigation-1",
+    "article_id": "article-northwind-1",
+    "cluster_id": "cluster-northwind-lawsuit",
+    "source_reference": {
+      "source_id": "reg-watch-api",
+      "url": "https://reg.example.com/northwind-lawsuit",
+      "provider_key": "reg-northwind-lawsuit",
+      "original_locator": {
+        "locator_type": "api_id",
+        "locator_value": "reg-northwind-lawsuit"
+      }
+    },
+    "fact_type": "litigation",
+    "summary": "Regulators opened a lawsuit against Northwind Motors over battery disclosures.",
+    "involved_entities": [
+      {
+        "mention_text": "Northwind Motors",
+        "canonical_id": "entity:northwind-motors",
+        "resolution_status": "resolved",
+        "type_hint": "company"
+      }
+    ],
+    "event_time": null,
+    "confidence": 0.74,
+    "source_reliability_tier": "B",
+    "export_contract": "Ex-1",
+    "evidence_spans": [
+      {
+        "article_id": "article-northwind-1",
+        "start_char": 0,
+        "end_char": 75,
+        "quote": "Northwind Motors said regulators opened a lawsuit over battery disclosures.",
+        "locator": "body"
+      }
+    ]
+  },
+  "judgement": {
+    "signal_type": "event_impact",
+    "direction": "negative",
+    "impact_scope": "company",
+    "time_horizon": "medium",
+    "rationale": "A regulator-led lawsuit is a negative event impact for the company.",
+    "confidence": 0.79
+  }
+}

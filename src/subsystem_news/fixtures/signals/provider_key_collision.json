@@ -1,0 +1,78 @@
+{
+  "facts": [
+    {
+      "candidate_id": "fact-east-shared-key",
+      "article_id": "article-east-1",
+      "cluster_id": "cluster-east-contract",
+      "source_reference": {
+        "source_id": "east-wire-rss",
+        "url": "https://east.example.com/shared-key-contract",
+        "provider_key": "shared-provider-key",
+        "original_locator": {
+          "locator_type": "rss_guid",
+          "locator_value": "shared-provider-key"
+        }
+      },
+      "fact_type": "contract",
+      "summary": "East Grid signed a transformer supply contract.",
+      "involved_entities": [
+        {
+          "mention_text": "East Grid",
+          "canonical_id": "entity:east-grid",
+          "resolution_status": "resolved",
+          "type_hint": "company"
+        }
+      ],
+      "event_time": null,
+      "confidence": 0.78,
+      "source_reliability_tier": "A",
+      "export_contract": "Ex-1",
+      "evidence_spans": [
+        {
+          "article_id": "article-east-1",
+          "start_char": 0,
+          "end_char": 45,
+          "quote": "East Grid signed a transformer supply contract.",
+          "locator": "body"
+        }
+      ]
+    },
+    {
+      "candidate_id": "fact-west-shared-key",
+      "article_id": "article-west-1",
+      "cluster_id": "cluster-west-lawsuit",
+      "source_reference": {
+        "source_id": "west-reg-api",
+        "url": "https://west.example.com/shared-key-lawsuit",
+        "provider_key": "shared-provider-key",
+        "original_locator": {
+          "locator_type": "api_id",
+          "locator_value": "shared-provider-key"
+        }
+      },
+      "fact_type": "litigation",
+      "summary": "West Motors faced a new disclosure lawsuit.",
+      "involved_entities": [
+        {
+          "mention_text": "West Motors",
+          "canonical_id": "entity:west-motors",
+          "resolution_status": "resolved",
+          "type_hint": "company"
+        }
+      ],
+      "event_time": null,
+      "confidence": 0.8,
+      "source_reliability_tier": "B",
+      "export_contract": "Ex-1",
+      "evidence_spans": [
+        {
+          "article_id": "article-west-1",
+          "start_char": 0,
+          "end_char": 44,
+          "quote": "West Motors faced a new disclosure lawsuit.",
+          "locator": "body"
+        }
+      ]
+    }
+  ]
+}
