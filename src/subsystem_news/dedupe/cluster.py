@@ -239,6 +239,7 @@ def _has_exact_key_match(
         artifact_provider_key is not None
         and snapshot_provider_key is not None
         and artifact_provider_key == snapshot_provider_key
+        and artifact.source_reference.source_id == snapshot.source_reference.source_id
     ):
         return True
     snapshot_url = _normalized_url(snapshot)
