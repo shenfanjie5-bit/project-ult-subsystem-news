@@ -11,12 +11,12 @@ from collections.abc import Iterator
 from contextlib import contextmanager
 from pathlib import Path
 from typing import ClassVar
-from urllib.parse import urlsplit, urlunsplit
 
 from pydantic import ValidationError
 
 from subsystem_news.contracts.article import NewsArticleArtifact
 from subsystem_news.contracts.cluster import NewsDedupeCluster
+from subsystem_news.dedupe.identity import has_exact_key_match, select_representative_member
 from subsystem_news.dedupe.similarity import article_similarity
 from subsystem_news.errors import ContractViolationError
 
@@ -230,7 +230,7 @@ class DedupeStore:
             raise ContractViolationError(
                 "refusing to append cluster with non-canonical member ordering"
             )
-        representative = self._select_representative(members)
+        representative = select_representative_member(members)
         expected_first_published_at = min(member.published_at for member in members)
         expected_source_count = len({member.source_id for member in members})
         expected_confidence = self._expected_append_confidence(
@@ -267,7 +267,7 @@ class DedupeStore:
         confidence = existing.cluster_confidence
         for article_id in sorted(new_member_ids):
             new_member = members_by_id[article_id]
-            if any(self._has_exact_key_match(new_member, member) for member in accepted_members):
+            if any(has_exact_key_match(new_member, member) for member in accepted_members):
                 score = 1.0
             else:
                 score = max(
@@ -277,57 +277,6 @@ class DedupeStore:
             confidence = min(confidence, score)
             accepted_members.append(new_member)
         return confidence
-
-    def _has_exact_key_match(
-        self,
-        artifact: NewsArticleArtifact,
-        snapshot: NewsArticleArtifact,
-    ) -> bool:
-        artifact_provider_key = artifact.source_reference.provider_key
-        snapshot_provider_key = snapshot.source_reference.provider_key
-        if (
-            artifact_provider_key is not None
-            and snapshot_provider_key is not None
-            and artifact_provider_key == snapshot_provider_key
-        ):
-            return True
-        artifact_url = self._normalized_url(artifact)
-        snapshot_url = self._normalized_url(snapshot)
-        if artifact_url is not None and snapshot_url is not None and artifact_url == snapshot_url:
-            return True
-        if artifact.content_hash == snapshot.content_hash:
-            return True
-        return artifact.article_fingerprint == snapshot.article_fingerprint
-
-    def _normalized_url(self, artifact: NewsArticleArtifact) -> str | None:
-        if artifact.source_reference.url is None:
-            return None
-        parsed = urlsplit(str(artifact.source_reference.url))
-        path = parsed.path.rstrip("/") or "/"
-        return urlunsplit(
-            (
-                parsed.scheme.lower(),
-                parsed.netloc.lower(),
-                path,
-                parsed.query,
-                "",
-            )
-        )
-
-    def _select_representative(
-        self,
-        members: list[NewsArticleArtifact],
-    ) -> NewsArticleArtifact:
-        reliability_rank = {"A": 0, "B": 1, "C": 2}
-        return sorted(
-            members,
-            key=lambda artifact: (
-                reliability_rank[artifact.reliability_tier],
-                artifact.published_at,
-                -len(artifact.body_text),
-                artifact.article_id,
-            ),
-        )[0]
 
     def _validate_index_update(self, cluster: NewsDedupeCluster) -> None:
         index = self._load_index()

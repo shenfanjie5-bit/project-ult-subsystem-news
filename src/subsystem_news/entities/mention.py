@@ -57,7 +57,7 @@ _EN_COMPANY_SUFFIX_PATTERN = re.compile(
 _EN_INDUSTRY_NAME_PATTERN = re.compile(
     r"\b(?:[A-Z][A-Za-z0-9&.-]*\s+){1,5}"
     r"(?:Metals|Energy|Motors|Automotive|Semiconductors?|Pharma|Therapeutics|"
-    r"Bank|Airlines|Mining|Steel|Power|Holdings|Capital)\b"
+    r"Bank|Airlines|Mining|Steel|Power|Holdings|Capital|Venture)\b"
 )
 
 _STANDARD_ABBREVIATION_PATTERN = re.compile(r"\b[A-Z][A-Z0-9&]{1,6}\b")
@@ -329,8 +329,8 @@ def _sort_key(mention: Mention) -> tuple[str, int, int, int, str]:
 
 def _specificity_key(mention: Mention) -> tuple[int, int, int]:
     return (
-        mention.end_char - mention.start_char,
         _TYPE_SPECIFICITY.get(mention.type_hint, 0),
+        mention.end_char - mention.start_char,
         -mention.start_char,
     )
 

@@ -207,6 +207,8 @@ def test_milestone3_pipeline_runs_sources_to_submit_and_trace(tmp_path: Path) ->
     ]
     assert len(collision_contexts) == 2
     assert len({context.cluster_id for context in collision_contexts}) == 2
+    assert all("match_reason" in context.dedupe_metadata for context in collision_contexts)
+    assert all("cluster_confidence" in context.dedupe_metadata for context in collision_contexts)
 
     trace_path = Path(result.trace_path or "")
     assert load_pipeline_trace(trace_path) == result

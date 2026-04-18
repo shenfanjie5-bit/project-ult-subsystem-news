@@ -144,6 +144,20 @@ def test_unresolved_result_records_case_without_fabricating_canonical_id() -> No
     assert all(case.resolution_status == "unresolved" for case in client.recorded_cases)
 
 
+def test_unresolved_fallback_survives_resolution_case_record_failure() -> None:
+    article = load_article("topic_only.json")
+    client = StubEntityRegistryClient(record_exception=EntityResolutionError("trace down"))
+
+    result = resolve_detected_mentions(detect_mentions(article), client)
+
+    assert result.entities
+    assert {entity.resolution_status for entity in result.entities} == {"unresolved"}
+    assert all(entity.canonical_id is None for entity in result.entities)
+    assert result.resolved_mentions
+    assert all(resolved.trace_error is not None for resolved in result.resolved_mentions)
+    assert client.recorded_cases == []
+
+
 def test_resolve_article_entities_returns_stable_deduped_entities() -> None:
     article = load_article("single_source_standard.json")
     client = StubEntityRegistryClient(

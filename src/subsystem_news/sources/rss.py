@@ -18,7 +18,9 @@ from subsystem_news.sources.base import (
     RawArticleFetch,
     UrllibHttpTransport,
     raw_content_hash,
+    same_article_ref,
     trace_id_for,
+    validate_response_url_within_source,
 )
 
 
@@ -163,7 +165,7 @@ class RssSourceAdapter:
         transport: HttpTransport | None = None,
     ) -> RawArticleFetch:
         for entry in self._load_entries(source, transport=transport):
-            if _same_ref(entry.ref, ref):
+            if same_article_ref(entry.ref, ref):
                 return _raw_fetch_from_entry(entry, source)
         raise ContractViolationError(f"rss entry not found for source reference {ref.source_reference}")
 
@@ -177,6 +179,7 @@ class RssSourceAdapter:
         response = http.get(str(source.base_url))
         if response.status_code >= 400:
             raise ContractViolationError(f"rss source returned status {response.status_code}")
+        validate_response_url_within_source(response.url, source, adapter_name="rss")
 
         try:
             root = ElementTree.fromstring(response.text)
@@ -285,18 +288,6 @@ def _atom_entries(root: ElementTree.Element, source: NewsSourceConfig) -> list[_
             )
         )
     return entries
-
-
-def _same_ref(left: NewsArticleRef, right: NewsArticleRef) -> bool:
-    return (
-        left.source_reference == right.source_reference
-        or (
-            left.provider_key is not None
-            and right.provider_key is not None
-            and left.provider_key == right.provider_key
-        )
-        or (left.url is not None and right.url is not None and left.url == right.url)
-    )
 
 
 def _raw_fetch_from_entry(entry: _FeedEntry, source: NewsSourceConfig) -> RawArticleFetch:

@@ -356,6 +356,38 @@ def test_site_html_adapter_rejects_redirect_outside_approved_base_url() -> None:
         fetch_article_body(ref, configs, transport=RedirectTransport())
 
 
+@pytest.mark.parametrize(
+    "source_id,redirect_text",
+    [
+        ("market-filings-api", (SOURCE_FIXTURE_ROOT / "api_response.json").read_text(encoding="utf-8")),
+        ("global-wire-rss", (SOURCE_FIXTURE_ROOT / "rss_feed.xml").read_text(encoding="utf-8")),
+    ],
+)
+def test_api_and_rss_adapters_reject_redirect_outside_approved_base_url(
+    source_id: str,
+    redirect_text: str,
+) -> None:
+    configs = [config_by_id(load_configs(), source_id)]
+
+    class RedirectTransport:
+        def get(
+            self,
+            url: str,
+            *,
+            headers: Mapping[str, str] | None = None,
+        ) -> HttpResponse:
+            del url, headers
+            return HttpResponse(
+                url="https://evil.example.com/redirected",
+                status_code=200,
+                text=redirect_text,
+                headers={},
+            )
+
+    with pytest.raises(ContractViolationError, match="redirect target"):
+        discover_articles(configs, transport=RedirectTransport())
+
+
 def test_fetch_trace_round_trip_excludes_body_text(tmp_path: Path) -> None:
     configs = [config_by_id(load_configs(), "market-filings-api")]
     ref = discover_articles(configs, transport=transport())[0]

@@ -100,6 +100,35 @@ def test_dedupe_mentions_prefers_longer_more_specific_overlap() -> None:
     assert deduped == [long]
 
 
+def test_entity_mentions_outrank_longer_overlapping_market_theme() -> None:
+    article = load_article("single_source_standard.json")
+    company = Mention(
+        article_id=article.article_id,
+        text="Acme Corp",
+        start_char=0,
+        end_char=9,
+        locator="body",
+        type_hint="company",
+        context=article.body_text,
+        source_reference=article.source_reference,
+    )
+    theme = Mention(
+        article_id=article.article_id,
+        text="Acme Corp battery modules",
+        start_char=0,
+        end_char=25,
+        locator="body",
+        type_hint="market_theme",
+        context=article.body_text,
+        source_reference=article.source_reference,
+    )
+
+    deduped = dedupe_mentions([theme, company])
+
+    assert company in deduped
+    assert theme not in deduped
+
+
 @pytest.mark.parametrize(
     "payload_update",
     [

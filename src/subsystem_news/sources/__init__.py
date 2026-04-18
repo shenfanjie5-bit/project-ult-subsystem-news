@@ -8,6 +8,7 @@ from subsystem_news.sources.base import (
     RawArticleFetch,
     SourceAdapter,
     UrllibHttpTransport,
+    same_article_ref,
 )
 from subsystem_news.sources.discover import discover_articles, fetch_article_body
 from subsystem_news.sources.registry import AdapterRegistry, default_registry
@@ -26,5 +27,6 @@ __all__ = [
     "discover_articles",
     "fetch_article_body",
     "load_fetch_trace",
+    "same_article_ref",
     "write_fetch_trace",
 ]

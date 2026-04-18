@@ -31,7 +31,7 @@ def test_runtime_backend_config_reads_only_provider_neutral_env_values() -> None
     config = load_runtime_backend_config(
         {
             "SUBSYSTEM_NEWS_REASONER_BACKEND": " fake-runtime ",
-            "SUBSYSTEM_NEWS_REASONER_CONFIG_VERSION": " runtime_backend_config.test ",
+            "SUBSYSTEM_NEWS_REASONER_CONFIG_VERSION": " runtime_backend_config.v1 ",
             "SUBSYSTEM_NEWS_REASONER_PROVIDER": " managed-provider ",
             "SUBSYSTEM_NEWS_REASONER_MODEL": " stable-model ",
             "SUBSYSTEM_NEWS_REASONER_FALLBACK_BACKEND": " reasoner-runtime ",
@@ -41,7 +41,7 @@ def test_runtime_backend_config_reads_only_provider_neutral_env_values() -> None
 
     assert config == RuntimeBackendConfig(
         backend_name="fake-runtime",
-        config_version="runtime_backend_config.test",
+        config_version="runtime_backend_config.v1",
         provider="managed-provider",
         model="stable-model",
         fallback_backend="reasoner-runtime",
@@ -69,6 +69,24 @@ def test_unknown_backend_fails_closed() -> None:
         match="unknown reasoner runtime backend: not-registered",
     ):
         resolve_reasoner_client(config)
+
+
+def test_unknown_backend_config_version_fails_closed() -> None:
+    with pytest.raises(ValidationError, match="unsupported runtime backend config_version"):
+        RuntimeBackendConfig(config_version="runtime_backend_config.v2")
+
+
+def test_unknown_fallback_backend_fails_closed() -> None:
+    config = RuntimeBackendConfig(
+        backend_name="runtime-a",
+        fallback_backend="missing-runtime",
+    )
+
+    with pytest.raises(
+        ContractViolationError,
+        match="unknown fallback reasoner runtime backend",
+    ):
+        resolve_reasoner_client(config, factories={"runtime-a": lambda _: object()})  # type: ignore[return-value]
 
 
 @pytest.mark.parametrize(

@@ -174,6 +174,21 @@ def test_source_reference_valid_provider_key_only_sample_passes() -> None:
 
 
 @pytest.mark.parametrize(
+    "payload_update",
+    [
+        {"start_char": -1},
+        {"end_char": -1},
+    ],
+)
+def test_evidence_span_rejects_negative_offsets(payload_update: dict[str, int]) -> None:
+    payload = evidence_payload()
+    payload.update(payload_update)
+
+    with pytest.raises(ValidationError):
+        EvidenceSpan.model_validate(payload)
+
+
+@pytest.mark.parametrize(
     "source_reference",
     [
         {},

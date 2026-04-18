@@ -10,11 +10,13 @@ import hashlib
 import json
 from datetime import datetime
 from typing import Mapping, Protocol
+from urllib.parse import urlsplit, urlunsplit
 from urllib.request import Request, urlopen
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 from subsystem_news.contracts import NewsSourceConfig, SourceReference
+from subsystem_news.errors import ContractViolationError
 
 
 def _json_ready(value: object) -> object:
@@ -93,6 +95,50 @@ class NewsArticleRef(BaseModel):
         if self.url is None and self.provider_key is None:
             raise ValueError("news article reference requires url or provider_key")
         return self
+
+
+def same_article_ref(left: NewsArticleRef, right: NewsArticleRef) -> bool:
+    """Return whether two source refs identify the same article within one source."""
+
+    if left.source_id != right.source_id:
+        return False
+    if left.source_reference == right.source_reference:
+        return True
+    if (
+        left.provider_key is not None
+        and right.provider_key is not None
+        and left.provider_key == right.provider_key
+    ):
+        return True
+    return left.url is not None and right.url is not None and left.url == right.url
+
+
+def validate_response_url_within_source(
+    response_url: str,
+    source: NewsSourceConfig,
+    *,
+    adapter_name: str,
+) -> None:
+    """Reject redirects whose final URL leaves the approved source endpoint."""
+
+    if _normalized_external_url(response_url) != _normalized_external_url(str(source.base_url)):
+        raise ContractViolationError(
+            f"{adapter_name} redirect target must match approved base_url"
+        )
+
+
+def _normalized_external_url(value: str) -> str:
+    parsed = urlsplit(value)
+    path = parsed.path.rstrip("/") or "/"
+    return urlunsplit(
+        (
+            parsed.scheme.lower(),
+            parsed.netloc.lower(),
+            path,
+            parsed.query,
+            "",
+        )
+    )
 
 
 class RawArticleFetch(BaseModel):

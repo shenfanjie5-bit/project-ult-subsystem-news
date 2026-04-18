@@ -5,6 +5,8 @@ from __future__ import annotations
 from datetime import datetime, timezone, tzinfo
 from email.utils import parsedate_to_datetime
 
+from subsystem_news.errors import ContractViolationError
+
 
 def _as_utc(value: datetime, default_tz: tzinfo) -> datetime:
     if value.tzinfo is None:
@@ -40,5 +42,10 @@ def parse_published_at(
     except ValueError:
         pass
 
-    parsed = parsedate_to_datetime(stripped)
+    try:
+        parsed = parsedate_to_datetime(stripped)
+    except (TypeError, ValueError, IndexError) as exc:
+        raise ContractViolationError(
+            f"invalid source timestamp: {stripped!r}"
+        ) from exc
     return _as_utc(parsed, default_tz)

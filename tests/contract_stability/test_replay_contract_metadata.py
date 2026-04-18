@@ -1,19 +1,14 @@
 from __future__ import annotations
 
 from collections.abc import Mapping
-from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
 from subsystem_news.contracts.candidates import NewsSignalCandidate
-from subsystem_news.contracts.source_reference import SourceReference
 from subsystem_news.entities.resolver_client import RegistryLookup, StubEntityRegistryClient
 from subsystem_news.extract.runtime_client import StructuredGenerationRequest
-from subsystem_news.extract.schema_pin import FACT_SCHEMA_PIN
-from subsystem_news.fixtures.catalog import FixtureArticleInput, FixtureCase
 from subsystem_news.fixtures.loader import load_fixture_suite
 from subsystem_news.fixtures.runner import replay_fixture_case
-from subsystem_news.graph import GRAPH_SCHEMA_PIN
 from subsystem_news.runtime.replay import ReplayRequest, ReplayRunResult
 from subsystem_news.signals.schema_pin import SIGNAL_SCHEMA_PIN
 
@@ -72,16 +67,18 @@ def test_ex1_only_replay_keeps_unresolved_mentions_without_ex2_promotion() -> No
     assert ex2_payloads == []
     assert unresolved_entities
     assert all(entity["canonical_id"] is None for entity in unresolved_entities)
+    assert {payload["article_id"] for payload in ex1_payloads} == {
+        "article-reg-ex1-only"
+    }
+    assert {payload["candidate_id"] for payload in ex1_payloads} == {
+        "fact-reg-ex1-only-unresolved"
+    }
 
 
 def _replay_case(case_id: str) -> ReplayRunResult:
-    if case_id == "ex1-only-unresolved-boundary":
-        case = _ex1_only_fixture_case()
-        baseline_path = Path("src/subsystem_news/fixtures/regression/baseline/ex1_only.json")
-    else:
-        suite = load_fixture_suite(MANIFEST)
-        case = next(case for case in suite.cases if case.case_id == case_id)
-        baseline_path = case.resolved_baseline_path(suite.root_path)
+    suite = load_fixture_suite(MANIFEST)
+    case = next(case for case in suite.cases if case.case_id == case_id)
+    baseline_path = case.resolved_baseline_path(suite.root_path)
 
     return replay_fixture_case(
         ReplayRequest(
@@ -132,47 +129,6 @@ def _entity_client() -> StubEntityRegistryClient:
     )
 
 
-def _ex1_only_fixture_case() -> FixtureCase:
-    published_at = datetime(2026, 3, 1, tzinfo=timezone.utc)
-    fetched_at = datetime(2026, 3, 1, 0, 5, tzinfo=timezone.utc)
-    source_reference = SourceReference.model_validate(
-        {
-            "source_id": "regression-topic",
-            "url": "https://fixtures.example.com/regression-topic/ex1-only-contract",
-            "provider_key": "ex1-only-contract",
-            "original_locator": {
-                "locator_type": "fixture",
-                "locator_value": "ex1-only-contract",
-            },
-        }
-    )
-    raw_input = FixtureArticleInput(
-        article_id="article-reg-ex1-only-contract",
-        source_reference=source_reference,
-        title="Mystery Power Ltd roadmap",
-        body_text=(
-            "Mystery Power Ltd announced a storage roadmap without naming any "
-            "customer contract."
-        ),
-        published_at=published_at,
-        fetched_at=fetched_at,
-    )
-    return FixtureCase(
-        case_id="ex1-only-unresolved-boundary",
-        category="ex1_only",
-        article_ids=[raw_input.article_id],
-        expected_outputs=[],
-        source_reference=source_reference,
-        version_pins={
-            "Ex-1": FACT_SCHEMA_PIN,
-            "Ex-2": SIGNAL_SCHEMA_PIN,
-            "Ex-3": GRAPH_SCHEMA_PIN,
-        },
-        baseline_path="baseline/ex1_only.json",
-        raw_inputs=[raw_input],
-    )
-
-
 class _ReplayContractReasoner:
     def generate_structured(
         self,
@@ -208,10 +164,10 @@ class _ReplayContractReasoner:
                 },
             ]
 
-        if article_id == "article-reg-ex1-only-contract":
+        if article_id == "article-reg-ex1-only":
             quote = (
-                "Mystery Power Ltd announced a storage roadmap without naming any "
-                "customer contract."
+                "Unlisted Battery Venture announced a storage roadmap without naming "
+                "any customer or ticker."
             )
             return [
                 {

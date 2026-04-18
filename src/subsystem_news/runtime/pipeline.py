@@ -9,7 +9,7 @@ from itertools import islice
 from pathlib import Path
 
 from subsystem_news.contracts import NewsSourceConfig
-from subsystem_news.dedupe.cluster import merge_into_cluster
+from subsystem_news.dedupe.cluster import DedupeDecision, merge_into_cluster_with_decision
 from subsystem_news.dedupe.store import DedupeStore
 from subsystem_news.entities.mention import detect_mentions
 from subsystem_news.entities.resolution import resolve_detected_mentions
@@ -145,11 +145,12 @@ class Pipeline:
 
                 error_stage = "dedupe"
                 stage_order.append("dedupe")
-                cluster = merge_into_cluster(
+                dedupe_decision = merge_into_cluster_with_decision(
                     artifact,
                     self.dedupe_store,
                     threshold=self.dedupe_threshold,
                 )
+                cluster = dedupe_decision.cluster
                 clustered_artifact = self.dedupe_store.load_article_snapshot(artifact.article_id)
                 representative = self.dedupe_store.load_article_snapshot(
                     cluster.representative_article_id
@@ -202,13 +203,10 @@ class Pipeline:
                         "Ex-2": SIGNAL_SCHEMA_PIN,
                         "Ex-3": GRAPH_SCHEMA_PIN,
                     },
-                    dedupe_metadata={
-                        "threshold": self.dedupe_threshold,
-                        "cluster_id": cluster.cluster_id,
-                        "representative_article_id": cluster.representative_article_id,
-                        "member_count": len(cluster.member_article_ids),
-                        "cluster_confidence": cluster.cluster_confidence,
-                    },
+                    dedupe_metadata=_dedupe_metadata(
+                        dedupe_decision,
+                        threshold=self.dedupe_threshold,
+                    ),
                     entity_metadata={
                         "mention_count": len(entity_resolution.mentions),
                         "resolved_count": sum(
@@ -568,6 +566,29 @@ def _run_id(started_at: datetime) -> str:
     stamp = started_at.strftime("%Y%m%dT%H%M%S%fZ")
     digest = hashlib.sha256(started_at.isoformat().encode("utf-8")).hexdigest()[:8]
     return f"run-{stamp}-{digest}"
+
+
+def _dedupe_metadata(
+    decision: DedupeDecision,
+    *,
+    threshold: float,
+) -> dict[str, object]:
+    cluster = decision.cluster
+    return {
+        "threshold": threshold,
+        "cluster_id": cluster.cluster_id,
+        "representative_article_id": cluster.representative_article_id,
+        "member_count": len(cluster.member_article_ids),
+        "cluster_confidence": cluster.cluster_confidence,
+        "created": decision.created,
+        "match_reason": None if decision.match is None else decision.match.reason,
+        "match_confidence": None if decision.match is None else decision.match.score,
+        "matched_article_ids": []
+        if decision.match is None
+        else list(decision.match.matched_article_ids),
+        "conflict_count": len(decision.conflicts),
+        "conflicts": [conflict.model_dump(mode="json") for conflict in decision.conflicts],
+    }
 
 
 def _error_message(exc: Exception) -> str:
