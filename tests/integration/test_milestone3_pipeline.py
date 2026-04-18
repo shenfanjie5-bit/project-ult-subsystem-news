@@ -12,7 +12,7 @@ from subsystem_news.runtime.artifact_store import ArtifactStore
 from subsystem_news.runtime.models import CandidatePayload
 from subsystem_news.runtime.pipeline import Pipeline
 from subsystem_news.runtime.submit import SubmitReceipt
-from subsystem_news.runtime.trace import load_pipeline_trace
+from subsystem_news.runtime.trace import candidate_idempotency_key, load_pipeline_trace
 from subsystem_news.sources.base import HttpResponse
 
 
@@ -138,6 +138,17 @@ class FakeSdkClient:
         )
 
 
+class ReceiptSdkClient:
+    def __init__(self, receipt_factory: Any) -> None:
+        self._receipt_factory = receipt_factory
+        self.calls: list[list[CandidatePayload]] = []
+
+    def submit(self, batch: Sequence[CandidatePayload]) -> SubmitReceipt:
+        submitted = list(batch)
+        self.calls.append(submitted)
+        return self._receipt_factory(submitted)
+
+
 def test_milestone3_pipeline_runs_sources_to_submit_and_trace(tmp_path: Path) -> None:
     sdk_client = FakeSdkClient()
     pipeline = _pipeline(tmp_path, sdk_client=sdk_client)
@@ -198,7 +209,67 @@ def test_pipeline_idempotency_skips_candidates_submitted_by_previous_trace(
     assert set(first.submitted_candidate_keys).issubset(set(second.skipped_candidate_keys))
 
 
-def _pipeline(tmp_path: Path, *, sdk_client: FakeSdkClient) -> Pipeline:
+def test_pipeline_rejects_ambiguous_submit_receipt_without_marking_submitted(
+    tmp_path: Path,
+) -> None:
+    sdk_client = ReceiptSdkClient(
+        lambda _batch: SubmitReceipt(accepted_count=0, rejected_count=0)
+    )
+
+    result = _pipeline(tmp_path, sdk_client=sdk_client).run()
+
+    assert len(sdk_client.calls) == 1
+    assert result.error_count == 1
+    assert result.submitted_count == 0
+    assert result.submitted_candidate_keys == []
+    assert result.error_message is not None
+    assert "counts must equal submitted batch size" in result.error_message
+
+
+def test_pipeline_records_only_explicitly_accepted_submit_receipt_ids(
+    tmp_path: Path,
+) -> None:
+    def partial_receipt(batch: list[CandidatePayload]) -> SubmitReceipt:
+        accepted = batch[:1]
+        rejected = batch[1:]
+        return SubmitReceipt(
+            accepted_count=len(accepted),
+            rejected_count=len(rejected),
+            submitted_candidate_ids=[candidate.candidate_id for candidate in accepted],
+            rejected_candidate_ids=[candidate.candidate_id for candidate in rejected],
+        )
+
+    sdk_client = ReceiptSdkClient(partial_receipt)
+
+    result = _pipeline(tmp_path, sdk_client=sdk_client).run()
+
+    accepted_keys = [candidate_idempotency_key(sdk_client.calls[0][0])]
+    rejected_keys = {
+        candidate_idempotency_key(candidate) for candidate in sdk_client.calls[0][1:]
+    }
+    assert result.error_count == 0
+    assert result.submitted_count == 1
+    assert result.submitted_candidate_keys == accepted_keys
+    assert rejected_keys.issubset(set(result.skipped_candidate_keys))
+
+
+def test_pipeline_fails_closed_on_unreadable_prior_trace(tmp_path: Path) -> None:
+    trace_dir = tmp_path / "trace"
+    trace_dir.mkdir()
+    (trace_dir / "corrupt.json").write_text("{not valid json", encoding="utf-8")
+    sdk_client = FakeSdkClient()
+
+    result = _pipeline(tmp_path, sdk_client=sdk_client).run()
+
+    assert sdk_client.calls == []
+    assert result.error_count == 1
+    assert result.submitted_count == 0
+    assert result.error_message is not None
+    assert "unreadable pipeline trace" in result.error_message
+    assert "submit" not in result.stage_order
+
+
+def _pipeline(tmp_path: Path, *, sdk_client: Any) -> Pipeline:
     return Pipeline(
         configs=load_allowlist(FIXTURE_ROOT / "approved_sources.json"),
         artifact_store=ArtifactStore(tmp_path / "artifacts"),

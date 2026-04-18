@@ -232,7 +232,22 @@ class Pipeline:
                     )
                 )
 
-        prior_keys = _load_prior_submitted_keys(self.trace_dir)
+        try:
+            prior_keys = _load_prior_submitted_keys(self.trace_dir)
+        except ContractViolationError as exc:
+            top_level_error = _error_message(exc)
+            result = self._build_result(
+                run_id=run_id,
+                started_at=started_at,
+                discovered_count=discovered_count,
+                fetched_count=fetched_count,
+                article_results=article_results,
+                submit_receipts=[],
+                stage_order=stage_order,
+                top_level_error=top_level_error,
+            )
+            return self._write_trace(result, stage_order)
+
         (
             article_results,
             submit_receipts,
@@ -289,6 +304,24 @@ class Pipeline:
                 submit_error,
             )
 
+        duplicate_candidate_ids = _duplicate_candidate_ids(
+            [candidate for _index, candidate, _key in candidate_records]
+        )
+        if duplicate_candidate_ids:
+            submit_error = (
+                "ContractViolationError: submit batch contains duplicate candidate_id values: "
+                f"{', '.join(duplicate_candidate_ids)}"
+            )
+            return (
+                _apply_candidate_counts(
+                    article_results,
+                    submitted_by_article,
+                    skipped_by_article,
+                ),
+                submit_receipts,
+                submit_error,
+            )
+
         if self.dry_run:
             stage_order.append("validate")
             try:
@@ -330,12 +363,19 @@ class Pipeline:
                 submit_error = _error_message(exc)
                 break
             submit_receipts.append(receipt.model_dump(mode="json"))
-            rejected_ids = set(receipt.rejected_candidate_ids)
+            try:
+                accepted_ids, rejected_ids = _validate_submit_receipt(receipt, batch)
+            except ContractViolationError as exc:
+                submit_error = _error_message(exc)
+                break
+
             for index, candidate, key in chunk:
-                if candidate.candidate_id in rejected_ids:
-                    skipped_by_article.setdefault(index, []).append(key)
-                else:
+                if candidate.candidate_id in accepted_ids:
                     submitted_by_article.setdefault(index, []).append(key)
+                elif candidate.candidate_id in rejected_ids:
+                    skipped_by_article.setdefault(index, []).append(key)
+                else:  # pragma: no cover - receipt validation guarantees partitioning.
+                    raise AssertionError("validated submit receipt did not partition batch")
 
         return (
             _apply_candidate_counts(article_results, submitted_by_article, skipped_by_article),
@@ -431,10 +471,76 @@ def _load_prior_submitted_keys(trace_dir: Path) -> set[str]:
     for path in sorted(trace_dir.glob("*.json")):
         try:
             result = load_pipeline_trace(path)
-        except ContractViolationError:
-            continue
+        except ContractViolationError as exc:
+            raise ContractViolationError(f"unreadable pipeline trace: {path}") from exc
         keys.update(result.submitted_candidate_keys)
     return keys
+
+
+def _validate_submit_receipt(
+    receipt: object,
+    batch: Sequence[CandidatePayload],
+) -> tuple[set[str], set[str]]:
+    if not all(
+        hasattr(receipt, field)
+        for field in (
+            "accepted_count",
+            "rejected_count",
+            "submitted_candidate_ids",
+            "rejected_candidate_ids",
+        )
+    ):
+        raise ContractViolationError(
+            "submit receipt must include counts and candidate ID lists"
+        )
+
+    batch_ids = [candidate.candidate_id for candidate in batch]
+    known_ids = set(batch_ids)
+    if len(known_ids) != len(batch_ids):
+        raise ContractViolationError("submit batch contains duplicate candidate_id values")
+
+    accepted_count = int(receipt.accepted_count)
+    rejected_count = int(receipt.rejected_count)
+    if accepted_count + rejected_count != len(batch):
+        raise ContractViolationError("submit receipt counts must equal submitted batch size")
+
+    accepted_ids = set(receipt.submitted_candidate_ids)
+    rejected_ids = set(receipt.rejected_candidate_ids)
+    unknown_ids = (accepted_ids | rejected_ids) - known_ids
+    if unknown_ids:
+        raise ContractViolationError(
+            "submit receipt references unknown candidate_id values: "
+            f"{', '.join(sorted(unknown_ids))}"
+        )
+    overlapping_ids = accepted_ids & rejected_ids
+    if overlapping_ids:
+        raise ContractViolationError(
+            "submit receipt lists candidate_id values as both accepted and rejected: "
+            f"{', '.join(sorted(overlapping_ids))}"
+        )
+    if len(accepted_ids) != accepted_count:
+        raise ContractViolationError(
+            "submit receipt submitted_candidate_ids must match accepted_count"
+        )
+    if len(rejected_ids) != rejected_count:
+        raise ContractViolationError(
+            "submit receipt rejected_candidate_ids must match rejected_count"
+        )
+    if accepted_ids | rejected_ids != known_ids:
+        raise ContractViolationError(
+            "submit receipt candidate IDs must partition the submitted batch"
+        )
+    return accepted_ids, rejected_ids
+
+
+def _duplicate_candidate_ids(candidates: Sequence[CandidatePayload]) -> list[str]:
+    seen: set[str] = set()
+    duplicates: set[str] = set()
+    for candidate in candidates:
+        if candidate.candidate_id in seen:
+            duplicates.add(candidate.candidate_id)
+        seen.add(candidate.candidate_id)
+    return sorted(duplicates)
 
 
 def _run_id(started_at: datetime) -> str:
