@@ -103,6 +103,19 @@ _MAX_BRIDGE_CHARS_BY_RELATION = {
     "divested": 120,
 }
 
+_ACQUIRED_NON_OBJECT_COMPLEMENT_RE = re.compile(
+    r"(?<![A-Za-z0-9])"
+    r"(?:"
+    r"\d+(?:\.\d+)?\s*%|"
+    r"(?:a|an|the|its|his|her|their|minority|majority|controlling|partial|"
+    r"remaining|additional|equity)?\s*"
+    r"(?:stake|share|shares|shareholding|interest|equity|asset|assets|unit|"
+    r"division|business|operations)"
+    r")"
+    r"(?:\s+(?:in|of|from|held\s+by|owned\s+by|belonging\s+to))\s*$",
+    re.IGNORECASE,
+)
+
 
 def validate_graph_evidence(
     article: NewsArticleArtifact,
@@ -336,9 +349,15 @@ def _object_binds_to_trigger_complement(
         return False
     if _ENTITY_LIKE_PHRASE_RE.search(compact_quote[trigger_end:object_start]):
         return False
+    if relation_type == "acquired" and _has_acquired_non_object_complement(bridge):
+        return False
     if relation_type == "divested" and not _contains_word(bridge, "to"):
         return False
     return True
+
+
+def _has_acquired_non_object_complement(bridge: str) -> bool:
+    return _ACQUIRED_NON_OBJECT_COMPLEMENT_RE.search(bridge) is not None
 
 
 def _subject_binds_after_sanctioning_authority(

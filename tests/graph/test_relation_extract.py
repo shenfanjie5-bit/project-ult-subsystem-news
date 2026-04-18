@@ -305,6 +305,35 @@ def test_validate_graph_evidence_rejects_trailing_unrelated_object_candidates(
         )
 
 
+def test_validate_graph_evidence_rejects_acquired_stake_as_entity_acquisition() -> None:
+    article, _, entity_resolution, facts = graph_input(
+        body_text="Acme Corp acquired a 5% stake in Globex Inc.",
+        subject_text="Acme Corp",
+        object_text="Globex Inc",
+    )
+    candidate = NewsGraphDeltaCandidate.model_validate(
+        raw_delta(
+            article,
+            relation_type="acquired",
+            subject=facts[0].involved_entities[0],
+            object_entity=facts[0].involved_entities[1],
+        )
+        | {
+            "candidate_id": "graph-acquired-stake",
+            "article_id": article.article_id,
+            "source_reference": article.source_reference.model_dump(mode="json"),
+            "export_contract": "Ex-3",
+        }
+    )
+
+    with pytest.raises(ContractViolationError, match="explicit relation trigger"):
+        validate_graph_evidence(
+            article,
+            candidate,
+            entity_resolution=entity_resolution,
+        )
+
+
 def test_extract_graph_deltas_rejects_malformed_runtime_response() -> None:
     article, cluster, entity_resolution, facts = graph_input()
 
