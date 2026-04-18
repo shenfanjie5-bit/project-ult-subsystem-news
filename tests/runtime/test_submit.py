@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import sys
+import types
 from datetime import datetime, timezone
 from typing import Sequence
 
@@ -14,7 +16,12 @@ from subsystem_news.contracts.evidence import EvidenceSpan
 from subsystem_news.contracts.source_reference import SourceReference, SourceReferenceLocator
 from subsystem_news.errors import ContractViolationError
 from subsystem_news.runtime.models import CandidatePayload
-from subsystem_news.runtime.submit import SubmitReceipt, submit_candidates, validate_candidate_batch
+from subsystem_news.runtime.submit import (
+    DefaultSubsystemSdkClient,
+    SubmitReceipt,
+    submit_candidates,
+    validate_candidate_batch,
+)
 
 
 def source_reference() -> SourceReference:
@@ -158,3 +165,26 @@ def test_submit_candidates_raises_after_final_retry_failure() -> None:
         submit_candidates([fact_candidate()], client, max_retries=1)
 
     assert len(client.calls) == 2
+
+
+def test_default_sdk_client_rejects_missing_receipt(monkeypatch: pytest.MonkeyPatch) -> None:
+    sdk_module = types.ModuleType("subsystem_sdk")
+    sdk_module.submit = lambda _payload: None  # type: ignore[attr-defined]
+    monkeypatch.setitem(sys.modules, "subsystem_sdk", sdk_module)
+
+    with pytest.raises(ContractViolationError, match="returned no receipt"):
+        DefaultSubsystemSdkClient().submit([fact_candidate()])
+
+
+def test_default_sdk_client_requires_receipt_candidate_id_partition(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    sdk_module = types.ModuleType("subsystem_sdk")
+    sdk_module.submit = lambda _payload: {  # type: ignore[attr-defined]
+        "accepted_count": 1,
+        "submitted_candidate_ids": [],
+    }
+    monkeypatch.setitem(sys.modules, "subsystem_sdk", sdk_module)
+
+    with pytest.raises(ContractViolationError, match="submitted_candidate_ids"):
+        DefaultSubsystemSdkClient().submit([fact_candidate()])

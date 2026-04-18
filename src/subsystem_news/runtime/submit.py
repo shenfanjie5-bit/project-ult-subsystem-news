@@ -40,13 +40,22 @@ class DefaultSubsystemSdkClient:
         payload = [candidate.model_dump(mode="json") for candidate in batch]
         response = sdk_submit(payload)
         if isinstance(response, SubmitReceipt):
-            return response
+            receipt = response
+            _require_receipt_partitions_batch(receipt, batch)
+            return receipt
         if isinstance(response, Mapping):
-            return SubmitReceipt.model_validate(response)
+            try:
+                receipt = SubmitReceipt.model_validate(response)
+            except (ValidationError, ValueError, TypeError) as exc:
+                raise ContractViolationError(
+                    "subsystem-sdk submit returned invalid receipt"
+                ) from exc
+            _require_receipt_partitions_batch(receipt, batch)
+            return receipt
         if response is None:
-            return SubmitReceipt(
-                accepted_count=len(batch),
-                submitted_candidate_ids=[candidate.candidate_id for candidate in batch],
+            raise ContractViolationError(
+                "subsystem-sdk submit returned no receipt; accepted candidate IDs "
+                "are ambiguous"
             )
         raise ContractViolationError("subsystem-sdk submit returned unsupported receipt")
 
@@ -82,8 +91,15 @@ def submit_candidates(
             if isinstance(receipt, SubmitReceipt):
                 return receipt
             if isinstance(receipt, Mapping):
-                return SubmitReceipt.model_validate(receipt)
+                try:
+                    return SubmitReceipt.model_validate(receipt)
+                except (ValidationError, ValueError, TypeError) as exc:
+                    raise ContractViolationError(
+                        "submit client returned invalid receipt"
+                    ) from exc
             raise ContractViolationError("submit client returned unsupported receipt")
+        except ContractViolationError:
+            raise
         except Exception as exc:  # noqa: BLE001 - submit clients decide which failures are transient.
             last_error = exc
 
@@ -139,3 +155,53 @@ def _revalidate_signal(candidate: NewsSignalCandidate) -> NewsSignalCandidate:
         return NewsSignalCandidate.model_validate(candidate.model_dump(mode="json"))
     except (ValidationError, ValueError, TypeError) as exc:
         raise ContractViolationError("candidate violates Ex-2 contract") from exc
+
+
+def _require_receipt_partitions_batch(
+    receipt: SubmitReceipt,
+    batch: Sequence[CandidatePayload],
+) -> None:
+    batch_ids = [candidate.candidate_id for candidate in batch]
+    known_ids = set(batch_ids)
+    if len(known_ids) != len(batch_ids):
+        raise ContractViolationError("submit batch contains duplicate candidate_id values")
+
+    if receipt.accepted_count + receipt.rejected_count != len(batch):
+        raise ContractViolationError("submit receipt counts must equal submitted batch size")
+
+    accepted_ids = set(receipt.submitted_candidate_ids)
+    rejected_ids = set(receipt.rejected_candidate_ids)
+    if len(accepted_ids) != len(receipt.submitted_candidate_ids):
+        raise ContractViolationError(
+            "submit receipt submitted_candidate_ids must not contain duplicates"
+        )
+    if len(rejected_ids) != len(receipt.rejected_candidate_ids):
+        raise ContractViolationError(
+            "submit receipt rejected_candidate_ids must not contain duplicates"
+        )
+    unknown_ids = (accepted_ids | rejected_ids) - known_ids
+    if unknown_ids:
+        raise ContractViolationError(
+            "submit receipt references unknown candidate_id values: "
+            f"{', '.join(sorted(unknown_ids))}"
+        )
+
+    overlapping_ids = accepted_ids & rejected_ids
+    if overlapping_ids:
+        raise ContractViolationError(
+            "submit receipt lists candidate_id values as both accepted and rejected: "
+            f"{', '.join(sorted(overlapping_ids))}"
+        )
+
+    if len(accepted_ids) != receipt.accepted_count:
+        raise ContractViolationError(
+            "submit receipt submitted_candidate_ids must match accepted_count"
+        )
+    if len(rejected_ids) != receipt.rejected_count:
+        raise ContractViolationError(
+            "submit receipt rejected_candidate_ids must match rejected_count"
+        )
+    if accepted_ids | rejected_ids != known_ids:
+        raise ContractViolationError(
+            "submit receipt candidate IDs must partition the submitted batch"
+        )
