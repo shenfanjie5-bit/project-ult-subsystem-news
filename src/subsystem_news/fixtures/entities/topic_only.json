@@ -1,0 +1,24 @@
+{
+  "article_id": "article-entity-topic-only",
+  "source_id": "global-wire-rss",
+  "source_reference": {
+    "source_id": "global-wire-rss",
+    "url": "https://news.example.com/articles/topic-only",
+    "provider_key": "topic-only",
+    "original_locator": {
+      "locator_type": "rss_guid",
+      "locator_value": "topic-only"
+    }
+  },
+  "title": "AI chips and battery modules lead market themes",
+  "body_text": "Analysts said AI chips and battery modules remained market themes, without naming a company.",
+  "published_at": "2026-01-19T08:00:00Z",
+  "fetched_at": "2026-01-19T08:05:00Z",
+  "language": "en",
+  "author_or_channel": "Markets Desk",
+  "content_hash": "sha256:entity-topic-only",
+  "article_fingerprint": "sha256:entity-topic-only-fingerprint",
+  "license_tag": "licensed-wire",
+  "reliability_tier": "C",
+  "cluster_id": null
+}
