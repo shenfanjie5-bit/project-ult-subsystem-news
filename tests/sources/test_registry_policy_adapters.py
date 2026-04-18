@@ -7,6 +7,7 @@ import pytest
 
 from subsystem_news.contracts import NewsSourceConfig, SourceReference, load_allowlist
 from subsystem_news.errors import ContractViolationError, SourceNotApprovedError
+from subsystem_news.normalize.pipeline import normalize_article
 from subsystem_news.sources import (
     AdapterRegistry,
     HttpResponse,
@@ -159,6 +160,44 @@ def test_rss_adapter_discovers_and_fetches_fixture_articles() -> None:
     assert fetch.summary == "Acme Corp announced a new supply agreement with Globex."
     assert fetch.published_at_raw == "Thu, 15 Jan 2026 10:30:00 GMT"
     assert fetch.content_hash == fetch_article_body(first, configs, transport=transport()).content_hash
+
+
+def test_rss_html_content_is_normalized_from_raw_html() -> None:
+    configs = [config_by_id(load_configs(), "global-wire-rss")]
+    rss_with_html = """<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>Global Wire</title>
+    <item>
+      <guid>wire-html-content</guid>
+      <link>https://news.example.com/articles/html-content</link>
+      <title>Acme raises guidance</title>
+      <pubDate>Thu, 15 Jan 2026 10:30:00 GMT</pubDate>
+      <description>Acme raised its guidance.</description>
+      <content:encoded><![CDATA[
+        <article>
+          <header>Subscribe now</header>
+          <p>Acme Corp raised 2026 guidance.</p>
+          <p>Globex Inc remains a supplier.</p>
+          <script>window.noise = true;</script>
+        </article>
+      ]]></content:encoded>
+    </item>
+  </channel>
+</rss>"""
+    html_transport = StaticTransport({"https://news.example.com/rss": rss_with_html})
+    ref = discover_articles(configs, transport=html_transport)[0]
+
+    fetch = fetch_article_body(ref, configs, transport=html_transport)
+    artifact = normalize_article(fetch)
+
+    assert fetch.raw_body is None
+    assert fetch.raw_html is not None
+    assert artifact.body_text == "Acme Corp raised 2026 guidance. Globex Inc remains a supplier."
+    assert "<" not in artifact.body_text
+    assert ">" not in artifact.body_text
+    assert "Subscribe now" not in artifact.body_text
+    assert artifact.source_reference == fetch.source_reference
 
 
 def test_api_adapter_discovers_and_fetches_provider_key_article() -> None:
