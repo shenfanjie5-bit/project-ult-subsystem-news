@@ -1,0 +1,24 @@
+{
+  "article_id": "article-entity-ambiguous",
+  "source_id": "global-wire-rss",
+  "source_reference": {
+    "source_id": "global-wire-rss",
+    "url": "https://news.example.com/articles/ambiguous-alias",
+    "provider_key": "ambiguous-alias",
+    "original_locator": {
+      "locator_type": "rss_guid",
+      "locator_value": "ambiguous-alias"
+    }
+  },
+  "title": "Mercury Energy reviews nickel plant investment",
+  "body_text": "Mercury Energy said a nickel plant investment would depend on power prices.",
+  "published_at": "2026-01-17T09:00:00Z",
+  "fetched_at": "2026-01-17T09:05:00Z",
+  "language": "en",
+  "author_or_channel": "Commodities Desk",
+  "content_hash": "sha256:entity-ambiguous",
+  "article_fingerprint": "sha256:entity-ambiguous-fingerprint",
+  "license_tag": "licensed-wire",
+  "reliability_tier": "B",
+  "cluster_id": null
+}

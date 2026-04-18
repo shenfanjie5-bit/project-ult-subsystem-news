@@ -1,0 +1,24 @@
+{
+  "article_id": "article-entity-registry-error",
+  "source_id": "global-wire-rss",
+  "source_reference": {
+    "source_id": "global-wire-rss",
+    "url": "https://news.example.com/articles/registry-error",
+    "provider_key": "registry-error",
+    "original_locator": {
+      "locator_type": "rss_guid",
+      "locator_value": "registry-error"
+    }
+  },
+  "title": "North River Metals updates nickel plant restart",
+  "body_text": "North River Metals said the nickel plant restart remains on schedule.",
+  "published_at": "2026-01-20T08:00:00Z",
+  "fetched_at": "2026-01-20T08:05:00Z",
+  "language": "en",
+  "author_or_channel": "Commodities Desk",
+  "content_hash": "sha256:entity-registry-error",
+  "article_fingerprint": "sha256:entity-registry-error-fingerprint",
+  "license_tag": "licensed-wire",
+  "reliability_tier": "B",
+  "cluster_id": null
+}

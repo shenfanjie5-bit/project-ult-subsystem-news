@@ -1,0 +1,24 @@
+{
+  "article_id": "article-entity-html-rss",
+  "source_id": "global-wire-rss",
+  "source_reference": {
+    "source_id": "global-wire-rss",
+    "url": "https://news.example.com/articles/html-entity",
+    "provider_key": "html-entity",
+    "original_locator": {
+      "locator_type": "rss_guid",
+      "locator_value": "html-entity"
+    }
+  },
+  "title": "Acme raises guidance",
+  "body_text": "Acme Corp raised 2026 guidance. Globex Inc remains a supplier.",
+  "published_at": "2026-01-21T10:30:00Z",
+  "fetched_at": "2026-01-21T10:35:00Z",
+  "language": "en",
+  "author_or_channel": "Markets Desk",
+  "content_hash": "sha256:entity-html-rss",
+  "article_fingerprint": "sha256:entity-html-rss-fingerprint",
+  "license_tag": "licensed-wire",
+  "reliability_tier": "A",
+  "cluster_id": null
+}
