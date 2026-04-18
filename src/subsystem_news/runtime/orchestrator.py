@@ -17,6 +17,7 @@ from subsystem_news.errors import ContractViolationError
 from subsystem_news.extract.runtime_client import ReasonerRuntimeClient
 from subsystem_news.runtime.artifact_store import ArtifactStore
 from subsystem_news.runtime.backend_config import (
+    ReasonerClientFactory,
     load_runtime_backend_config,
     resolve_reasoner_client,
 )
@@ -38,6 +39,7 @@ def run_once(
     dedupe_store: DedupeStore | None = None,
     entity_client: EntityRegistryClient | None = None,
     reasoner_client: ReasonerRuntimeClient | None = None,
+    reasoner_factories: Mapping[str, ReasonerClientFactory] | None = None,
     sdk_client: SubsystemSdkClient | None = None,
     source_registry: AdapterRegistry | None = None,
     transport: HttpTransport | None = None,
@@ -53,7 +55,11 @@ def run_once(
             artifact_store=artifact_store or ArtifactStore(config.artifact_root),
             dedupe_store=dedupe_store or DedupeStore(config.dedupe_root),
             entity_client=_entity_client_for_config(config, entity_client),
-            reasoner_client=_reasoner_client_for_config(config, reasoner_client),
+            reasoner_client=_reasoner_client_for_config(
+                config,
+                reasoner_client,
+                reasoner_factories,
+            ),
             sdk_client=sdk_client
             or (_NoopSubsystemSdkClient() if config.dry_run else DefaultSubsystemSdkClient()),
             trace_dir=config.trace_root,
@@ -122,12 +128,16 @@ def _entity_client_for_config(
 def _reasoner_client_for_config(
     config: PipelineConfig,
     reasoner_client: ReasonerRuntimeClient | None,
+    reasoner_factories: Mapping[str, ReasonerClientFactory] | None,
 ) -> ReasonerRuntimeClient:
     if reasoner_client is not None:
         return reasoner_client
     if config.dry_run:
         return _NoopReasonerRuntimeClient()
-    return resolve_reasoner_client(load_runtime_backend_config())
+    return resolve_reasoner_client(
+        load_runtime_backend_config(),
+        factories=reasoner_factories,
+    )
 
 
 class _NoopReasonerRuntimeClient:
