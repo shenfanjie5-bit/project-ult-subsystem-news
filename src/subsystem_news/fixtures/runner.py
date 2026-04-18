@@ -2,19 +2,43 @@
 
 from __future__ import annotations
 
+import os
+import tempfile
 from collections.abc import Callable
 from datetime import datetime, timezone
+from pathlib import Path
 from typing import Any
+from urllib.parse import urlparse
 
 from pydantic import ValidationError
 
+from subsystem_news.contracts import NewsSourceConfig
+from subsystem_news.contracts.article import NewsArticleArtifact
 from subsystem_news.contracts.candidates import (
     NewsFactCandidate,
     NewsGraphDeltaCandidate,
     NewsSignalCandidate,
 )
+from subsystem_news.dedupe.cluster import merge_into_cluster
+from subsystem_news.dedupe.store import DedupeStore
+from subsystem_news.entities.mention import detect_mentions
+from subsystem_news.entities.resolution import (
+    EntityResolutionResult,
+    resolve_detected_mentions,
+)
+from subsystem_news.entities.resolver_client import (
+    EntityRegistryClient,
+    HttpEntityRegistryClient,
+)
 from subsystem_news.errors import ContractViolationError
+from subsystem_news.extract.fact_extractor import extract_facts
+from subsystem_news.extract.runtime_client import (
+    DefaultReasonerRuntimeClient,
+    ReasonerRuntimeClient,
+)
+from subsystem_news.graph import extract_graph_deltas
 from subsystem_news.fixtures.catalog import (
+    FixtureArticleInput,
     FixtureCase,
     FixtureSuite,
     RegressionCaseResult,
@@ -28,12 +52,23 @@ from subsystem_news.fixtures.metrics import (
     compute_ex2_contract_completeness,
     compute_ex3_false_positive_rate,
 )
+from subsystem_news.normalize.pipeline import normalize_article
 from subsystem_news.runtime.models import CandidatePayload
 from subsystem_news.runtime.replay import (
+    ReplayArticleResult,
+    ReplayArticleSummary,
     ReplayRequest,
     ReplayResult,
+    ReplayRunResult,
     diff_replay_results,
     replay_article,
+)
+from subsystem_news.signals.aggregator import generate_signals
+from subsystem_news.sources.base import (
+    NewsArticleRef,
+    RawArticleFetch,
+    raw_content_hash,
+    trace_id_for,
 )
 
 
@@ -41,16 +76,17 @@ def run_regression_suite(
     suite: FixtureSuite,
     *,
     thresholds: RegressionThresholds,
-    replay_runner: Callable[[ReplayRequest], ReplayResult] = replay_article,
+    replay_runner: Callable[[ReplayRequest], ReplayResult] | None = None,
 ) -> RegressionReport:
     """Run the checked-in fixture suite through the provided replay runner."""
 
     validate_fixture_suite(suite)
+    active_replay_runner = replay_runner or fixture_replay_runner()
     case_results: list[RegressionCaseResult] = []
     all_candidates: list[CandidatePayload] = []
 
     for case in suite.cases:
-        case_result, case_candidates = _run_case(case, suite, replay_runner)
+        case_result, case_candidates = _run_case(case, suite, active_replay_runner)
         case_results.append(case_result)
         all_candidates.extend(case_candidates)
 
@@ -98,7 +134,7 @@ def _run_case(
     replay_runner: Callable[[ReplayRequest], ReplayResult],
 ) -> tuple[RegressionCaseResult, list[CandidatePayload]]:
     baseline_path = case.resolved_baseline_path(suite.root_path)
-    request = ReplayRequest(
+    baseline_request = ReplayRequest(
         case_id=case.case_id,
         category=case.category,
         article_ids=list(case.article_ids),
@@ -106,9 +142,20 @@ def _run_case(
         baseline_path=baseline_path,
         metadata={"expected_cluster_id": case.expected_cluster_id},
     )
+    replay_request = ReplayRequest(
+        case_id=case.case_id,
+        category=case.category,
+        article_ids=list(case.article_ids),
+        input_path=_case_replay_input_path(case, suite),
+        baseline_path=baseline_path,
+        metadata={
+            "expected_cluster_id": case.expected_cluster_id,
+            "fixture_case": case.model_dump(mode="json"),
+        },
+    )
     try:
-        baseline = replay_article(request)
-        replayed = replay_runner(request)
+        baseline = replay_article(baseline_request)
+        replayed = replay_runner(replay_request)
         diff = diff_replay_results(baseline, replayed)
         candidates = _case_candidate_payloads(
             case,
@@ -178,6 +225,191 @@ def _run_case(
             ),
             [],
         )
+
+
+def fixture_replay_runner(
+    *,
+    entity_client: EntityRegistryClient | None = None,
+    reasoner_client: ReasonerRuntimeClient | None = None,
+    dedupe_threshold: float = 0.82,
+) -> Callable[[ReplayRequest], ReplayResult]:
+    """Build the default real fixture replay runner.
+
+    Unlike ``replay_article()``, this runner does not load the baseline snapshot as
+    replay output. It reconstructs replay inputs from the fixture case payload and
+    executes normalize/dedupe/entities/extract/signals/graph with configured
+    runtime clients.
+    """
+
+    active_entity_client = entity_client or _configured_entity_client()
+    active_reasoner_client = reasoner_client or DefaultReasonerRuntimeClient()
+
+    def _runner(request: ReplayRequest) -> ReplayResult:
+        return replay_fixture_case(
+            request,
+            entity_client=active_entity_client,
+            reasoner_client=active_reasoner_client,
+            dedupe_threshold=dedupe_threshold,
+        )
+
+    return _runner
+
+
+def replay_fixture_case(
+    request: ReplayRequest,
+    *,
+    entity_client: EntityRegistryClient,
+    reasoner_client: ReasonerRuntimeClient,
+    dedupe_threshold: float = 0.82,
+) -> ReplayResult:
+    """Replay one fixture case from raw inputs or normalized artifacts."""
+
+    if not 0.0 <= dedupe_threshold <= 1.0:
+        raise ValueError("dedupe_threshold must be between 0 and 1")
+
+    case = _fixture_case_from_request(request)
+    schema_pins = _schema_pins_for_case(case)
+    started_at = datetime.now(timezone.utc)
+    stage_order: list[str] = ["load_fixture"]
+    article_results: list[ReplayArticleResult] = []
+    contexts: list[Any] = []
+
+    artifacts, normalized_from_raw = _fixture_artifacts(case)
+    if normalized_from_raw:
+        stage_order.append("normalize")
+
+    with tempfile.TemporaryDirectory(prefix="subsystem-news-fixture-replay-") as temp_root:
+        dedupe_store = DedupeStore(Path(temp_root) / "dedupe")
+        for artifact in artifacts:
+            last_stage = "load_fixture"
+            try:
+                last_stage = "dedupe"
+                stage_order.append("dedupe")
+                cluster = merge_into_cluster(
+                    artifact,
+                    dedupe_store,
+                    threshold=dedupe_threshold,
+                )
+                clustered_artifact = dedupe_store.load_article_snapshot(artifact.article_id)
+                representative = dedupe_store.load_article_snapshot(
+                    cluster.representative_article_id
+                )
+
+                last_stage = "mention_detect"
+                stage_order.append("mention_detect")
+                mentions = detect_mentions(representative)
+
+                last_stage = "entity_resolve"
+                stage_order.append("entity_resolve")
+                entity_resolution = resolve_detected_mentions(
+                    mentions,
+                    entity_client,
+                )
+
+                last_stage = "extract"
+                stage_order.append("extract")
+                facts = extract_facts(
+                    representative,
+                    cluster,
+                    entity_resolution,
+                    reasoner_client,
+                    schema_pin=schema_pins["Ex-1"],
+                )
+
+                last_stage = "signals"
+                stage_order.append("signals")
+                signals = generate_signals(
+                    facts,
+                    reasoner_client,
+                    schema_pin=schema_pins["Ex-2"],
+                )
+
+                last_stage = "graph"
+                stage_order.append("graph")
+                graph_deltas = extract_graph_deltas(
+                    representative,
+                    cluster,
+                    entity_resolution,
+                    facts,
+                    reasoner_client,
+                    schema_pin=schema_pins["Ex-3"],
+                )
+
+                context = _FixtureReplayContext(
+                    article_id=clustered_artifact.article_id,
+                    cluster_id=cluster.cluster_id,
+                    source_reference=clustered_artifact.source_reference,
+                    artifact=clustered_artifact,
+                    representative_artifact=representative,
+                    entity_resolution=entity_resolution,
+                    facts=facts,
+                    signals=signals,
+                    graph_deltas=graph_deltas,
+                    schema_pins=schema_pins,
+                )
+                contexts.append(context)
+                article_results.append(_article_result_for_context(context))
+            except Exception as exc:  # noqa: BLE001 - replay reports per-article failures.
+                article_results.append(
+                    ReplayArticleResult(
+                        article_id=artifact.article_id,
+                        source_reference=artifact.source_reference,
+                        status="failed",
+                        baseline_available=False,
+                        error_stage=last_stage,
+                        error_message=f"{exc.__class__.__name__}: {exc}",
+                    )
+                )
+
+    if stage_order[-1:] != ["diff"]:
+        stage_order.append("diff")
+    error_count = sum(1 for result in article_results if result.status == "failed")
+    return ReplayRunResult(
+        replay_id=_fixture_replay_id(started_at, request),
+        input_kind="artifact",
+        input_path=str(request.input_path),
+        source_run_id=None,
+        started_at=started_at,
+        completed_at=datetime.now(timezone.utc),
+        article_results=article_results,
+        changed_count=0,
+        error_count=error_count,
+        has_changes=False,
+        stage_order=stage_order,
+        metadata={
+            "case_id": case.case_id,
+            "category": case.category,
+            "article_count": len(artifacts),
+            **_metadata_for_fixture_contexts(contexts),
+        },
+    )
+
+
+class _FixtureReplayContext:
+    def __init__(
+        self,
+        *,
+        article_id: str,
+        cluster_id: str,
+        source_reference: Any,
+        artifact: NewsArticleArtifact,
+        representative_artifact: NewsArticleArtifact,
+        entity_resolution: EntityResolutionResult,
+        facts: list[NewsFactCandidate],
+        signals: list[NewsSignalCandidate],
+        graph_deltas: list[NewsGraphDeltaCandidate],
+        schema_pins: dict[str, Any],
+    ) -> None:
+        self.article_id = article_id
+        self.cluster_id = cluster_id
+        self.source_reference = source_reference
+        self.artifact = artifact
+        self.representative_artifact = representative_artifact
+        self.entity_resolution = entity_resolution
+        self.facts = facts
+        self.signals = signals
+        self.graph_deltas = graph_deltas
+        self.schema_pins = schema_pins
 
 
 def _case_metrics(
@@ -371,6 +603,279 @@ def _results_expect_unresolved(case_results: list[RegressionCaseResult]) -> bool
     )
 
 
+def _case_replay_input_path(case: FixtureCase, suite: FixtureSuite) -> Path:
+    if suite.manifest_path is not None:
+        return suite.manifest_path
+    if suite.root_path is not None:
+        return suite.root_path / "manifest.json"
+    return Path(f"{case.case_id}.fixture.json")
+
+
+def _fixture_case_from_request(request: ReplayRequest) -> FixtureCase:
+    payload = request.metadata.get("fixture_case")
+    if payload is None:
+        raise ContractViolationError(
+            "fixture replay requires fixture_case metadata; use run_regression_suite"
+        )
+    try:
+        return FixtureCase.model_validate(payload)
+    except (ValidationError, ValueError, TypeError) as exc:
+        raise ContractViolationError("fixture_case metadata violates FixtureCase") from exc
+
+
+def _schema_pins_for_case(case: FixtureCase) -> dict[str, Any]:
+    required = {"Ex-1", "Ex-2", "Ex-3"}
+    missing = required - set(case.version_pins)
+    if missing:
+        raise ContractViolationError(
+            "fixture replay requires schema pins for "
+            + ", ".join(sorted(missing))
+        )
+    return {contract: case.version_pins[contract] for contract in sorted(required)}
+
+
+def _fixture_artifacts(
+    case: FixtureCase,
+) -> tuple[list[NewsArticleArtifact], bool]:
+    artifact_hints = {
+        artifact.article_id: artifact for artifact in case.normalized_artifacts
+    }
+    if case.raw_inputs:
+        return (
+            [
+                _artifact_from_raw_input(raw_input, artifact_hints.get(raw_input.article_id))
+                for raw_input in case.raw_inputs
+            ],
+            True,
+        )
+    if case.normalized_artifacts:
+        return (
+            [
+                _artifact_from_normalized_artifact(artifact)
+                for artifact in case.normalized_artifacts
+            ],
+            True,
+        )
+    raise ContractViolationError(
+        f"{case.case_id} fixture replay requires raw_inputs or normalized_artifacts"
+    )
+
+
+def _artifact_from_raw_input(
+    raw_input: FixtureArticleInput,
+    artifact_hint: NewsArticleArtifact | None,
+) -> NewsArticleArtifact:
+    raw_fetch = _raw_fetch_from_fixture_input(raw_input, artifact_hint)
+    normalized = normalize_article(raw_fetch)
+    return normalized.model_copy(
+        update={
+            "article_id": raw_input.article_id,
+            "cluster_id": None,
+        }
+    )
+
+
+def _artifact_from_normalized_artifact(
+    artifact: NewsArticleArtifact,
+) -> NewsArticleArtifact:
+    raw_fetch = _raw_fetch_from_artifact(artifact)
+    normalized = normalize_article(raw_fetch)
+    return normalized.model_copy(
+        update={
+            "article_id": artifact.article_id,
+            "cluster_id": None,
+        }
+    )
+
+
+def _raw_fetch_from_fixture_input(
+    raw_input: FixtureArticleInput,
+    artifact_hint: NewsArticleArtifact | None,
+) -> RawArticleFetch:
+    source_reference = raw_input.source_reference
+    url = str(source_reference.url) if source_reference.url is not None else None
+    source_id = source_reference.source_id
+    source = NewsSourceConfig(
+        source_id=source_id,
+        display_name=source_id,
+        access_mode="api",
+        base_url=url or "https://fixture.invalid/",
+        approved=True,
+        reliability_tier=(
+            artifact_hint.reliability_tier if artifact_hint is not None else "C"
+        ),
+        license_tag=artifact_hint.license_tag if artifact_hint is not None else "fixture",
+        language=artifact_hint.language if artifact_hint is not None else "und",
+        credential_ref=None,
+    )
+    ref = NewsArticleRef(
+        source_id=source_id,
+        source_reference=source_reference,
+        url=url,
+        provider_key=source_reference.provider_key,
+        title_hint=raw_input.title,
+        published_at_hint=raw_input.published_at,
+        cursor=source_reference.provider_key or url,
+    )
+    payload = {
+        "source_reference": source_reference,
+        "raw_title": raw_input.title,
+        "raw_body": raw_input.body_text,
+        "published_at_raw": raw_input.published_at.isoformat(),
+        "author_or_channel": (
+            artifact_hint.author_or_channel
+            if artifact_hint is not None
+            else "Fixture"
+        ),
+    }
+    content_hash = raw_content_hash(payload)
+    return RawArticleFetch(
+        ref=ref,
+        source=source,
+        raw_title=raw_input.title,
+        raw_body=raw_input.body_text,
+        raw_html=None,
+        summary=None,
+        published_at_raw=raw_input.published_at.isoformat(),
+        author_or_channel=str(payload["author_or_channel"]),
+        fetched_at=raw_input.fetched_at,
+        content_hash=content_hash,
+        trace_id=trace_id_for(source_id, content_hash, raw_input.fetched_at),
+    )
+
+
+def _raw_fetch_from_artifact(artifact: NewsArticleArtifact) -> RawArticleFetch:
+    source_reference = artifact.source_reference
+    url = str(source_reference.url) if source_reference.url is not None else None
+    source = NewsSourceConfig(
+        source_id=artifact.source_id,
+        display_name=artifact.source_id,
+        access_mode="api",
+        base_url=url or "https://fixture.invalid/",
+        approved=True,
+        reliability_tier=artifact.reliability_tier,
+        license_tag=artifact.license_tag,
+        language=artifact.language,
+        credential_ref=None,
+    )
+    ref = NewsArticleRef(
+        source_id=artifact.source_id,
+        source_reference=source_reference,
+        url=url,
+        provider_key=source_reference.provider_key,
+        title_hint=artifact.title,
+        published_at_hint=artifact.published_at,
+        cursor=source_reference.provider_key or url,
+    )
+    payload = {
+        "source_reference": source_reference,
+        "raw_title": artifact.title,
+        "raw_body": artifact.body_text,
+        "published_at_raw": artifact.published_at.isoformat(),
+        "author_or_channel": artifact.author_or_channel,
+    }
+    content_hash = raw_content_hash(payload)
+    return RawArticleFetch(
+        ref=ref,
+        source=source,
+        raw_title=artifact.title,
+        raw_body=artifact.body_text,
+        raw_html=None,
+        summary=None,
+        published_at_raw=artifact.published_at.isoformat(),
+        author_or_channel=artifact.author_or_channel,
+        fetched_at=artifact.fetched_at,
+        content_hash=content_hash,
+        trace_id=trace_id_for(artifact.source_id, content_hash, artifact.fetched_at),
+    )
+
+
+def _article_result_for_context(context: _FixtureReplayContext) -> ReplayArticleResult:
+    return ReplayArticleResult(
+        article_id=context.article_id,
+        source_reference=context.source_reference,
+        status="processed",
+        baseline_available=False,
+        has_changes=False,
+        replayed=ReplayArticleSummary(
+            article_id=context.article_id,
+            cluster_id=context.cluster_id,
+            representative_article_id=context.representative_artifact.article_id,
+            source_reference=context.source_reference,
+            candidate_ids=[
+                _candidate_key(candidate) for candidate in _context_candidates(context)
+            ],
+            schema_pins=_version_map(context),
+        ),
+    )
+
+
+def _metadata_for_fixture_contexts(
+    contexts: list[_FixtureReplayContext],
+) -> dict[str, Any]:
+    candidates: list[dict[str, Any]] = []
+    evidence_spans: dict[str, Any] = {}
+    entity_resolutions: dict[str, Any] = {}
+    schema_pins: dict[str, Any] = {}
+
+    for context in contexts:
+        for candidate in _context_candidates(context):
+            candidates.append(candidate.model_dump(mode="json"))
+            for index, span in enumerate(candidate.evidence_spans):
+                evidence_spans[f"{_candidate_key(candidate)}:evidence:{index}"] = (
+                    span.model_dump(mode="json")
+                )
+            for entity in _candidate_entities(candidate):
+                entity_resolutions[f"{candidate.candidate_id}:{entity.mention_text}"] = (
+                    entity.model_dump(mode="json")
+                )
+        for name, pin in _version_map(context).items():
+            schema_pins.setdefault(name, pin)
+
+    return {
+        "candidate_payloads": candidates,
+        "evidence_spans": evidence_spans,
+        "entity_resolutions": entity_resolutions,
+        "schema_pins": schema_pins,
+    }
+
+
+def _context_candidates(context: _FixtureReplayContext) -> list[CandidatePayload]:
+    return [*context.facts, *context.signals, *context.graph_deltas]
+
+
+def _candidate_key(candidate: CandidatePayload) -> str:
+    return f"{candidate.export_contract}:{candidate.candidate_id}"
+
+
+def _version_map(context: _FixtureReplayContext) -> dict[str, dict[str, Any]]:
+    return {
+        name: pin.model_dump(mode="json")
+        for name, pin in sorted(context.schema_pins.items())
+    }
+
+
+def _configured_entity_client() -> EntityRegistryClient:
+    base_url = (
+        os.environ.get("SUBSYSTEM_NEWS_ENTITY_REGISTRY_URL")
+        or os.environ.get("ENTITY_REGISTRY_URL")
+        or ""
+    ).strip()
+    parsed = urlparse(base_url)
+    if parsed.scheme not in {"http", "https"} or not parsed.netloc:
+        raise ContractViolationError(
+            "fixture replay requires an entity-registry URL in "
+            "SUBSYSTEM_NEWS_ENTITY_REGISTRY_URL or ENTITY_REGISTRY_URL, "
+            "or an explicit entity_client"
+        )
+    return HttpEntityRegistryClient(base_url)
+
+
+def _fixture_replay_id(started_at: datetime, request: ReplayRequest) -> str:
+    stamp = started_at.strftime("%Y%m%dT%H%M%S%fZ")
+    return f"fixture-replay-{request.case_id}-{stamp}"
+
+
 def _threshold_violations(
     metrics: dict[str, float],
     thresholds: RegressionThresholds,
@@ -392,4 +897,8 @@ def _threshold_violations(
     return violations
 
 
-__all__ = ["run_regression_suite"]
+__all__ = [
+    "fixture_replay_runner",
+    "replay_fixture_case",
+    "run_regression_suite",
+]
