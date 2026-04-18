@@ -14,8 +14,12 @@ from subsystem_news.entities.resolver_client import (
     StubEntityRegistryClient,
 )
 from subsystem_news.errors import ContractViolationError
-from subsystem_news.extract.runtime_client import DefaultReasonerRuntimeClient, ReasonerRuntimeClient
+from subsystem_news.extract.runtime_client import ReasonerRuntimeClient
 from subsystem_news.runtime.artifact_store import ArtifactStore
+from subsystem_news.runtime.backend_config import (
+    load_runtime_backend_config,
+    resolve_reasoner_client,
+)
 from subsystem_news.runtime.models import PipelineConfig, PipelineRunResult
 from subsystem_news.runtime.pipeline import Pipeline
 from subsystem_news.runtime.submit import DefaultSubsystemSdkClient, SubmitReceipt, SubsystemSdkClient
@@ -49,8 +53,7 @@ def run_once(
             artifact_store=artifact_store or ArtifactStore(config.artifact_root),
             dedupe_store=dedupe_store or DedupeStore(config.dedupe_root),
             entity_client=_entity_client_for_config(config, entity_client),
-            reasoner_client=reasoner_client
-            or (_NoopReasonerRuntimeClient() if config.dry_run else DefaultReasonerRuntimeClient()),
+            reasoner_client=_reasoner_client_for_config(config, reasoner_client),
             sdk_client=sdk_client
             or (_NoopSubsystemSdkClient() if config.dry_run else DefaultSubsystemSdkClient()),
             trace_dir=config.trace_root,
@@ -114,6 +117,17 @@ def _entity_client_for_config(
             "or ENTITY_REGISTRY_URL to point at entity-registry"
         )
     return HttpEntityRegistryClient(base_url)
+
+
+def _reasoner_client_for_config(
+    config: PipelineConfig,
+    reasoner_client: ReasonerRuntimeClient | None,
+) -> ReasonerRuntimeClient:
+    if reasoner_client is not None:
+        return reasoner_client
+    if config.dry_run:
+        return _NoopReasonerRuntimeClient()
+    return resolve_reasoner_client(load_runtime_backend_config())
 
 
 class _NoopReasonerRuntimeClient:

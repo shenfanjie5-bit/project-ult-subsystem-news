@@ -1,0 +1,39 @@
+{
+  "candidate_id": "golden-ex2-sector-positive",
+  "article_id": "golden-article-sector-positive",
+  "cluster_id": "golden-cluster-sector-positive",
+  "source_reference": {
+    "source_id": "golden-api",
+    "url": "https://golden.example.com/sector-positive",
+    "provider_key": "sector-positive",
+    "original_locator": {
+      "locator_type": "api_id",
+      "locator_value": "sector-positive"
+    }
+  },
+  "signal_type": "sector_rotation",
+  "direction": "positive",
+  "magnitude": 0.63,
+  "affected_entities": [
+    {
+      "mention_text": "grid equipment makers",
+      "canonical_id": null,
+      "resolution_status": "unresolved",
+      "type_hint": "sector"
+    }
+  ],
+  "impact_scope": "sector",
+  "time_horizon": "long",
+  "rationale": "Policy support creates a positive sector-level impact for grid equipment makers.",
+  "confidence": 0.77,
+  "evidence_spans": [
+    {
+      "article_id": "golden-article-sector-positive",
+      "start_char": 2,
+      "end_char": 76,
+      "quote": "Policy support lifted long-term demand expectations for grid equipment makers.",
+      "locator": "body"
+    }
+  ],
+  "export_contract": "Ex-2"
+}

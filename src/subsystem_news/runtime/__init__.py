@@ -1,6 +1,12 @@
 """Pipeline assembly, submit integration, and replay entry points."""
 
 from subsystem_news.runtime.artifact_store import ArtifactStore
+from subsystem_news.runtime.backend_config import (
+    ReasonerClientFactory,
+    RuntimeBackendConfig,
+    load_runtime_backend_config,
+    resolve_reasoner_client,
+)
 from subsystem_news.runtime.models import (
     CandidatePayload,
     PipelineArticleContext,
@@ -40,16 +46,20 @@ __all__ = [
     "PipelineArticleResult",
     "PipelineConfig",
     "PipelineRunResult",
+    "ReasonerClientFactory",
     "ReplayArticleResult",
     "ReplayArticleSummary",
     "ReplayRunResult",
     "ReplayValueDiff",
+    "RuntimeBackendConfig",
     "SubmitReceipt",
     "SubsystemSdkClient",
     "candidate_idempotency_key",
+    "load_runtime_backend_config",
     "load_pipeline_trace",
     "replay_artifact_snapshot",
     "replay_trace",
+    "resolve_reasoner_client",
     "run_once",
     "submit_candidates",
     "validate_candidate_batch",

@@ -1,0 +1,39 @@
+{
+  "candidate_id": "golden-ex2-company-positive",
+  "article_id": "golden-article-company-positive",
+  "cluster_id": "golden-cluster-company-positive",
+  "source_reference": {
+    "source_id": "golden-wire",
+    "url": "https://golden.example.com/company-positive",
+    "provider_key": "company-positive",
+    "original_locator": {
+      "locator_type": "fixture",
+      "locator_value": "company-positive"
+    }
+  },
+  "signal_type": "event_impact",
+  "direction": "positive",
+  "magnitude": "high",
+  "affected_entities": [
+    {
+      "mention_text": "Acme Corp",
+      "canonical_id": "entity:acme-corp",
+      "resolution_status": "resolved",
+      "type_hint": "company"
+    }
+  ],
+  "impact_scope": "company",
+  "time_horizon": "short",
+  "rationale": "Acme Corp signed a new contract supported by direct article evidence.",
+  "confidence": 0.91,
+  "evidence_spans": [
+    {
+      "article_id": "golden-article-company-positive",
+      "start_char": 0,
+      "end_char": 48,
+      "quote": "Acme Corp signed a new supply contract today.",
+      "locator": "body"
+    }
+  ],
+  "export_contract": "Ex-2"
+}

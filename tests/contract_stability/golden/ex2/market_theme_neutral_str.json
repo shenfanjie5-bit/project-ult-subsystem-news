@@ -1,0 +1,39 @@
+{
+  "candidate_id": "golden-ex2-market-theme-neutral",
+  "article_id": "golden-article-market-theme-neutral",
+  "cluster_id": "golden-cluster-market-theme-neutral",
+  "source_reference": {
+    "source_id": "golden-wire",
+    "url": "https://golden.example.com/market-theme-neutral",
+    "provider_key": "market-theme-neutral",
+    "original_locator": {
+      "locator_type": "fixture",
+      "locator_value": "market-theme-neutral"
+    }
+  },
+  "signal_type": "sentiment",
+  "direction": "neutral",
+  "magnitude": "low",
+  "affected_entities": [
+    {
+      "mention_text": "battery storage theme",
+      "canonical_id": null,
+      "resolution_status": "unresolved",
+      "type_hint": "market_theme"
+    }
+  ],
+  "impact_scope": "market_theme",
+  "time_horizon": "long",
+  "rationale": "The article repeats a market theme without clear directional impact.",
+  "confidence": 0.7,
+  "evidence_spans": [
+    {
+      "article_id": "golden-article-market-theme-neutral",
+      "start_char": 4,
+      "end_char": 70,
+      "quote": "Analysts repeated a battery storage theme without new guidance.",
+      "locator": "body"
+    }
+  ],
+  "export_contract": "Ex-2"
+}

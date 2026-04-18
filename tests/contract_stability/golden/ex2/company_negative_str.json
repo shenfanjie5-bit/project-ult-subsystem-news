@@ -1,0 +1,39 @@
+{
+  "candidate_id": "golden-ex2-company-negative",
+  "article_id": "golden-article-company-negative",
+  "cluster_id": null,
+  "source_reference": {
+    "source_id": "golden-api",
+    "url": "https://golden.example.com/company-negative",
+    "provider_key": "company-negative",
+    "original_locator": {
+      "locator_type": "api_id",
+      "locator_value": "company-negative"
+    }
+  },
+  "signal_type": "event_impact",
+  "direction": "negative",
+  "magnitude": "medium",
+  "affected_entities": [
+    {
+      "mention_text": "Globex Inc",
+      "canonical_id": "entity:globex-inc",
+      "resolution_status": "resolved",
+      "type_hint": "company"
+    }
+  ],
+  "impact_scope": "company",
+  "time_horizon": "medium",
+  "rationale": "Globex Inc faces litigation tied to delayed modules.",
+  "confidence": 0.84,
+  "evidence_spans": [
+    {
+      "article_id": "golden-article-company-negative",
+      "start_char": 5,
+      "end_char": 62,
+      "quote": "Globex Inc faces litigation tied to delayed modules.",
+      "locator": "body"
+    }
+  ],
+  "export_contract": "Ex-2"
+}
