@@ -1,0 +1,24 @@
+[
+  {
+    "source_id": "runtime-primary-api",
+    "display_name": "Runtime Primary API",
+    "access_mode": "api",
+    "base_url": "https://runtime.example.com/api/primary",
+    "approved": true,
+    "reliability_tier": "A",
+    "license_tag": "runtime-fixture",
+    "language": "en",
+    "credential_ref": null
+  },
+  {
+    "source_id": "runtime-secondary-api",
+    "display_name": "Runtime Secondary API",
+    "access_mode": "api",
+    "base_url": "https://runtime.example.com/api/secondary",
+    "approved": true,
+    "reliability_tier": "B",
+    "license_tag": "runtime-fixture",
+    "language": "en",
+    "credential_ref": null
+  }
+]
