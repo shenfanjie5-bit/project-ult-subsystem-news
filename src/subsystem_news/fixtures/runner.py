@@ -15,7 +15,6 @@ from subsystem_news.contracts.candidates import (
 )
 from subsystem_news.errors import ContractViolationError
 from subsystem_news.fixtures.catalog import (
-    ExpectedCandidateSummary,
     FixtureCase,
     FixtureSuite,
     RegressionCaseResult,
@@ -28,7 +27,6 @@ from subsystem_news.fixtures.metrics import (
     compute_evidence_coverage,
     compute_ex2_contract_completeness,
     compute_ex3_false_positive_rate,
-    compute_unresolved_explicitness,
 )
 from subsystem_news.runtime.models import CandidatePayload
 from subsystem_news.runtime.replay import (
@@ -67,14 +65,19 @@ def run_regression_suite(
         passed=False,
     )
     metrics = {
-        "evidence_coverage": _expected_evidence_coverage(case_results)
-        if not all_candidates
-        else compute_evidence_coverage(all_candidates),
+        "evidence_coverage": _evidence_coverage_from_replayed(
+            case_results,
+            all_candidates,
+        ),
         "dedupe_precision": compute_dedupe_precision(provisional),
-        "unresolved_explicitness": compute_unresolved_explicitness(provisional),
-        "ex2_contract_completeness": _expected_ex2_completeness(case_results)
-        if not all_candidates
-        else compute_ex2_contract_completeness(all_candidates),
+        "unresolved_explicitness": _unresolved_explicitness_from_replayed(
+            case_results,
+            all_candidates,
+        ),
+        "ex2_contract_completeness": _ex2_completeness_from_replayed(
+            case_results,
+            all_candidates,
+        ),
         "ex3_false_positive_rate": compute_ex3_false_positive_rate(provisional),
     }
     violations = _threshold_violations(metrics, thresholds)
@@ -107,9 +110,29 @@ def _run_case(
         baseline = replay_article(request)
         replayed = replay_runner(request)
         diff = diff_replay_results(baseline, replayed)
-        candidates = _candidate_payloads_from_result(replayed)
-        metrics = _case_metrics(case, diff=diff, candidates=candidates)
-        status = "failed" if diff.has_changes or replayed.error_count else "passed"
+        candidates = _case_candidate_payloads(
+            case,
+            _candidate_payloads_from_result(replayed),
+        )
+        missing_candidate_payloads = _missing_candidate_payloads(case, candidates)
+        expected_output_mismatch = _expected_output_mismatch(case, candidates)
+        metrics = _case_metrics(
+            case,
+            diff=diff,
+            candidates=candidates,
+            missing_candidate_payloads=missing_candidate_payloads,
+            expected_output_mismatch=expected_output_mismatch,
+        )
+        status = (
+            "failed"
+            if (
+                diff.has_changes
+                or replayed.error_count
+                or missing_candidate_payloads
+                or expected_output_mismatch
+            )
+            else "passed"
+        )
         return (
             RegressionCaseResult(
                 case_id=case.case_id,
@@ -122,6 +145,8 @@ def _run_case(
                 metrics=metrics,
                 metadata={
                     "expected_cluster_id": case.expected_cluster_id,
+                    "missing_candidate_payloads": missing_candidate_payloads,
+                    "expected_output_mismatch": expected_output_mismatch,
                     **case.metadata,
                 },
             ),
@@ -137,9 +162,17 @@ def _run_case(
                 baseline_path=str(baseline_path),
                 expected_outputs=list(case.expected_outputs),
                 replay_error=f"{exc.__class__.__name__}: {exc}",
-                metrics=_case_metrics(case, diff=None, candidates=[]),
+                metrics=_case_metrics(
+                    case,
+                    diff=None,
+                    candidates=[],
+                    missing_candidate_payloads=_case_expects_candidates(case),
+                    expected_output_mismatch=_case_expects_candidates(case),
+                ),
                 metadata={
                     "expected_cluster_id": case.expected_cluster_id,
+                    "missing_candidate_payloads": _case_expects_candidates(case),
+                    "expected_output_mismatch": _case_expects_candidates(case),
                     **case.metadata,
                 },
             ),
@@ -152,41 +185,67 @@ def _case_metrics(
     *,
     diff: Any,
     candidates: list[CandidatePayload],
+    missing_candidate_payloads: bool,
+    expected_output_mismatch: bool,
 ) -> dict[str, float]:
     outputs = list(case.expected_outputs)
     ex3_count = sum(1 for candidate in candidates if candidate.export_contract == "Ex-3")
-    if not candidates:
-        ex3_count = sum(1 for output in outputs if output.export_contract == "Ex-3")
 
     dedupe_correct = 1.0
     if case.category == "repost_cluster":
-        expected_ex2_ids = {
-            output.candidate_id
-            for output in outputs
-            if output.export_contract == "Ex-2"
+        article_ids = set(case.article_ids)
+        replayed_article_ids = {candidate.article_id for candidate in candidates}
+        cluster_ids = {
+            candidate.cluster_id
+            for candidate in candidates
+            if getattr(candidate, "cluster_id", None) is not None
         }
-        duplicate_target = float(case.metadata.get("expected_folded_duplicates", 1.0))
-        dedupe_correct = 1.0 if expected_ex2_ids and duplicate_target >= 1.0 else 0.0
+        dedupe_correct = (
+            1.0
+            if candidates
+            and article_ids.issubset(replayed_article_ids)
+            and len(cluster_ids) == 1
+            else 0.0
+        )
         if diff is not None and getattr(diff, "candidate_diffs", None):
             dedupe_correct = 0.0
 
     return {
         "expected_candidate_count": float(len(outputs)),
+        "actual_candidate_count": float(len(candidates)),
         "expected_ex2_count": float(
             sum(1 for output in outputs if output.export_contract == "Ex-2")
+        ),
+        "actual_ex2_count": float(
+            sum(1 for candidate in candidates if candidate.export_contract == "Ex-2")
         ),
         "expected_ex3_count": float(
             sum(1 for output in outputs if output.export_contract == "Ex-3")
         ),
+        "actual_ex3_count": float(ex3_count),
         "ex3_candidate_count": float(ex3_count),
+        "missing_candidate_payloads": 1.0 if missing_candidate_payloads else 0.0,
+        "expected_output_mismatch": 1.0 if expected_output_mismatch else 0.0,
         "dedupe_correct": dedupe_correct,
     }
 
 
+def _case_candidate_payloads(
+    case: FixtureCase,
+    candidates: list[CandidatePayload],
+) -> list[CandidatePayload]:
+    article_ids = set(case.article_ids)
+    return [
+        candidate for candidate in candidates if candidate.article_id in article_ids
+    ]
+
+
 def _candidate_payloads_from_result(result: ReplayResult) -> list[CandidatePayload]:
-    payloads = result.metadata.get("candidate_payloads", [])
-    if not isinstance(payloads, list):
+    payloads = result.metadata.get("candidate_payloads")
+    if payloads is None:
         return []
+    if not isinstance(payloads, list):
+        raise ContractViolationError("candidate_payloads must be a list")
     candidates: list[CandidatePayload] = []
     for payload in payloads:
         if not isinstance(payload, dict):
@@ -209,40 +268,107 @@ def _candidate_from_payload(payload: dict[str, Any]) -> CandidatePayload:
     raise ContractViolationError("candidate payload missing supported export_contract")
 
 
-def _expected_evidence_coverage(case_results: list[RegressionCaseResult]) -> float:
-    outputs = _expected_outputs(case_results)
-    if not outputs:
-        return 1.0
-    covered = sum(1 for output in outputs if output.evidence_spans)
-    return covered / len(outputs)
+def _missing_candidate_payloads(
+    case: FixtureCase,
+    candidates: list[CandidatePayload],
+) -> bool:
+    return _case_expects_candidates(case) and not candidates
 
 
-def _expected_ex2_completeness(case_results: list[RegressionCaseResult]) -> float:
-    outputs = [
-        output
-        for output in _expected_outputs(case_results)
-        if output.export_contract == "Ex-2"
-    ]
-    if not outputs:
-        return 1.0
-    complete = sum(
-        1
-        for output in outputs
-        if output.direction is not None
-        and output.magnitude not in {None, ""}
-        and output.affected_entities
-    )
-    return complete / len(outputs)
+def _case_expects_candidates(case: FixtureCase) -> bool:
+    return bool(case.expected_outputs)
 
 
-def _expected_outputs(
+def _expected_output_mismatch(
+    case: FixtureCase,
+    candidates: list[CandidatePayload],
+) -> bool:
+    expected_ids = {output.candidate_id for output in case.expected_outputs}
+    actual_ids = {candidate.candidate_id for candidate in candidates}
+    return expected_ids != actual_ids
+
+
+def _evidence_coverage_from_replayed(
     case_results: list[RegressionCaseResult],
-) -> list[ExpectedCandidateSummary]:
-    return [
-        output
+    candidates: list[CandidatePayload],
+) -> float:
+    if candidates:
+        return compute_evidence_coverage(candidates)
+    if _results_expect_candidates(case_results):
+        return 0.0
+    return compute_evidence_coverage(candidates)
+
+
+def _ex2_completeness_from_replayed(
+    case_results: list[RegressionCaseResult],
+    candidates: list[CandidatePayload],
+) -> float:
+    has_replayed_ex2 = any(
+        candidate.export_contract == "Ex-2" for candidate in candidates
+    )
+    if has_replayed_ex2:
+        return compute_ex2_contract_completeness(candidates)
+    if _results_expect_ex2(case_results):
+        return 0.0
+    return compute_ex2_contract_completeness(candidates)
+
+
+def _unresolved_explicitness_from_replayed(
+    case_results: list[RegressionCaseResult],
+    candidates: list[CandidatePayload],
+) -> float:
+    entities = [
+        entity
+        for candidate in candidates
+        for entity in _candidate_entities(candidate)
+        if entity.resolution_status in {"unresolved", "ambiguous"}
+    ]
+    if not entities:
+        return 0.0 if _results_expect_unresolved(case_results) else 1.0
+    explicit = sum(1 for entity in entities if entity.canonical_id is None)
+    return explicit / len(entities)
+
+
+def _candidate_entities(candidate: CandidatePayload) -> list[Any]:
+    if candidate.export_contract == "Ex-1":
+        return list(candidate.involved_entities)
+    if candidate.export_contract == "Ex-2":
+        return list(candidate.affected_entities)
+    return [candidate.subject_entity, candidate.object_entity]
+
+
+def _results_expect_candidates(case_results: list[RegressionCaseResult]) -> bool:
+    return any(result.expected_outputs for result in case_results)
+
+
+def _results_expect_ex2(case_results: list[RegressionCaseResult]) -> bool:
+    return any(
+        output.export_contract == "Ex-2"
         for result in case_results
         for output in result.expected_outputs
-    ]
+    )
+
+
+def _results_expect_unresolved(case_results: list[RegressionCaseResult]) -> bool:
+    return any(
+        entity.resolution_status in {"unresolved", "ambiguous"}
+        for result in case_results
+        for output in result.expected_outputs
+        for entity in [
+            *output.involved_entities,
+            *output.affected_entities,
+            *(
+                [output.subject_entity]
+                if output.subject_entity is not None
+                else []
+            ),
+            *(
+                [output.object_entity]
+                if output.object_entity is not None
+                else []
+            ),
+        ]
+    )
 
 
 def _threshold_violations(

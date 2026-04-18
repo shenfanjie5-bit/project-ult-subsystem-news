@@ -127,6 +127,13 @@ def test_replay_trace_unchanged_has_no_diffs_and_preserves_schema_pins(
     assert result.has_changes is False
     assert result.source_run_id == baseline.run_id
     assert result.article_results
+    assert result.metadata["article_count"] == len(result.article_results)
+    assert result.metadata["candidate_payloads"]
+    assert result.metadata["evidence_spans"]
+    assert result.metadata["entity_resolutions"]
+    assert result.metadata["schema_pins"]["Ex-1"]["schema_version"] == (
+        FACT_SCHEMA_PIN.schema_version
+    )
     assert all(not article.has_changes for article in result.article_results)
     assert all(not article.candidate_diffs for article in result.article_results)
     assert all(not article.evidence_span_diffs for article in result.article_results)

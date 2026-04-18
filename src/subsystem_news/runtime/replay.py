@@ -307,6 +307,7 @@ def _replay_contexts(
     started_at = datetime.now(timezone.utc)
     replay_id = _replay_id(started_at, input_path)
     article_results: list[ReplayArticleResult] = []
+    replayed_contexts: list[PipelineArticleContext] = []
 
     with tempfile.TemporaryDirectory(prefix="subsystem-news-replay-") as temp_root:
         dedupe_store = DedupeStore(Path(temp_root) / "dedupe")
@@ -331,6 +332,7 @@ def _replay_contexts(
                         source_reference=context.source_reference,
                     )
                 )
+                replayed_contexts.append(replayed)
             except Exception as exc:  # noqa: BLE001 - replay must report per-article drift.
                 article_results.append(
                     ReplayArticleResult(
@@ -363,7 +365,10 @@ def _replay_contexts(
         error_count=error_count,
         has_changes=changed_count > 0,
         stage_order=list(stage_order),
-        metadata={"article_count": len(contexts)},
+        metadata={
+            "article_count": len(contexts),
+            **_metadata_for_replayed_contexts(replayed_contexts),
+        },
     )
 
 
@@ -644,6 +649,44 @@ def _version_map(context: PipelineArticleContext) -> dict[str, dict[str, Any]]:
 
 def _context_candidates(context: PipelineArticleContext) -> list[CandidatePayload]:
     return [*context.facts, *context.signals, *context.graph_deltas]
+
+
+def _metadata_for_replayed_contexts(
+    contexts: list[PipelineArticleContext],
+) -> dict[str, Any]:
+    candidates: list[dict[str, Any]] = []
+    evidence_spans: dict[str, Any] = {}
+    entity_resolutions: dict[str, Any] = {}
+    schema_pins: dict[str, Any] = {}
+
+    for context in contexts:
+        for candidate in _context_candidates(context):
+            candidates.append(candidate.model_dump(mode="json"))
+            for index, span in enumerate(candidate.evidence_spans):
+                evidence_spans[f"{_candidate_key(candidate)}:evidence:{index}"] = (
+                    span.model_dump(mode="json")
+                )
+            for entity in _candidate_entities(candidate):
+                entity_resolutions[f"{candidate.candidate_id}:{entity.mention_text}"] = (
+                    entity.model_dump(mode="json")
+                )
+        for name, pin in _version_map(context).items():
+            schema_pins.setdefault(name, pin)
+
+    return {
+        "candidate_payloads": candidates,
+        "evidence_spans": evidence_spans,
+        "entity_resolutions": entity_resolutions,
+        "schema_pins": schema_pins,
+    }
+
+
+def _candidate_entities(candidate: CandidatePayload) -> list[Any]:
+    if candidate.export_contract == "Ex-1":
+        return list(candidate.involved_entities)
+    if candidate.export_contract == "Ex-2":
+        return list(candidate.affected_entities)
+    return [candidate.subject_entity, candidate.object_entity]
 
 
 def _candidate_key(candidate: CandidatePayload) -> str:

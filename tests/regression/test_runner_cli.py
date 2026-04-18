@@ -56,6 +56,25 @@ def test_controlled_changed_output_reports_all_diff_families() -> None:
     assert diff.schema_pin_diffs
 
 
+def test_missing_candidate_payloads_fail_without_expected_metric_fallback() -> None:
+    suite = load_fixture_suite(MANIFEST)
+    suite = suite.model_copy(update={"cases": [suite.cases[0]]})
+
+    report = run_regression_suite(
+        suite,
+        thresholds=suite.thresholds,
+        replay_runner=_metadata_without_candidate_payloads,
+    )
+
+    result = report.case_results[0]
+    assert report.passed is False
+    assert result.status == "failed"
+    assert result.metrics["missing_candidate_payloads"] == 1.0
+    assert result.metrics["actual_candidate_count"] == 0.0
+    assert report.metrics["evidence_coverage"] == 0.0
+    assert report.metrics["ex2_contract_completeness"] == 0.0
+
+
 def test_replay_diff_cli_writes_json_and_markdown(tmp_path: Path) -> None:
     exit_code = main(
         [
@@ -91,6 +110,14 @@ def test_replay_diff_cli_returns_nonzero_for_threshold_failure(tmp_path: Path) -
         for payload in positive["metadata"]["candidate_payloads"]
         if payload["export_contract"] == "Ex-3"
     )
+    target_payload = negative["metadata"]["candidate_payloads"][0]
+    graph_payload = {
+        **graph_payload,
+        "candidate_id": "graph-negative-injected-false-positive",
+        "article_id": target_payload["article_id"],
+        "source_reference": target_payload["source_reference"],
+        "evidence_spans": target_payload["evidence_spans"],
+    }
     negative["metadata"]["candidate_payloads"].append(graph_payload)
     negative_path.write_text(json.dumps(negative, indent=2) + "\n", encoding="utf-8")
 
@@ -126,3 +153,8 @@ def _changed_replay_runner(request: ReplayRequest):
 
     metadata["schema_pins"]["Ex-1"]["schema_version"] = "news_fact_candidate.changed"
     return result.model_copy(update={"metadata": metadata})
+
+
+def _metadata_without_candidate_payloads(request: ReplayRequest):
+    result = replay_article(request)
+    return result.model_copy(update={"metadata": {"article_count": 1}})
