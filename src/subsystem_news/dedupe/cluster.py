@@ -148,6 +148,16 @@ def merge_into_cluster(
 ) -> NewsDedupeCluster:
     """Merge an artifact into a dedupe cluster or create a new one."""
 
+    with store.locked_merge():
+        return _merge_into_cluster_locked(artifact, store, threshold=threshold)
+
+
+def _merge_into_cluster_locked(
+    artifact: NewsArticleArtifact,
+    store: DedupeStore,
+    *,
+    threshold: float,
+) -> NewsDedupeCluster:
     matches = cluster_candidates(artifact, store, threshold=threshold)
     match = matches[0] if matches else None
     if match is None:
@@ -163,6 +173,8 @@ def merge_into_cluster(
             for article_id in match.cluster.member_article_ids
         ]
         members = _unique_members([*existing_members, artifact])
+        if {member.article_id for member in members} == set(match.cluster.member_article_ids):
+            return match.cluster
         confidence = 1.0 if match.reason == "exact" else min(
             match.cluster.cluster_confidence,
             match.score,
@@ -180,6 +192,8 @@ def merge_into_cluster(
         )
 
     conflicts = detect_conflicts(members)
+    for member in members:
+        store.save_article_snapshot(member.model_copy(update={"cluster_id": None}))
     store.save_cluster(cluster)
     for member in members:
         store.save_article_snapshot(member.model_copy(update={"cluster_id": cluster.cluster_id}))

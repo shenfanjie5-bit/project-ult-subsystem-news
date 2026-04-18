@@ -2,21 +2,30 @@
 
 from __future__ import annotations
 
+import fcntl
 import json
 import os
 import tempfile
+import threading
 from collections.abc import Iterator
+from contextlib import contextmanager
 from pathlib import Path
+from typing import ClassVar
+from urllib.parse import urlsplit, urlunsplit
 
 from pydantic import ValidationError
 
 from subsystem_news.contracts.article import NewsArticleArtifact
 from subsystem_news.contracts.cluster import NewsDedupeCluster
+from subsystem_news.dedupe.similarity import article_similarity
 from subsystem_news.errors import ContractViolationError
 
 
 class DedupeStore:
     """Persist dedupe-local snapshots, clusters, and article-cluster indexes."""
+
+    _thread_locks_guard: ClassVar[threading.Lock] = threading.Lock()
+    _thread_locks: ClassVar[dict[str, threading.RLock]] = {}
 
     def __init__(self, root: Path) -> None:
         self.root = root
@@ -24,6 +33,22 @@ class DedupeStore:
         self.cluster_dir = root / "clusters"
         self.trace_dir = root / "traces"
         self._index_path = root / "article_cluster_index.json"
+
+    @contextmanager
+    def locked_merge(self) -> Iterator[None]:
+        """Serialize a dedupe merge transaction for this store root."""
+
+        root_key = str(self.root.resolve())
+        thread_lock = self._thread_lock(root_key)
+        with thread_lock:
+            self.root.mkdir(parents=True, exist_ok=True)
+            lock_path = self.root / ".dedupe_store.lock"
+            with lock_path.open("a+", encoding="utf-8") as lock_file:
+                fcntl.flock(lock_file.fileno(), fcntl.LOCK_EX)
+                try:
+                    yield
+                finally:
+                    fcntl.flock(lock_file.fileno(), fcntl.LOCK_UN)
 
     def save_article_snapshot(self, artifact: NewsArticleArtifact) -> Path:
         """Save an article snapshot without silently overwriting content drift."""
@@ -153,6 +178,156 @@ class DedupeStore:
         incoming_members = set(incoming.member_article_ids)
         if not existing_members.issubset(incoming_members):
             raise ContractViolationError("refusing to remove members from existing cluster")
+        new_member_ids = incoming_members - existing_members
+        if not new_member_ids:
+            self._reject_same_member_cluster_drift(existing, incoming)
+        members = self._load_cluster_update_members(incoming.member_article_ids)
+        self._validate_append_only_cluster(existing, incoming, members, new_member_ids)
+
+    def _reject_same_member_cluster_drift(
+        self,
+        existing: NewsDedupeCluster,
+        incoming: NewsDedupeCluster,
+    ) -> None:
+        for field_name in (
+            "representative_article_id",
+            "canonical_headline",
+            "first_published_at",
+            "source_count",
+            "cluster_confidence",
+        ):
+            if getattr(existing, field_name) != getattr(incoming, field_name):
+                raise ContractViolationError(
+                    f"refusing to overwrite cluster with canonical field drift: {field_name}"
+                )
+        raise ContractViolationError(
+            "refusing to overwrite existing cluster without appended members"
+        )
+
+    def _load_cluster_update_members(
+        self,
+        member_article_ids: list[str],
+    ) -> list[NewsArticleArtifact]:
+        members: list[NewsArticleArtifact] = []
+        for article_id in member_article_ids:
+            try:
+                members.append(self.load_article_snapshot(article_id))
+            except ContractViolationError as exc:
+                raise ContractViolationError(
+                    "cannot append cluster without stored article snapshots"
+                ) from exc
+        return members
+
+    def _validate_append_only_cluster(
+        self,
+        existing: NewsDedupeCluster,
+        incoming: NewsDedupeCluster,
+        members: list[NewsArticleArtifact],
+        new_member_ids: set[str],
+    ) -> None:
+        member_ids = sorted(member.article_id for member in members)
+        if incoming.member_article_ids != member_ids:
+            raise ContractViolationError(
+                "refusing to append cluster with non-canonical member ordering"
+            )
+        representative = self._select_representative(members)
+        expected_first_published_at = min(member.published_at for member in members)
+        expected_source_count = len({member.source_id for member in members})
+        expected_confidence = self._expected_append_confidence(
+            existing,
+            members,
+            new_member_ids,
+        )
+        expected_fields = {
+            "representative_article_id": representative.article_id,
+            "canonical_headline": representative.title,
+            "first_published_at": expected_first_published_at,
+            "source_count": expected_source_count,
+            "cluster_confidence": expected_confidence,
+        }
+        for field_name, expected_value in expected_fields.items():
+            incoming_value = getattr(incoming, field_name)
+            if field_name == "cluster_confidence":
+                if abs(incoming_value - expected_value) <= 1e-12:
+                    continue
+            elif incoming_value == expected_value:
+                continue
+            raise ContractViolationError(
+                f"refusing to overwrite cluster with canonical field drift: {field_name}"
+            )
+
+    def _expected_append_confidence(
+        self,
+        existing: NewsDedupeCluster,
+        members: list[NewsArticleArtifact],
+        new_member_ids: set[str],
+    ) -> float:
+        members_by_id = {member.article_id: member for member in members}
+        accepted_members = [members_by_id[article_id] for article_id in existing.member_article_ids]
+        confidence = existing.cluster_confidence
+        for article_id in sorted(new_member_ids):
+            new_member = members_by_id[article_id]
+            if any(self._has_exact_key_match(new_member, member) for member in accepted_members):
+                score = 1.0
+            else:
+                score = max(
+                    (article_similarity(new_member, member) for member in accepted_members),
+                    default=0.0,
+                )
+            confidence = min(confidence, score)
+            accepted_members.append(new_member)
+        return confidence
+
+    def _has_exact_key_match(
+        self,
+        artifact: NewsArticleArtifact,
+        snapshot: NewsArticleArtifact,
+    ) -> bool:
+        artifact_provider_key = artifact.source_reference.provider_key
+        snapshot_provider_key = snapshot.source_reference.provider_key
+        if (
+            artifact_provider_key is not None
+            and snapshot_provider_key is not None
+            and artifact_provider_key == snapshot_provider_key
+        ):
+            return True
+        artifact_url = self._normalized_url(artifact)
+        snapshot_url = self._normalized_url(snapshot)
+        if artifact_url is not None and snapshot_url is not None and artifact_url == snapshot_url:
+            return True
+        if artifact.content_hash == snapshot.content_hash:
+            return True
+        return artifact.article_fingerprint == snapshot.article_fingerprint
+
+    def _normalized_url(self, artifact: NewsArticleArtifact) -> str | None:
+        if artifact.source_reference.url is None:
+            return None
+        parsed = urlsplit(str(artifact.source_reference.url))
+        path = parsed.path.rstrip("/") or "/"
+        return urlunsplit(
+            (
+                parsed.scheme.lower(),
+                parsed.netloc.lower(),
+                path,
+                parsed.query,
+                "",
+            )
+        )
+
+    def _select_representative(
+        self,
+        members: list[NewsArticleArtifact],
+    ) -> NewsArticleArtifact:
+        reliability_rank = {"A": 0, "B": 1, "C": 2}
+        return sorted(
+            members,
+            key=lambda artifact: (
+                reliability_rank[artifact.reliability_tier],
+                artifact.published_at,
+                -len(artifact.body_text),
+                artifact.article_id,
+            ),
+        )[0]
 
     def _validate_index_update(self, cluster: NewsDedupeCluster) -> None:
         index = self._load_index()
@@ -211,6 +386,15 @@ class DedupeStore:
         self.root.mkdir(parents=True, exist_ok=True)
         payload = json.dumps(index, indent=2, sort_keys=True) + "\n"
         self._write_json(self._index_path, payload)
+
+    @classmethod
+    def _thread_lock(cls, root_key: str) -> threading.RLock:
+        with cls._thread_locks_guard:
+            lock = cls._thread_locks.get(root_key)
+            if lock is None:
+                lock = threading.RLock()
+                cls._thread_locks[root_key] = lock
+            return lock
 
     def _write_json(self, path: Path, payload: str) -> None:
         path.parent.mkdir(parents=True, exist_ok=True)

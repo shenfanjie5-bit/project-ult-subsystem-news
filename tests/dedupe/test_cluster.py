@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import time
+from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
 from subsystem_news.dedupe.cluster import (
@@ -177,3 +179,40 @@ def test_build_cluster_counts_distinct_sources_not_members() -> None:
 
     assert cluster.source_count == 2
     assert cluster.member_article_ids == ["member-a", "member-b", "member-c"]
+
+
+def test_merge_into_cluster_serializes_candidate_selection_after_store_lock(
+    tmp_path: Path,
+) -> None:
+    store = DedupeStore(tmp_path)
+    first = make_artifact(article_id="concurrent-a", content_hash="sha256:concurrent-event")
+    second = make_artifact(
+        article_id="concurrent-b",
+        source_id="source-b",
+        provider_key="provider-b",
+        url="https://source-b.example.com/concurrent-b",
+        content_hash="sha256:concurrent-event",
+        article_fingerprint="sha256:concurrent-b-fp",
+    )
+    seeded_cluster = build_cluster(
+        [first],
+        fingerprint_family="sha256:concurrent-family",
+        confidence=1.0,
+    )
+
+    with ThreadPoolExecutor(max_workers=1) as executor:
+        with store.locked_merge():
+            future = executor.submit(merge_into_cluster, second, store)
+            time.sleep(0.05)
+            assert not future.done()
+            store.save_article_snapshot(first)
+            store.save_cluster(seeded_cluster)
+            store.save_article_snapshot(
+                first.model_copy(update={"cluster_id": seeded_cluster.cluster_id})
+            )
+        second_cluster = future.result(timeout=5)
+
+    assert second_cluster.cluster_id == seeded_cluster.cluster_id
+    assert set(second_cluster.member_article_ids) == {first.article_id, second.article_id}
+    assert store.cluster_for_article(first.article_id) == second_cluster
+    assert store.cluster_for_article(second.article_id) == second_cluster
