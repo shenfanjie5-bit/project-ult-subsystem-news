@@ -1,0 +1,172 @@
+[
+  [
+    {
+      "article_id": "fixture-near-miss-01-a",
+      "source_id": "fixture-wire-a",
+      "source_reference": {"source_id": "fixture-wire-a", "url": "https://wire-a.example.com/news/near-01-a", "provider_key": "near-01-a", "original_locator": {"locator_type": "fixture", "locator_value": "near-01-a"}},
+      "title": "Acme opens a solar module plant in Texas",
+      "body_text": "Acme Corp opened a solar module plant in Texas after completing construction ahead of schedule. Management said the site will supply utility projects and add one hundred manufacturing jobs.",
+      "published_at": "2026-03-01T09:00:00Z",
+      "fetched_at": "2026-03-01T09:04:00Z",
+      "language": "en",
+      "author_or_channel": "Fixture Desk",
+      "content_hash": "sha256:near01a",
+      "article_fingerprint": "sha256:near01a-fp",
+      "license_tag": "fixture-license",
+      "reliability_tier": "A",
+      "cluster_id": null
+    },
+    {
+      "article_id": "fixture-near-miss-01-b",
+      "source_id": "fixture-wire-b",
+      "source_reference": {"source_id": "fixture-wire-b", "url": "https://wire-b.example.com/news/near-01-b", "provider_key": "near-01-b", "original_locator": {"locator_type": "fixture", "locator_value": "near-01-b"}},
+      "title": "Acme closes a battery pack plant in Texas",
+      "body_text": "Acme Corp closed a battery pack plant in Texas after a customer program ended. Management said production will move to Arizona and affected workers will receive severance offers.",
+      "published_at": "2026-03-01T11:00:00Z",
+      "fetched_at": "2026-03-01T11:04:00Z",
+      "language": "en",
+      "author_or_channel": "Fixture Wire",
+      "content_hash": "sha256:near01b",
+      "article_fingerprint": "sha256:near01b-fp",
+      "license_tag": "fixture-license",
+      "reliability_tier": "B",
+      "cluster_id": null
+    }
+  ],
+  [
+    {
+      "article_id": "fixture-near-miss-02-a",
+      "source_id": "fixture-wire-a",
+      "source_reference": {"source_id": "fixture-wire-a", "url": "https://wire-a.example.com/news/near-02-a", "provider_key": "near-02-a", "original_locator": {"locator_type": "fixture", "locator_value": "near-02-a"}},
+      "title": "Globex raises full year revenue guidance",
+      "body_text": "Globex Inc raised full year revenue guidance after software bookings improved in the first quarter. The company said margins should remain stable as subscription renewals offset hardware costs.",
+      "published_at": "2026-03-02T09:00:00Z",
+      "fetched_at": "2026-03-02T09:04:00Z",
+      "language": "en",
+      "author_or_channel": "Fixture Desk",
+      "content_hash": "sha256:near02a",
+      "article_fingerprint": "sha256:near02a-fp",
+      "license_tag": "fixture-license",
+      "reliability_tier": "A",
+      "cluster_id": null
+    },
+    {
+      "article_id": "fixture-near-miss-02-b",
+      "source_id": "fixture-wire-b",
+      "source_reference": {"source_id": "fixture-wire-b", "url": "https://wire-b.example.com/news/near-02-b", "provider_key": "near-02-b", "original_locator": {"locator_type": "fixture", "locator_value": "near-02-b"}},
+      "title": "Globex cuts full year revenue guidance",
+      "body_text": "Globex Inc cut full year revenue guidance after hardware orders weakened in the first quarter. The company said margins will face pressure as component costs rise faster than renewals.",
+      "published_at": "2026-03-02T12:00:00Z",
+      "fetched_at": "2026-03-02T12:04:00Z",
+      "language": "en",
+      "author_or_channel": "Fixture Wire",
+      "content_hash": "sha256:near02b",
+      "article_fingerprint": "sha256:near02b-fp",
+      "license_tag": "fixture-license",
+      "reliability_tier": "B",
+      "cluster_id": null
+    }
+  ],
+  [
+    {
+      "article_id": "fixture-near-miss-03-a",
+      "source_id": "fixture-wire-a",
+      "source_reference": {"source_id": "fixture-wire-a", "url": "https://wire-a.example.com/news/near-03-a", "provider_key": "near-03-a", "original_locator": {"locator_type": "fixture", "locator_value": "near-03-a"}},
+      "title": "North River restarts nickel line at Plant One",
+      "body_text": "North River Metals restarted the nickel line at Plant One after scheduled maintenance. Supervisors said the line should return to normal output during the next two weeks.",
+      "published_at": "2026-03-03T09:00:00Z",
+      "fetched_at": "2026-03-03T09:04:00Z",
+      "language": "en",
+      "author_or_channel": "Fixture Desk",
+      "content_hash": "sha256:near03a",
+      "article_fingerprint": "sha256:near03a-fp",
+      "license_tag": "fixture-license",
+      "reliability_tier": "A",
+      "cluster_id": null
+    },
+    {
+      "article_id": "fixture-near-miss-03-b",
+      "source_id": "fixture-wire-b",
+      "source_reference": {"source_id": "fixture-wire-b", "url": "https://wire-b.example.com/news/near-03-b", "provider_key": "near-03-b", "original_locator": {"locator_type": "fixture", "locator_value": "near-03-b"}},
+      "title": "North River restarts copper line at Plant Two",
+      "body_text": "North River Metals restarted the copper line at Plant Two after an electrical outage. Supervisors said shipments will resume once safety inspectors clear the affected building.",
+      "published_at": "2026-03-03T15:00:00Z",
+      "fetched_at": "2026-03-03T15:04:00Z",
+      "language": "en",
+      "author_or_channel": "Fixture Wire",
+      "content_hash": "sha256:near03b",
+      "article_fingerprint": "sha256:near03b-fp",
+      "license_tag": "fixture-license",
+      "reliability_tier": "B",
+      "cluster_id": null
+    }
+  ],
+  [
+    {
+      "article_id": "fixture-near-miss-04-a",
+      "source_id": "fixture-wire-a",
+      "source_reference": {"source_id": "fixture-wire-a", "url": "https://wire-a.example.com/news/near-04-a", "provider_key": "near-04-a", "original_locator": {"locator_type": "fixture", "locator_value": "near-04-a"}},
+      "title": "HelioGrid wins offshore wind maintenance contract",
+      "body_text": "HelioGrid won an offshore wind maintenance contract covering turbines near the Atlantic coast. The company said work starts in July and will use existing service crews.",
+      "published_at": "2026-03-04T09:00:00Z",
+      "fetched_at": "2026-03-04T09:04:00Z",
+      "language": "en",
+      "author_or_channel": "Fixture Desk",
+      "content_hash": "sha256:near04a",
+      "article_fingerprint": "sha256:near04a-fp",
+      "license_tag": "fixture-license",
+      "reliability_tier": "A",
+      "cluster_id": null
+    },
+    {
+      "article_id": "fixture-near-miss-04-b",
+      "source_id": "fixture-wire-b",
+      "source_reference": {"source_id": "fixture-wire-b", "url": "https://wire-b.example.com/news/near-04-b", "provider_key": "near-04-b", "original_locator": {"locator_type": "fixture", "locator_value": "near-04-b"}},
+      "title": "HelioGrid loses offshore wind maintenance contract",
+      "body_text": "HelioGrid lost an offshore wind maintenance contract covering turbines near the Baltic coast. The company said the customer selected a rival bidder after a pricing review.",
+      "published_at": "2026-03-04T13:00:00Z",
+      "fetched_at": "2026-03-04T13:04:00Z",
+      "language": "en",
+      "author_or_channel": "Fixture Wire",
+      "content_hash": "sha256:near04b",
+      "article_fingerprint": "sha256:near04b-fp",
+      "license_tag": "fixture-license",
+      "reliability_tier": "B",
+      "cluster_id": null
+    }
+  ],
+  [
+    {
+      "article_id": "fixture-near-miss-05-a",
+      "source_id": "fixture-wire-a",
+      "source_reference": {"source_id": "fixture-wire-a", "url": "https://wire-a.example.com/news/near-05-a", "provider_key": "near-05-a", "original_locator": {"locator_type": "fixture", "locator_value": "near-05-a"}},
+      "title": "MetroFoods recalls frozen spinach in Oregon",
+      "body_text": "MetroFoods recalled frozen spinach sold in Oregon after routine testing found possible contamination. The company said no illnesses were reported and refunds are available.",
+      "published_at": "2026-03-05T09:00:00Z",
+      "fetched_at": "2026-03-05T09:04:00Z",
+      "language": "en",
+      "author_or_channel": "Fixture Desk",
+      "content_hash": "sha256:near05a",
+      "article_fingerprint": "sha256:near05a-fp",
+      "license_tag": "fixture-license",
+      "reliability_tier": "A",
+      "cluster_id": null
+    },
+    {
+      "article_id": "fixture-near-miss-05-b",
+      "source_id": "fixture-wire-b",
+      "source_reference": {"source_id": "fixture-wire-b", "url": "https://wire-b.example.com/news/near-05-b", "provider_key": "near-05-b", "original_locator": {"locator_type": "fixture", "locator_value": "near-05-b"}},
+      "title": "MetroFoods recalls frozen peas in Nevada",
+      "body_text": "MetroFoods recalled frozen peas sold in Nevada after a packaging error listed the wrong allergen statement. The company said customers should discard affected bags.",
+      "published_at": "2026-03-05T14:00:00Z",
+      "fetched_at": "2026-03-05T14:04:00Z",
+      "language": "en",
+      "author_or_channel": "Fixture Wire",
+      "content_hash": "sha256:near05b",
+      "article_fingerprint": "sha256:near05b-fp",
+      "license_tag": "fixture-license",
+      "reliability_tier": "B",
+      "cluster_id": null
+    }
+  ]
+]
