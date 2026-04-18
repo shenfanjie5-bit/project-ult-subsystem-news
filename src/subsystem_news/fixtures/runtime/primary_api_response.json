@@ -1,0 +1,31 @@
+{
+  "articles": [
+    {
+      "id": "runtime-acme-contract",
+      "url": "https://runtime.example.com/articles/acme-contract",
+      "title": "Acme Corp signs supply contract",
+      "published_at": "2026-02-01T09:00:00Z",
+      "body": "Acme Corp signed a three-year supply contract with Globex Inc for battery modules.",
+      "summary": "Acme signed a supply contract with Globex.",
+      "author_or_channel": "Runtime Desk"
+    },
+    {
+      "id": "runtime-north-river-boundary",
+      "url": "https://runtime.example.com/articles/north-river-maintenance",
+      "title": "North River Metals schedules maintenance",
+      "published_at": "2026-02-01T10:00:00Z",
+      "body": "North River Metals scheduled routine maintenance at its nickel plant next month.",
+      "summary": "North River scheduled maintenance.",
+      "author_or_channel": "Runtime Desk"
+    },
+    {
+      "id": "shared-provider-key",
+      "url": "https://runtime.example.com/articles/east-power-contract",
+      "title": "East Power signs grid equipment contract",
+      "published_at": "2026-02-01T11:00:00Z",
+      "body": "East Power Ltd signed a grid equipment contract for a regional utility upgrade.",
+      "summary": "East Power signed a grid equipment contract.",
+      "author_or_channel": "Runtime Desk"
+    }
+  ]
+}

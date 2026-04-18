@@ -1,0 +1,22 @@
+{
+  "articles": [
+    {
+      "id": "runtime-acme-contract-repost",
+      "url": "https://runtime.example.com/articles/acme-contract-repost",
+      "title": "Acme Corp signs supply contract with Globex",
+      "published_at": "2026-02-01T09:05:00Z",
+      "body": "Acme Corp signed a three-year supply contract with Globex Inc for battery modules.",
+      "summary": "Acme signed a supply contract with Globex.",
+      "author_or_channel": "Runtime Syndication"
+    },
+    {
+      "id": "shared-provider-key",
+      "url": "https://runtime.example.com/articles/west-retail-lawsuit",
+      "title": "West Retail faces supplier lawsuit",
+      "published_at": "2026-02-01T11:30:00Z",
+      "body": "West Retail PLC faces a supplier lawsuit over delayed store renovation payments.",
+      "summary": "West Retail faces litigation.",
+      "author_or_channel": "Runtime Syndication"
+    }
+  ]
+}
