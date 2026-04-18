@@ -1,0 +1,47 @@
+{
+  "fact": {
+    "candidate_id": "fact-orbit-product-1",
+    "article_id": "article-orbit-1",
+    "cluster_id": "cluster-orbit-product",
+    "source_reference": {
+      "source_id": "markets-wire-rss",
+      "url": "https://markets.example.com/orbit-product-update",
+      "provider_key": "wire-orbit-product-update",
+      "original_locator": {
+        "locator_type": "rss_guid",
+        "locator_value": "wire-orbit-product-update"
+      }
+    },
+    "fact_type": "product",
+    "summary": "Orbit Systems updated a product roadmap while keeping prior guidance unchanged.",
+    "involved_entities": [
+      {
+        "mention_text": "Orbit Systems",
+        "canonical_id": "entity:orbit-systems",
+        "resolution_status": "resolved",
+        "type_hint": "company"
+      }
+    ],
+    "event_time": null,
+    "confidence": 0.69,
+    "source_reliability_tier": "B",
+    "export_contract": "Ex-1",
+    "evidence_spans": [
+      {
+        "article_id": "article-orbit-1",
+        "start_char": 0,
+        "end_char": 75,
+        "quote": "Orbit Systems updated a product roadmap while keeping prior guidance unchanged.",
+        "locator": "body"
+      }
+    ]
+  },
+  "judgement": {
+    "signal_type": "sentiment",
+    "direction": "neutral",
+    "impact_scope": "company",
+    "time_horizon": "short",
+    "rationale": "The update is operationally relevant but does not imply a directional impact.",
+    "confidence": 0.64
+  }
+}
