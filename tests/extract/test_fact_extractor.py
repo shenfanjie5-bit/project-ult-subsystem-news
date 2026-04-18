@@ -285,6 +285,21 @@ def test_extract_facts_rejects_runtime_extra_fields_and_fabricated_entities() ->
         )
 
 
+def test_extract_facts_rejects_detached_entity_without_resolved_mention_span() -> None:
+    article, cluster, entity_resolution, response = load_fact_input()
+    detached_resolution = EntityResolutionResult(
+        mentions=[],
+        resolved_mentions=[],
+        entities=[entity_resolution.entities[0]],
+    )
+    client = FakeReasonerRuntimeClient(response)
+
+    with pytest.raises(ContractViolationError, match="backed by resolved mention spans"):
+        extract_facts(article, cluster, detached_resolution, client)
+
+    assert client.requests == []
+
+
 def test_extract_facts_rejects_non_representative_article_cluster_mismatch() -> None:
     article, cluster, entity_resolution, response = load_fact_input()
     cluster_payload = cluster.model_dump(mode="json")

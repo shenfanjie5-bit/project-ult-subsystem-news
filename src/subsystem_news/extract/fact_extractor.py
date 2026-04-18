@@ -10,6 +10,7 @@ from pydantic import BaseModel, ConfigDict, ValidationError, model_validator
 from subsystem_news.contracts.article import NewsArticleArtifact
 from subsystem_news.contracts.candidates import InvolvedEntity, NewsFactCandidate
 from subsystem_news.contracts.cluster import NewsDedupeCluster
+from subsystem_news.entities.mention import Mention
 from subsystem_news.entities.resolution import EntityResolutionResult
 from subsystem_news.errors import ContractViolationError, EvidenceMissingError
 from subsystem_news.extract.evidence import coerce_evidence_spans
@@ -66,15 +67,17 @@ def extract_facts(
             "fact extraction input violates article, cluster, or entity identity"
         ) from exc
 
-    if not entity_resolution.entities:
+    allowed_entities = _span_backed_entity_keys(article, entity_resolution)
+    if not allowed_entities:
         return []
 
     request = build_fact_extraction_request(extraction_input, schema_pin=schema_pin)
     response = client.generate_structured(request)
     drafts = _candidate_drafts(response)
-    allowed_entities = _allowed_entity_keys(entity_resolution)
     has_resolved_entity = any(
-        entity.resolution_status == "resolved" for entity in entity_resolution.entities
+        resolved.entity.resolution_status == "resolved"
+        for resolved in entity_resolution.resolved_mentions
+        if _entity_key(resolved.entity) in allowed_entities
     )
 
     candidates: list[NewsFactCandidate] = []
@@ -144,14 +147,47 @@ def _coerce_confidence(raw_confidence: object) -> float:
     return confidence
 
 
-def _allowed_entity_keys(entity_resolution: EntityResolutionResult) -> set[tuple[Any, ...]]:
-    return {
+def _span_backed_entity_keys(
+    article: NewsArticleArtifact,
+    entity_resolution: EntityResolutionResult,
+) -> set[tuple[Any, ...]]:
+    span_backed_keys: set[tuple[Any, ...]] = set()
+    for resolved in entity_resolution.resolved_mentions:
+        _validate_mention_span(article, resolved.mention)
+        span_backed_keys.add(_entity_key(resolved.entity))
+
+    detached_keys = {
         _entity_key(entity)
-        for entity in [
-            *entity_resolution.entities,
-            *(resolved.entity for resolved in entity_resolution.resolved_mentions),
-        ]
+        for entity in entity_resolution.entities
+        if _entity_key(entity) not in span_backed_keys
     }
+    if detached_keys:
+        raise ContractViolationError(
+            "entity_resolution entities must be backed by resolved mention spans"
+        )
+
+    return span_backed_keys
+
+
+def _validate_mention_span(article: NewsArticleArtifact, mention: Mention) -> None:
+    if mention.article_id != article.article_id:
+        raise ContractViolationError("resolved mention article_id must match article")
+    if mention.source_reference != article.source_reference:
+        raise ContractViolationError("resolved mention source_reference must match article")
+    if mention.start_char < 0 or mention.end_char < 0:
+        raise ContractViolationError("resolved mention offsets must be non-negative")
+
+    if mention.locator == "title":
+        source_text = article.title
+    elif mention.locator == "body":
+        source_text = article.body_text
+    else:
+        raise ContractViolationError(f"unsupported resolved mention locator: {mention.locator}")
+
+    if mention.end_char > len(source_text):
+        raise ContractViolationError("resolved mention span exceeds article text bounds")
+    if source_text[mention.start_char : mention.end_char] != mention.text:
+        raise ContractViolationError("resolved mention text does not match article text")
 
 
 def _validate_involved_entities(
