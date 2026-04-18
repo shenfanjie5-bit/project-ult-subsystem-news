@@ -72,12 +72,42 @@ def aggregate_cluster_signals(
 ) -> list[NewsSignalCandidate]:
     """Keep the highest-confidence semantic duplicates per cluster."""
 
+    keyed_signals = [(_aggregation_key(signal), signal) for signal in signals]
+    return _aggregate_keyed_signals(
+        keyed_signals,
+        max_per_cluster_signal_type=max_per_cluster_signal_type,
+    )
+
+
+def _aggregate_fact_signals(
+    fact_signals: Sequence[tuple[NewsFactCandidate, NewsSignalCandidate]],
+    *,
+    max_per_cluster_signal_type: int = 1,
+) -> list[NewsSignalCandidate]:
+    """Keep semantic duplicates while retaining Ex-1 fact discriminators."""
+
+    keyed_signals = [
+        (_aggregation_key(signal, fact_type=fact.fact_type), signal)
+        for fact, signal in fact_signals
+    ]
+    return _aggregate_keyed_signals(
+        keyed_signals,
+        max_per_cluster_signal_type=max_per_cluster_signal_type,
+    )
+
+
+def _aggregate_keyed_signals(
+    keyed_signals: Sequence[tuple[tuple[object, ...], NewsSignalCandidate]],
+    *,
+    max_per_cluster_signal_type: int = 1,
+) -> list[NewsSignalCandidate]:
+    """Keep the highest-confidence signal for each provided semantic key."""
+
     if max_per_cluster_signal_type < 1:
         raise ValueError("max_per_cluster_signal_type must be at least 1")
 
     grouped: OrderedDict[tuple[object, ...], list[NewsSignalCandidate]] = OrderedDict()
-    for signal in signals:
-        group_key = _aggregation_key(signal)
+    for group_key, signal in keyed_signals:
         grouped.setdefault(group_key, []).append(signal)
 
     aggregated: list[NewsSignalCandidate] = []
@@ -101,7 +131,7 @@ def generate_signals(
 ) -> list[NewsSignalCandidate]:
     """Promote, judge, build, and cluster-de-amplify Ex-2 signal candidates."""
 
-    signals: list[NewsSignalCandidate] = []
+    fact_signals: list[tuple[NewsFactCandidate, NewsSignalCandidate]] = []
     for fact in facts:
         decision = should_promote_fact(fact, min_confidence=min_fact_confidence)
         if not decision.promote:
@@ -112,16 +142,19 @@ def generate_signals(
             update={"confidence": min(judgement.confidence, decision.base_confidence)}
         )
         magnitude = estimate_magnitude(fact, judgement)
-        signals.append(
-            build_signal_candidate(
+        fact_signals.append(
+            (
                 fact,
-                judgement,
-                magnitude=magnitude,
+                build_signal_candidate(
+                    fact,
+                    judgement,
+                    magnitude=magnitude,
+                ),
             )
         )
 
-    return aggregate_cluster_signals(
-        signals,
+    return _aggregate_fact_signals(
+        fact_signals,
         max_per_cluster_signal_type=max_per_cluster_signal_type,
     )
 
@@ -133,7 +166,11 @@ def _signal_candidate_id(
     return f"signal:{fact.candidate_id}:{judgement.signal_type}"
 
 
-def _aggregation_key(signal: NewsSignalCandidate) -> tuple[object, ...]:
+def _aggregation_key(
+    signal: NewsSignalCandidate,
+    *,
+    fact_type: str | None = None,
+) -> tuple[object, ...]:
     if signal.cluster_id is None:
         identity_scope = ("article", signal.article_id)
     else:
@@ -142,10 +179,17 @@ def _aggregation_key(signal: NewsSignalCandidate) -> tuple[object, ...]:
     return (
         *identity_scope,
         signal.signal_type,
+        _fact_type_key(fact_type),
         signal.direction,
         _affected_entities_key(signal.affected_entities),
         _evidence_key(signal),
     )
+
+
+def _fact_type_key(fact_type: str | None) -> str | None:
+    if fact_type is None:
+        return None
+    return _normalize_key_text(fact_type)
 
 
 def _affected_entities_key(
