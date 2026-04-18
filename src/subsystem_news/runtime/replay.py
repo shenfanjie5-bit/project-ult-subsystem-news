@@ -105,6 +105,120 @@ class ReplayRunResult(BaseModel):
     metadata: dict[str, Any] = Field(default_factory=dict)
 
 
+class ReplayRequest(BaseModel):
+    """Single fixture replay request.
+
+    The full runtime replay path is trace/artifact based. Regression fixtures use the
+    same result shape but pass a checked-in snapshot path through this lightweight
+    request object so callers can inject the real replay runner when available.
+    """
+
+    model_config = ConfigDict(frozen=True, extra="forbid")
+
+    case_id: str
+    category: str
+    article_ids: list[str] = Field(default_factory=list)
+    input_path: Path
+    baseline_path: Path | None = None
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+
+ReplayResult = ReplayRunResult
+
+
+class ReplayDiff(BaseModel):
+    """Aggregated difference between two replay snapshots."""
+
+    model_config = ConfigDict(frozen=True, extra="forbid")
+
+    has_changes: bool = False
+    changed_count: int = Field(default=0, ge=0)
+    error_count: int = Field(default=0, ge=0)
+    candidate_diffs: list[ReplayValueDiff] = Field(default_factory=list)
+    evidence_span_diffs: list[ReplayValueDiff] = Field(default_factory=list)
+    entity_resolution_diffs: list[ReplayValueDiff] = Field(default_factory=list)
+    schema_pin_diffs: list[ReplayValueDiff] = Field(default_factory=list)
+    article_diffs: list[ReplayArticleResult] = Field(default_factory=list)
+
+
+def replay_article(request: ReplayRequest) -> ReplayResult:
+    """Load the replay snapshot referenced by a fixture request.
+
+    Production callers can pass a custom runner to the fixture regression layer. This
+    default intentionally avoids reconstructing the business pipeline in fixtures.
+    """
+
+    return _load_replay_result(request.input_path)
+
+
+def diff_replay_results(
+    baseline: ReplayResult,
+    replayed: ReplayResult,
+) -> ReplayDiff:
+    """Compare two replay snapshots using the existing stable diff primitive."""
+
+    candidate_diffs = _diff_maps(
+        _result_candidate_summary_map(baseline),
+        _result_candidate_summary_map(replayed),
+    )
+    evidence_span_diffs = _diff_maps(
+        _result_metadata_map(baseline, "evidence_spans"),
+        _result_metadata_map(replayed, "evidence_spans"),
+    )
+    entity_resolution_diffs = _diff_maps(
+        _result_metadata_map(baseline, "entity_resolutions"),
+        _result_metadata_map(replayed, "entity_resolutions"),
+    )
+    schema_pin_diffs = _diff_maps(
+        _result_schema_pin_map(baseline),
+        _result_schema_pin_map(replayed),
+    )
+
+    changed_articles = [
+        article
+        for article in replayed.article_results
+        if article.has_changes
+        or article.candidate_diffs
+        or article.evidence_span_diffs
+        or article.entity_resolution_diffs
+        or article.version_metadata_diffs
+    ]
+    if not changed_articles:
+        changed_articles = [
+            article
+            for article in replayed.article_results
+            if article.status == "failed"
+        ]
+
+    changed_count = (
+        len(candidate_diffs)
+        + len(evidence_span_diffs)
+        + len(entity_resolution_diffs)
+        + len(schema_pin_diffs)
+        + replayed.changed_count
+    )
+    has_changes = any(
+        (
+            candidate_diffs,
+            evidence_span_diffs,
+            entity_resolution_diffs,
+            schema_pin_diffs,
+            replayed.has_changes,
+            replayed.error_count,
+        )
+    )
+    return ReplayDiff(
+        has_changes=has_changes,
+        changed_count=changed_count,
+        error_count=replayed.error_count,
+        candidate_diffs=candidate_diffs,
+        evidence_span_diffs=evidence_span_diffs,
+        entity_resolution_diffs=entity_resolution_diffs,
+        schema_pin_diffs=schema_pin_diffs,
+        article_diffs=changed_articles,
+    )
+
+
 def replay_trace(
     trace_path: Path,
     *,
@@ -582,6 +696,53 @@ def _stable_json(value: Any) -> str:
     )
 
 
+def _load_replay_result(path: Path) -> ReplayResult:
+    try:
+        return ReplayRunResult.model_validate_json(path.read_text(encoding="utf-8"))
+    except (OSError, ValueError) as exc:
+        raise ContractViolationError("replay snapshot violates ReplayRunResult") from exc
+
+
+def _result_candidate_summary_map(result: ReplayResult) -> dict[str, Any]:
+    payload: dict[str, Any] = {}
+    for article in result.article_results:
+        summary = article.replayed or article.baseline
+        if summary is None:
+            key = article.article_id or "unknown"
+            payload[key] = {"status": article.status, "error_message": article.error_message}
+            continue
+        payload[summary.article_id] = {
+            "cluster_id": summary.cluster_id,
+            "representative_article_id": summary.representative_article_id,
+            "source_reference": summary.source_reference.model_dump(mode="json"),
+            "candidate_ids": summary.candidate_ids,
+        }
+    if "candidate_payloads" in result.metadata:
+        payload["metadata:candidate_payloads"] = result.metadata["candidate_payloads"]
+    return payload
+
+
+def _result_metadata_map(result: ReplayResult, key: str) -> dict[str, Any]:
+    value = result.metadata.get(key, {})
+    if isinstance(value, Mapping):
+        return dict(value)
+    if isinstance(value, list):
+        return {f"{key}:{index}": item for index, item in enumerate(value)}
+    return {key: value}
+
+
+def _result_schema_pin_map(result: ReplayResult) -> dict[str, Any]:
+    pins: dict[str, Any] = {}
+    for article in result.article_results:
+        summary = article.replayed or article.baseline
+        if summary is not None:
+            pins[f"article:{summary.article_id}"] = summary.schema_pins
+    metadata_pins = result.metadata.get("schema_pins")
+    if isinstance(metadata_pins, Mapping):
+        pins["metadata:schema_pins"] = dict(metadata_pins)
+    return pins
+
+
 def _load_artifact_snapshot(path: Path) -> NewsArticleArtifact:
     try:
         return NewsArticleArtifact.model_validate_json(path.read_text(encoding="utf-8"))
@@ -614,8 +775,13 @@ def _replay_id(started_at: datetime, input_path: Path) -> str:
 __all__ = [
     "ReplayArticleResult",
     "ReplayArticleSummary",
+    "ReplayDiff",
+    "ReplayRequest",
+    "ReplayResult",
     "ReplayRunResult",
     "ReplayValueDiff",
+    "diff_replay_results",
+    "replay_article",
     "replay_artifact_snapshot",
     "replay_trace",
 ]

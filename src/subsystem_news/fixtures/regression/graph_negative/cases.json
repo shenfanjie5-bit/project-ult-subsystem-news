@@ -1,0 +1,3964 @@
+{
+  "cases": [
+    {
+      "case_id": "graph-negative-cooccurrence_expo",
+      "category": "graph_negative",
+      "article_ids": [
+        "article-reg-graph-negative-cooccurrence_expo"
+      ],
+      "expected_outputs": [
+        {
+          "candidate_id": "fact-reg-graph-negative-cooccurrence_expo",
+          "export_contract": "Ex-1",
+          "article_id": "article-reg-graph-negative-cooccurrence_expo",
+          "cluster_id": "cluster-reg-graph-negative-cooccurrence_expo",
+          "source_reference": {
+            "source_id": "regression-graph-negative",
+            "url": "https://fixtures.example.com/regression-graph-negative/graph-negative-cooccurrence_expo",
+            "provider_key": "graph-negative-cooccurrence_expo",
+            "original_locator": {
+              "locator_type": "fixture",
+              "locator_value": "graph-negative-cooccurrence_expo"
+            }
+          },
+          "evidence_spans": [
+            {
+              "article_id": "article-reg-graph-negative-cooccurrence_expo",
+              "start_char": 0,
+              "end_char": 56,
+              "quote": "Acme Corp and Globex Inc attended the same battery expo.",
+              "locator": "body"
+            }
+          ],
+          "schema_pin": {
+            "schema_name": "news_fact_candidate",
+            "schema_version": "news_fact_candidate.v1",
+            "contract": "Ex-1",
+            "model_output_version": "news_fact_candidate.output.v1"
+          },
+          "involved_entities": [
+            {
+              "mention_text": "Acme Corp",
+              "canonical_id": "entity:acme-corp",
+              "resolution_status": "resolved",
+              "type_hint": "company"
+            },
+            {
+              "mention_text": "Globex Inc",
+              "canonical_id": "entity:globex-inc",
+              "resolution_status": "resolved",
+              "type_hint": "company"
+            }
+          ]
+        }
+      ],
+      "source_reference": {
+        "source_id": "regression-graph-negative",
+        "url": "https://fixtures.example.com/regression-graph-negative/graph-negative-cooccurrence_expo",
+        "provider_key": "graph-negative-cooccurrence_expo",
+        "original_locator": {
+          "locator_type": "fixture",
+          "locator_value": "graph-negative-cooccurrence_expo"
+        }
+      },
+      "version_pins": {
+        "Ex-1": {
+          "schema_name": "news_fact_candidate",
+          "schema_version": "news_fact_candidate.v1",
+          "contract": "Ex-1",
+          "model_output_version": "news_fact_candidate.output.v1"
+        },
+        "Ex-2": {
+          "schema_name": "news_signal_candidate",
+          "schema_version": "news_signal_candidate.v1",
+          "contract": "Ex-2",
+          "model_output_version": "news_signal_candidate.output.v1"
+        },
+        "Ex-3": {
+          "schema_name": "news_graph_delta_candidate",
+          "schema_version": "news_graph_delta_candidate.v1",
+          "contract": "Ex-3",
+          "model_output_version": "news_graph_delta_candidate.output.v1"
+        }
+      },
+      "baseline_path": "baseline/graph_negative.json",
+      "raw_inputs": [
+        {
+          "article_id": "article-reg-graph-negative-cooccurrence_expo",
+          "source_reference": {
+            "source_id": "regression-graph-negative",
+            "url": "https://fixtures.example.com/regression-graph-negative/graph-negative-cooccurrence_expo",
+            "provider_key": "graph-negative-cooccurrence_expo",
+            "original_locator": {
+              "locator_type": "fixture",
+              "locator_value": "graph-negative-cooccurrence_expo"
+            }
+          },
+          "title": "Graph negative cooccurrence_expo",
+          "body_text": "Acme Corp and Globex Inc attended the same battery expo.",
+          "published_at": "2026-03-01T00:00:00+00:00",
+          "fetched_at": "2026-03-01T00:05:00+00:00"
+        }
+      ],
+      "normalized_artifacts": [
+        {
+          "article_id": "article-reg-graph-negative-cooccurrence_expo",
+          "source_id": "regression-graph-negative",
+          "source_reference": {
+            "source_id": "regression-graph-negative",
+            "url": "https://fixtures.example.com/regression-graph-negative/graph-negative-cooccurrence_expo",
+            "provider_key": "graph-negative-cooccurrence_expo",
+            "original_locator": {
+              "locator_type": "fixture",
+              "locator_value": "graph-negative-cooccurrence_expo"
+            }
+          },
+          "title": "Graph negative cooccurrence_expo",
+          "body_text": "Acme Corp and Globex Inc attended the same battery expo.",
+          "published_at": "2026-03-01T00:00:00+00:00",
+          "fetched_at": "2026-03-01T00:05:00+00:00",
+          "language": "en",
+          "author_or_channel": "Regression Fixture",
+          "content_hash": "sha256:article-reg-graph-negative-cooccurrence_expo:content",
+          "article_fingerprint": "sha256:cluster-reg-graph-negative-cooccurrence_expo:fingerprint",
+          "license_tag": "fixture",
+          "reliability_tier": "A",
+          "cluster_id": "cluster-reg-graph-negative-cooccurrence_expo"
+        }
+      ],
+      "expected_cluster_id": "cluster-reg-graph-negative-cooccurrence_expo",
+      "metadata": {
+        "negative_category": "cooccurrence",
+        "expected_ex3_count": 0
+      }
+    },
+    {
+      "case_id": "graph-negative-cooccurrence_roundup",
+      "category": "graph_negative",
+      "article_ids": [
+        "article-reg-graph-negative-cooccurrence_roundup"
+      ],
+      "expected_outputs": [
+        {
+          "candidate_id": "fact-reg-graph-negative-cooccurrence_roundup",
+          "export_contract": "Ex-1",
+          "article_id": "article-reg-graph-negative-cooccurrence_roundup",
+          "cluster_id": "cluster-reg-graph-negative-cooccurrence_roundup",
+          "source_reference": {
+            "source_id": "regression-graph-negative",
+            "url": "https://fixtures.example.com/regression-graph-negative/graph-negative-cooccurrence_roundup",
+            "provider_key": "graph-negative-cooccurrence_roundup",
+            "original_locator": {
+              "locator_type": "fixture",
+              "locator_value": "graph-negative-cooccurrence_roundup"
+            }
+          },
+          "evidence_spans": [
+            {
+              "article_id": "article-reg-graph-negative-cooccurrence_roundup",
+              "start_char": 0,
+              "end_char": 73,
+              "quote": "North River Metals and East Power Ltd were mentioned in a sector roundup.",
+              "locator": "body"
+            }
+          ],
+          "schema_pin": {
+            "schema_name": "news_fact_candidate",
+            "schema_version": "news_fact_candidate.v1",
+            "contract": "Ex-1",
+            "model_output_version": "news_fact_candidate.output.v1"
+          },
+          "involved_entities": [
+            {
+              "mention_text": "North River Metals",
+              "canonical_id": "entity:north-river-metals",
+              "resolution_status": "resolved",
+              "type_hint": "company"
+            },
+            {
+              "mention_text": "East Power Ltd",
+              "canonical_id": "entity:east-power-ltd",
+              "resolution_status": "resolved",
+              "type_hint": "company"
+            }
+          ]
+        }
+      ],
+      "source_reference": {
+        "source_id": "regression-graph-negative",
+        "url": "https://fixtures.example.com/regression-graph-negative/graph-negative-cooccurrence_roundup",
+        "provider_key": "graph-negative-cooccurrence_roundup",
+        "original_locator": {
+          "locator_type": "fixture",
+          "locator_value": "graph-negative-cooccurrence_roundup"
+        }
+      },
+      "version_pins": {
+        "Ex-1": {
+          "schema_name": "news_fact_candidate",
+          "schema_version": "news_fact_candidate.v1",
+          "contract": "Ex-1",
+          "model_output_version": "news_fact_candidate.output.v1"
+        },
+        "Ex-2": {
+          "schema_name": "news_signal_candidate",
+          "schema_version": "news_signal_candidate.v1",
+          "contract": "Ex-2",
+          "model_output_version": "news_signal_candidate.output.v1"
+        },
+        "Ex-3": {
+          "schema_name": "news_graph_delta_candidate",
+          "schema_version": "news_graph_delta_candidate.v1",
+          "contract": "Ex-3",
+          "model_output_version": "news_graph_delta_candidate.output.v1"
+        }
+      },
+      "baseline_path": "baseline/graph_negative.json",
+      "raw_inputs": [
+        {
+          "article_id": "article-reg-graph-negative-cooccurrence_roundup",
+          "source_reference": {
+            "source_id": "regression-graph-negative",
+            "url": "https://fixtures.example.com/regression-graph-negative/graph-negative-cooccurrence_roundup",
+            "provider_key": "graph-negative-cooccurrence_roundup",
+            "original_locator": {
+              "locator_type": "fixture",
+              "locator_value": "graph-negative-cooccurrence_roundup"
+            }
+          },
+          "title": "Graph negative cooccurrence_roundup",
+          "body_text": "North River Metals and East Power Ltd were mentioned in a sector roundup.",
+          "published_at": "2026-03-01T00:00:00+00:00",
+          "fetched_at": "2026-03-01T00:05:00+00:00"
+        }
+      ],
+      "normalized_artifacts": [
+        {
+          "article_id": "article-reg-graph-negative-cooccurrence_roundup",
+          "source_id": "regression-graph-negative",
+          "source_reference": {
+            "source_id": "regression-graph-negative",
+            "url": "https://fixtures.example.com/regression-graph-negative/graph-negative-cooccurrence_roundup",
+            "provider_key": "graph-negative-cooccurrence_roundup",
+            "original_locator": {
+              "locator_type": "fixture",
+              "locator_value": "graph-negative-cooccurrence_roundup"
+            }
+          },
+          "title": "Graph negative cooccurrence_roundup",
+          "body_text": "North River Metals and East Power Ltd were mentioned in a sector roundup.",
+          "published_at": "2026-03-01T00:00:00+00:00",
+          "fetched_at": "2026-03-01T00:05:00+00:00",
+          "language": "en",
+          "author_or_channel": "Regression Fixture",
+          "content_hash": "sha256:article-reg-graph-negative-cooccurrence_roundup:content",
+          "article_fingerprint": "sha256:cluster-reg-graph-negative-cooccurrence_roundup:fingerprint",
+          "license_tag": "fixture",
+          "reliability_tier": "A",
+          "cluster_id": "cluster-reg-graph-negative-cooccurrence_roundup"
+        }
+      ],
+      "expected_cluster_id": "cluster-reg-graph-negative-cooccurrence_roundup",
+      "metadata": {
+        "negative_category": "cooccurrence",
+        "expected_ex3_count": 0
+      }
+    },
+    {
+      "case_id": "graph-negative-cooccurrence_hearing",
+      "category": "graph_negative",
+      "article_ids": [
+        "article-reg-graph-negative-cooccurrence_hearing"
+      ],
+      "expected_outputs": [
+        {
+          "candidate_id": "fact-reg-graph-negative-cooccurrence_hearing",
+          "export_contract": "Ex-1",
+          "article_id": "article-reg-graph-negative-cooccurrence_hearing",
+          "cluster_id": "cluster-reg-graph-negative-cooccurrence_hearing",
+          "source_reference": {
+            "source_id": "regression-graph-negative",
+            "url": "https://fixtures.example.com/regression-graph-negative/graph-negative-cooccurrence_hearing",
+            "provider_key": "graph-negative-cooccurrence_hearing",
+            "original_locator": {
+              "locator_type": "fixture",
+              "locator_value": "graph-negative-cooccurrence_hearing"
+            }
+          },
+          "evidence_spans": [
+            {
+              "article_id": "article-reg-graph-negative-cooccurrence_hearing",
+              "start_char": 0,
+              "end_char": 76,
+              "quote": "Atlas Shipping and State Treasury appeared in the same trade hearing agenda.",
+              "locator": "body"
+            }
+          ],
+          "schema_pin": {
+            "schema_name": "news_fact_candidate",
+            "schema_version": "news_fact_candidate.v1",
+            "contract": "Ex-1",
+            "model_output_version": "news_fact_candidate.output.v1"
+          },
+          "involved_entities": [
+            {
+              "mention_text": "Atlas Shipping",
+              "canonical_id": "entity:atlas-shipping",
+              "resolution_status": "resolved",
+              "type_hint": "company"
+            },
+            {
+              "mention_text": "State Treasury",
+              "canonical_id": "entity:state-treasury",
+              "resolution_status": "resolved",
+              "type_hint": "company"
+            }
+          ]
+        }
+      ],
+      "source_reference": {
+        "source_id": "regression-graph-negative",
+        "url": "https://fixtures.example.com/regression-graph-negative/graph-negative-cooccurrence_hearing",
+        "provider_key": "graph-negative-cooccurrence_hearing",
+        "original_locator": {
+          "locator_type": "fixture",
+          "locator_value": "graph-negative-cooccurrence_hearing"
+        }
+      },
+      "version_pins": {
+        "Ex-1": {
+          "schema_name": "news_fact_candidate",
+          "schema_version": "news_fact_candidate.v1",
+          "contract": "Ex-1",
+          "model_output_version": "news_fact_candidate.output.v1"
+        },
+        "Ex-2": {
+          "schema_name": "news_signal_candidate",
+          "schema_version": "news_signal_candidate.v1",
+          "contract": "Ex-2",
+          "model_output_version": "news_signal_candidate.output.v1"
+        },
+        "Ex-3": {
+          "schema_name": "news_graph_delta_candidate",
+          "schema_version": "news_graph_delta_candidate.v1",
+          "contract": "Ex-3",
+          "model_output_version": "news_graph_delta_candidate.output.v1"
+        }
+      },
+      "baseline_path": "baseline/graph_negative.json",
+      "raw_inputs": [
+        {
+          "article_id": "article-reg-graph-negative-cooccurrence_hearing",
+          "source_reference": {
+            "source_id": "regression-graph-negative",
+            "url": "https://fixtures.example.com/regression-graph-negative/graph-negative-cooccurrence_hearing",
+            "provider_key": "graph-negative-cooccurrence_hearing",
+            "original_locator": {
+              "locator_type": "fixture",
+              "locator_value": "graph-negative-cooccurrence_hearing"
+            }
+          },
+          "title": "Graph negative cooccurrence_hearing",
+          "body_text": "Atlas Shipping and State Treasury appeared in the same trade hearing agenda.",
+          "published_at": "2026-03-01T00:00:00+00:00",
+          "fetched_at": "2026-03-01T00:05:00+00:00"
+        }
+      ],
+      "normalized_artifacts": [
+        {
+          "article_id": "article-reg-graph-negative-cooccurrence_hearing",
+          "source_id": "regression-graph-negative",
+          "source_reference": {
+            "source_id": "regression-graph-negative",
+            "url": "https://fixtures.example.com/regression-graph-negative/graph-negative-cooccurrence_hearing",
+            "provider_key": "graph-negative-cooccurrence_hearing",
+            "original_locator": {
+              "locator_type": "fixture",
+              "locator_value": "graph-negative-cooccurrence_hearing"
+            }
+          },
+          "title": "Graph negative cooccurrence_hearing",
+          "body_text": "Atlas Shipping and State Treasury appeared in the same trade hearing agenda.",
+          "published_at": "2026-03-01T00:00:00+00:00",
+          "fetched_at": "2026-03-01T00:05:00+00:00",
+          "language": "en",
+          "author_or_channel": "Regression Fixture",
+          "content_hash": "sha256:article-reg-graph-negative-cooccurrence_hearing:content",
+          "article_fingerprint": "sha256:cluster-reg-graph-negative-cooccurrence_hearing:fingerprint",
+          "license_tag": "fixture",
+          "reliability_tier": "A",
+          "cluster_id": "cluster-reg-graph-negative-cooccurrence_hearing"
+        }
+      ],
+      "expected_cluster_id": "cluster-reg-graph-negative-cooccurrence_hearing",
+      "metadata": {
+        "negative_category": "cooccurrence",
+        "expected_ex3_count": 0
+      }
+    },
+    {
+      "case_id": "graph-negative-cooccurrence_panel",
+      "category": "graph_negative",
+      "article_ids": [
+        "article-reg-graph-negative-cooccurrence_panel"
+      ],
+      "expected_outputs": [
+        {
+          "candidate_id": "fact-reg-graph-negative-cooccurrence_panel",
+          "export_contract": "Ex-1",
+          "article_id": "article-reg-graph-negative-cooccurrence_panel",
+          "cluster_id": "cluster-reg-graph-negative-cooccurrence_panel",
+          "source_reference": {
+            "source_id": "regression-graph-negative",
+            "url": "https://fixtures.example.com/regression-graph-negative/graph-negative-cooccurrence_panel",
+            "provider_key": "graph-negative-cooccurrence_panel",
+            "original_locator": {
+              "locator_type": "fixture",
+              "locator_value": "graph-negative-cooccurrence_panel"
+            }
+          },
+          "evidence_spans": [
+            {
+              "article_id": "article-reg-graph-negative-cooccurrence_panel",
+              "start_char": 0,
+              "end_char": 78,
+              "quote": "Delta Components and Zenith Motors joined an industry panel on battery demand.",
+              "locator": "body"
+            }
+          ],
+          "schema_pin": {
+            "schema_name": "news_fact_candidate",
+            "schema_version": "news_fact_candidate.v1",
+            "contract": "Ex-1",
+            "model_output_version": "news_fact_candidate.output.v1"
+          },
+          "involved_entities": [
+            {
+              "mention_text": "Delta Components",
+              "canonical_id": "entity:delta-components",
+              "resolution_status": "resolved",
+              "type_hint": "company"
+            },
+            {
+              "mention_text": "Zenith Motors",
+              "canonical_id": "entity:zenith-motors",
+              "resolution_status": "resolved",
+              "type_hint": "company"
+            }
+          ]
+        }
+      ],
+      "source_reference": {
+        "source_id": "regression-graph-negative",
+        "url": "https://fixtures.example.com/regression-graph-negative/graph-negative-cooccurrence_panel",
+        "provider_key": "graph-negative-cooccurrence_panel",
+        "original_locator": {
+          "locator_type": "fixture",
+          "locator_value": "graph-negative-cooccurrence_panel"
+        }
+      },
+      "version_pins": {
+        "Ex-1": {
+          "schema_name": "news_fact_candidate",
+          "schema_version": "news_fact_candidate.v1",
+          "contract": "Ex-1",
+          "model_output_version": "news_fact_candidate.output.v1"
+        },
+        "Ex-2": {
+          "schema_name": "news_signal_candidate",
+          "schema_version": "news_signal_candidate.v1",
+          "contract": "Ex-2",
+          "model_output_version": "news_signal_candidate.output.v1"
+        },
+        "Ex-3": {
+          "schema_name": "news_graph_delta_candidate",
+          "schema_version": "news_graph_delta_candidate.v1",
+          "contract": "Ex-3",
+          "model_output_version": "news_graph_delta_candidate.output.v1"
+        }
+      },
+      "baseline_path": "baseline/graph_negative.json",
+      "raw_inputs": [
+        {
+          "article_id": "article-reg-graph-negative-cooccurrence_panel",
+          "source_reference": {
+            "source_id": "regression-graph-negative",
+            "url": "https://fixtures.example.com/regression-graph-negative/graph-negative-cooccurrence_panel",
+            "provider_key": "graph-negative-cooccurrence_panel",
+            "original_locator": {
+              "locator_type": "fixture",
+              "locator_value": "graph-negative-cooccurrence_panel"
+            }
+          },
+          "title": "Graph negative cooccurrence_panel",
+          "body_text": "Delta Components and Zenith Motors joined an industry panel on battery demand.",
+          "published_at": "2026-03-01T00:00:00+00:00",
+          "fetched_at": "2026-03-01T00:05:00+00:00"
+        }
+      ],
+      "normalized_artifacts": [
+        {
+          "article_id": "article-reg-graph-negative-cooccurrence_panel",
+          "source_id": "regression-graph-negative",
+          "source_reference": {
+            "source_id": "regression-graph-negative",
+            "url": "https://fixtures.example.com/regression-graph-negative/graph-negative-cooccurrence_panel",
+            "provider_key": "graph-negative-cooccurrence_panel",
+            "original_locator": {
+              "locator_type": "fixture",
+              "locator_value": "graph-negative-cooccurrence_panel"
+            }
+          },
+          "title": "Graph negative cooccurrence_panel",
+          "body_text": "Delta Components and Zenith Motors joined an industry panel on battery demand.",
+          "published_at": "2026-03-01T00:00:00+00:00",
+          "fetched_at": "2026-03-01T00:05:00+00:00",
+          "language": "en",
+          "author_or_channel": "Regression Fixture",
+          "content_hash": "sha256:article-reg-graph-negative-cooccurrence_panel:content",
+          "article_fingerprint": "sha256:cluster-reg-graph-negative-cooccurrence_panel:fingerprint",
+          "license_tag": "fixture",
+          "reliability_tier": "A",
+          "cluster_id": "cluster-reg-graph-negative-cooccurrence_panel"
+        }
+      ],
+      "expected_cluster_id": "cluster-reg-graph-negative-cooccurrence_panel",
+      "metadata": {
+        "negative_category": "cooccurrence",
+        "expected_ex3_count": 0
+      }
+    },
+    {
+      "case_id": "graph-negative-cooccurrence_index",
+      "category": "graph_negative",
+      "article_ids": [
+        "article-reg-graph-negative-cooccurrence_index"
+      ],
+      "expected_outputs": [
+        {
+          "candidate_id": "fact-reg-graph-negative-cooccurrence_index",
+          "export_contract": "Ex-1",
+          "article_id": "article-reg-graph-negative-cooccurrence_index",
+          "cluster_id": "cluster-reg-graph-negative-cooccurrence_index",
+          "source_reference": {
+            "source_id": "regression-graph-negative",
+            "url": "https://fixtures.example.com/regression-graph-negative/graph-negative-cooccurrence_index",
+            "provider_key": "graph-negative-cooccurrence_index",
+            "original_locator": {
+              "locator_type": "fixture",
+              "locator_value": "graph-negative-cooccurrence_index"
+            }
+          },
+          "evidence_spans": [
+            {
+              "article_id": "article-reg-graph-negative-cooccurrence_index",
+              "start_char": 0,
+              "end_char": 73,
+              "quote": "Harbor Energy and Bay Capital were both added to an infrastructure index.",
+              "locator": "body"
+            }
+          ],
+          "schema_pin": {
+            "schema_name": "news_fact_candidate",
+            "schema_version": "news_fact_candidate.v1",
+            "contract": "Ex-1",
+            "model_output_version": "news_fact_candidate.output.v1"
+          },
+          "involved_entities": [
+            {
+              "mention_text": "Harbor Energy",
+              "canonical_id": "entity:harbor-energy",
+              "resolution_status": "resolved",
+              "type_hint": "company"
+            },
+            {
+              "mention_text": "Bay Capital",
+              "canonical_id": "entity:bay-capital",
+              "resolution_status": "resolved",
+              "type_hint": "company"
+            }
+          ]
+        }
+      ],
+      "source_reference": {
+        "source_id": "regression-graph-negative",
+        "url": "https://fixtures.example.com/regression-graph-negative/graph-negative-cooccurrence_index",
+        "provider_key": "graph-negative-cooccurrence_index",
+        "original_locator": {
+          "locator_type": "fixture",
+          "locator_value": "graph-negative-cooccurrence_index"
+        }
+      },
+      "version_pins": {
+        "Ex-1": {
+          "schema_name": "news_fact_candidate",
+          "schema_version": "news_fact_candidate.v1",
+          "contract": "Ex-1",
+          "model_output_version": "news_fact_candidate.output.v1"
+        },
+        "Ex-2": {
+          "schema_name": "news_signal_candidate",
+          "schema_version": "news_signal_candidate.v1",
+          "contract": "Ex-2",
+          "model_output_version": "news_signal_candidate.output.v1"
+        },
+        "Ex-3": {
+          "schema_name": "news_graph_delta_candidate",
+          "schema_version": "news_graph_delta_candidate.v1",
+          "contract": "Ex-3",
+          "model_output_version": "news_graph_delta_candidate.output.v1"
+        }
+      },
+      "baseline_path": "baseline/graph_negative.json",
+      "raw_inputs": [
+        {
+          "article_id": "article-reg-graph-negative-cooccurrence_index",
+          "source_reference": {
+            "source_id": "regression-graph-negative",
+            "url": "https://fixtures.example.com/regression-graph-negative/graph-negative-cooccurrence_index",
+            "provider_key": "graph-negative-cooccurrence_index",
+            "original_locator": {
+              "locator_type": "fixture",
+              "locator_value": "graph-negative-cooccurrence_index"
+            }
+          },
+          "title": "Graph negative cooccurrence_index",
+          "body_text": "Harbor Energy and Bay Capital were both added to an infrastructure index.",
+          "published_at": "2026-03-01T00:00:00+00:00",
+          "fetched_at": "2026-03-01T00:05:00+00:00"
+        }
+      ],
+      "normalized_artifacts": [
+        {
+          "article_id": "article-reg-graph-negative-cooccurrence_index",
+          "source_id": "regression-graph-negative",
+          "source_reference": {
+            "source_id": "regression-graph-negative",
+            "url": "https://fixtures.example.com/regression-graph-negative/graph-negative-cooccurrence_index",
+            "provider_key": "graph-negative-cooccurrence_index",
+            "original_locator": {
+              "locator_type": "fixture",
+              "locator_value": "graph-negative-cooccurrence_index"
+            }
+          },
+          "title": "Graph negative cooccurrence_index",
+          "body_text": "Harbor Energy and Bay Capital were both added to an infrastructure index.",
+          "published_at": "2026-03-01T00:00:00+00:00",
+          "fetched_at": "2026-03-01T00:05:00+00:00",
+          "language": "en",
+          "author_or_channel": "Regression Fixture",
+          "content_hash": "sha256:article-reg-graph-negative-cooccurrence_index:content",
+          "article_fingerprint": "sha256:cluster-reg-graph-negative-cooccurrence_index:fingerprint",
+          "license_tag": "fixture",
+          "reliability_tier": "A",
+          "cluster_id": "cluster-reg-graph-negative-cooccurrence_index"
+        }
+      ],
+      "expected_cluster_id": "cluster-reg-graph-negative-cooccurrence_index",
+      "metadata": {
+        "negative_category": "cooccurrence",
+        "expected_ex3_count": 0
+      }
+    },
+    {
+      "case_id": "graph-negative-sentiment_same_upgrade",
+      "category": "graph_negative",
+      "article_ids": [
+        "article-reg-graph-negative-sentiment_same_upgrade"
+      ],
+      "expected_outputs": [
+        {
+          "candidate_id": "fact-reg-graph-negative-sentiment_same_upgrade",
+          "export_contract": "Ex-1",
+          "article_id": "article-reg-graph-negative-sentiment_same_upgrade",
+          "cluster_id": "cluster-reg-graph-negative-sentiment_same_upgrade",
+          "source_reference": {
+            "source_id": "regression-graph-negative",
+            "url": "https://fixtures.example.com/regression-graph-negative/graph-negative-sentiment_same_upgrade",
+            "provider_key": "graph-negative-sentiment_same_upgrade",
+            "original_locator": {
+              "locator_type": "fixture",
+              "locator_value": "graph-negative-sentiment_same_upgrade"
+            }
+          },
+          "evidence_spans": [
+            {
+              "article_id": "article-reg-graph-negative-sentiment_same_upgrade",
+              "start_char": 0,
+              "end_char": 58,
+              "quote": "Acme Corp and Globex Inc both rose after analyst upgrades.",
+              "locator": "body"
+            }
+          ],
+          "schema_pin": {
+            "schema_name": "news_fact_candidate",
+            "schema_version": "news_fact_candidate.v1",
+            "contract": "Ex-1",
+            "model_output_version": "news_fact_candidate.output.v1"
+          },
+          "involved_entities": [
+            {
+              "mention_text": "Acme Corp",
+              "canonical_id": "entity:acme-corp",
+              "resolution_status": "resolved",
+              "type_hint": "company"
+            },
+            {
+              "mention_text": "Globex Inc",
+              "canonical_id": "entity:globex-inc",
+              "resolution_status": "resolved",
+              "type_hint": "company"
+            }
+          ]
+        }
+      ],
+      "source_reference": {
+        "source_id": "regression-graph-negative",
+        "url": "https://fixtures.example.com/regression-graph-negative/graph-negative-sentiment_same_upgrade",
+        "provider_key": "graph-negative-sentiment_same_upgrade",
+        "original_locator": {
+          "locator_type": "fixture",
+          "locator_value": "graph-negative-sentiment_same_upgrade"
+        }
+      },
+      "version_pins": {
+        "Ex-1": {
+          "schema_name": "news_fact_candidate",
+          "schema_version": "news_fact_candidate.v1",
+          "contract": "Ex-1",
+          "model_output_version": "news_fact_candidate.output.v1"
+        },
+        "Ex-2": {
+          "schema_name": "news_signal_candidate",
+          "schema_version": "news_signal_candidate.v1",
+          "contract": "Ex-2",
+          "model_output_version": "news_signal_candidate.output.v1"
+        },
+        "Ex-3": {
+          "schema_name": "news_graph_delta_candidate",
+          "schema_version": "news_graph_delta_candidate.v1",
+          "contract": "Ex-3",
+          "model_output_version": "news_graph_delta_candidate.output.v1"
+        }
+      },
+      "baseline_path": "baseline/graph_negative.json",
+      "raw_inputs": [
+        {
+          "article_id": "article-reg-graph-negative-sentiment_same_upgrade",
+          "source_reference": {
+            "source_id": "regression-graph-negative",
+            "url": "https://fixtures.example.com/regression-graph-negative/graph-negative-sentiment_same_upgrade",
+            "provider_key": "graph-negative-sentiment_same_upgrade",
+            "original_locator": {
+              "locator_type": "fixture",
+              "locator_value": "graph-negative-sentiment_same_upgrade"
+            }
+          },
+          "title": "Graph negative sentiment_same_upgrade",
+          "body_text": "Acme Corp and Globex Inc both rose after analyst upgrades.",
+          "published_at": "2026-03-01T00:00:00+00:00",
+          "fetched_at": "2026-03-01T00:05:00+00:00"
+        }
+      ],
+      "normalized_artifacts": [
+        {
+          "article_id": "article-reg-graph-negative-sentiment_same_upgrade",
+          "source_id": "regression-graph-negative",
+          "source_reference": {
+            "source_id": "regression-graph-negative",
+            "url": "https://fixtures.example.com/regression-graph-negative/graph-negative-sentiment_same_upgrade",
+            "provider_key": "graph-negative-sentiment_same_upgrade",
+            "original_locator": {
+              "locator_type": "fixture",
+              "locator_value": "graph-negative-sentiment_same_upgrade"
+            }
+          },
+          "title": "Graph negative sentiment_same_upgrade",
+          "body_text": "Acme Corp and Globex Inc both rose after analyst upgrades.",
+          "published_at": "2026-03-01T00:00:00+00:00",
+          "fetched_at": "2026-03-01T00:05:00+00:00",
+          "language": "en",
+          "author_or_channel": "Regression Fixture",
+          "content_hash": "sha256:article-reg-graph-negative-sentiment_same_upgrade:content",
+          "article_fingerprint": "sha256:cluster-reg-graph-negative-sentiment_same_upgrade:fingerprint",
+          "license_tag": "fixture",
+          "reliability_tier": "A",
+          "cluster_id": "cluster-reg-graph-negative-sentiment_same_upgrade"
+        }
+      ],
+      "expected_cluster_id": "cluster-reg-graph-negative-sentiment_same_upgrade",
+      "metadata": {
+        "negative_category": "sentiment_same",
+        "expected_ex3_count": 0
+      }
+    },
+    {
+      "case_id": "graph-negative-sentiment_same_sales",
+      "category": "graph_negative",
+      "article_ids": [
+        "article-reg-graph-negative-sentiment_same_sales"
+      ],
+      "expected_outputs": [
+        {
+          "candidate_id": "fact-reg-graph-negative-sentiment_same_sales",
+          "export_contract": "Ex-1",
+          "article_id": "article-reg-graph-negative-sentiment_same_sales",
+          "cluster_id": "cluster-reg-graph-negative-sentiment_same_sales",
+          "source_reference": {
+            "source_id": "regression-graph-negative",
+            "url": "https://fixtures.example.com/regression-graph-negative/graph-negative-sentiment_same_sales",
+            "provider_key": "graph-negative-sentiment_same_sales",
+            "original_locator": {
+              "locator_type": "fixture",
+              "locator_value": "graph-negative-sentiment_same_sales"
+            }
+          },
+          "evidence_spans": [
+            {
+              "article_id": "article-reg-graph-negative-sentiment_same_sales",
+              "start_char": 0,
+              "end_char": 65,
+              "quote": "Delta Components and Zenith Motors fell after weak vehicle sales.",
+              "locator": "body"
+            }
+          ],
+          "schema_pin": {
+            "schema_name": "news_fact_candidate",
+            "schema_version": "news_fact_candidate.v1",
+            "contract": "Ex-1",
+            "model_output_version": "news_fact_candidate.output.v1"
+          },
+          "involved_entities": [
+            {
+              "mention_text": "Delta Components",
+              "canonical_id": "entity:delta-components",
+              "resolution_status": "resolved",
+              "type_hint": "company"
+            },
+            {
+              "mention_text": "Zenith Motors",
+              "canonical_id": "entity:zenith-motors",
+              "resolution_status": "resolved",
+              "type_hint": "company"
+            }
+          ]
+        }
+      ],
+      "source_reference": {
+        "source_id": "regression-graph-negative",
+        "url": "https://fixtures.example.com/regression-graph-negative/graph-negative-sentiment_same_sales",
+        "provider_key": "graph-negative-sentiment_same_sales",
+        "original_locator": {
+          "locator_type": "fixture",
+          "locator_value": "graph-negative-sentiment_same_sales"
+        }
+      },
+      "version_pins": {
+        "Ex-1": {
+          "schema_name": "news_fact_candidate",
+          "schema_version": "news_fact_candidate.v1",
+          "contract": "Ex-1",
+          "model_output_version": "news_fact_candidate.output.v1"
+        },
+        "Ex-2": {
+          "schema_name": "news_signal_candidate",
+          "schema_version": "news_signal_candidate.v1",
+          "contract": "Ex-2",
+          "model_output_version": "news_signal_candidate.output.v1"
+        },
+        "Ex-3": {
+          "schema_name": "news_graph_delta_candidate",
+          "schema_version": "news_graph_delta_candidate.v1",
+          "contract": "Ex-3",
+          "model_output_version": "news_graph_delta_candidate.output.v1"
+        }
+      },
+      "baseline_path": "baseline/graph_negative.json",
+      "raw_inputs": [
+        {
+          "article_id": "article-reg-graph-negative-sentiment_same_sales",
+          "source_reference": {
+            "source_id": "regression-graph-negative",
+            "url": "https://fixtures.example.com/regression-graph-negative/graph-negative-sentiment_same_sales",
+            "provider_key": "graph-negative-sentiment_same_sales",
+            "original_locator": {
+              "locator_type": "fixture",
+              "locator_value": "graph-negative-sentiment_same_sales"
+            }
+          },
+          "title": "Graph negative sentiment_same_sales",
+          "body_text": "Delta Components and Zenith Motors fell after weak vehicle sales.",
+          "published_at": "2026-03-01T00:00:00+00:00",
+          "fetched_at": "2026-03-01T00:05:00+00:00"
+        }
+      ],
+      "normalized_artifacts": [
+        {
+          "article_id": "article-reg-graph-negative-sentiment_same_sales",
+          "source_id": "regression-graph-negative",
+          "source_reference": {
+            "source_id": "regression-graph-negative",
+            "url": "https://fixtures.example.com/regression-graph-negative/graph-negative-sentiment_same_sales",
+            "provider_key": "graph-negative-sentiment_same_sales",
+            "original_locator": {
+              "locator_type": "fixture",
+              "locator_value": "graph-negative-sentiment_same_sales"
+            }
+          },
+          "title": "Graph negative sentiment_same_sales",
+          "body_text": "Delta Components and Zenith Motors fell after weak vehicle sales.",
+          "published_at": "2026-03-01T00:00:00+00:00",
+          "fetched_at": "2026-03-01T00:05:00+00:00",
+          "language": "en",
+          "author_or_channel": "Regression Fixture",
+          "content_hash": "sha256:article-reg-graph-negative-sentiment_same_sales:content",
+          "article_fingerprint": "sha256:cluster-reg-graph-negative-sentiment_same_sales:fingerprint",
+          "license_tag": "fixture",
+          "reliability_tier": "A",
+          "cluster_id": "cluster-reg-graph-negative-sentiment_same_sales"
+        }
+      ],
+      "expected_cluster_id": "cluster-reg-graph-negative-sentiment_same_sales",
+      "metadata": {
+        "negative_category": "sentiment_same",
+        "expected_ex3_count": 0
+      }
+    },
+    {
+      "case_id": "graph-negative-sentiment_same_rates",
+      "category": "graph_negative",
+      "article_ids": [
+        "article-reg-graph-negative-sentiment_same_rates"
+      ],
+      "expected_outputs": [
+        {
+          "candidate_id": "fact-reg-graph-negative-sentiment_same_rates",
+          "export_contract": "Ex-1",
+          "article_id": "article-reg-graph-negative-sentiment_same_rates",
+          "cluster_id": "cluster-reg-graph-negative-sentiment_same_rates",
+          "source_reference": {
+            "source_id": "regression-graph-negative",
+            "url": "https://fixtures.example.com/regression-graph-negative/graph-negative-sentiment_same_rates",
+            "provider_key": "graph-negative-sentiment_same_rates",
+            "original_locator": {
+              "locator_type": "fixture",
+              "locator_value": "graph-negative-sentiment_same_rates"
+            }
+          },
+          "evidence_spans": [
+            {
+              "article_id": "article-reg-graph-negative-sentiment_same_rates",
+              "start_char": 0,
+              "end_char": 66,
+              "quote": "North River Metals and East Power Ltd gained as rates moved lower.",
+              "locator": "body"
+            }
+          ],
+          "schema_pin": {
+            "schema_name": "news_fact_candidate",
+            "schema_version": "news_fact_candidate.v1",
+            "contract": "Ex-1",
+            "model_output_version": "news_fact_candidate.output.v1"
+          },
+          "involved_entities": [
+            {
+              "mention_text": "North River Metals",
+              "canonical_id": "entity:north-river-metals",
+              "resolution_status": "resolved",
+              "type_hint": "company"
+            },
+            {
+              "mention_text": "East Power Ltd",
+              "canonical_id": "entity:east-power-ltd",
+              "resolution_status": "resolved",
+              "type_hint": "company"
+            }
+          ]
+        }
+      ],
+      "source_reference": {
+        "source_id": "regression-graph-negative",
+        "url": "https://fixtures.example.com/regression-graph-negative/graph-negative-sentiment_same_rates",
+        "provider_key": "graph-negative-sentiment_same_rates",
+        "original_locator": {
+          "locator_type": "fixture",
+          "locator_value": "graph-negative-sentiment_same_rates"
+        }
+      },
+      "version_pins": {
+        "Ex-1": {
+          "schema_name": "news_fact_candidate",
+          "schema_version": "news_fact_candidate.v1",
+          "contract": "Ex-1",
+          "model_output_version": "news_fact_candidate.output.v1"
+        },
+        "Ex-2": {
+          "schema_name": "news_signal_candidate",
+          "schema_version": "news_signal_candidate.v1",
+          "contract": "Ex-2",
+          "model_output_version": "news_signal_candidate.output.v1"
+        },
+        "Ex-3": {
+          "schema_name": "news_graph_delta_candidate",
+          "schema_version": "news_graph_delta_candidate.v1",
+          "contract": "Ex-3",
+          "model_output_version": "news_graph_delta_candidate.output.v1"
+        }
+      },
+      "baseline_path": "baseline/graph_negative.json",
+      "raw_inputs": [
+        {
+          "article_id": "article-reg-graph-negative-sentiment_same_rates",
+          "source_reference": {
+            "source_id": "regression-graph-negative",
+            "url": "https://fixtures.example.com/regression-graph-negative/graph-negative-sentiment_same_rates",
+            "provider_key": "graph-negative-sentiment_same_rates",
+            "original_locator": {
+              "locator_type": "fixture",
+              "locator_value": "graph-negative-sentiment_same_rates"
+            }
+          },
+          "title": "Graph negative sentiment_same_rates",
+          "body_text": "North River Metals and East Power Ltd gained as rates moved lower.",
+          "published_at": "2026-03-01T00:00:00+00:00",
+          "fetched_at": "2026-03-01T00:05:00+00:00"
+        }
+      ],
+      "normalized_artifacts": [
+        {
+          "article_id": "article-reg-graph-negative-sentiment_same_rates",
+          "source_id": "regression-graph-negative",
+          "source_reference": {
+            "source_id": "regression-graph-negative",
+            "url": "https://fixtures.example.com/regression-graph-negative/graph-negative-sentiment_same_rates",
+            "provider_key": "graph-negative-sentiment_same_rates",
+            "original_locator": {
+              "locator_type": "fixture",
+              "locator_value": "graph-negative-sentiment_same_rates"
+            }
+          },
+          "title": "Graph negative sentiment_same_rates",
+          "body_text": "North River Metals and East Power Ltd gained as rates moved lower.",
+          "published_at": "2026-03-01T00:00:00+00:00",
+          "fetched_at": "2026-03-01T00:05:00+00:00",
+          "language": "en",
+          "author_or_channel": "Regression Fixture",
+          "content_hash": "sha256:article-reg-graph-negative-sentiment_same_rates:content",
+          "article_fingerprint": "sha256:cluster-reg-graph-negative-sentiment_same_rates:fingerprint",
+          "license_tag": "fixture",
+          "reliability_tier": "A",
+          "cluster_id": "cluster-reg-graph-negative-sentiment_same_rates"
+        }
+      ],
+      "expected_cluster_id": "cluster-reg-graph-negative-sentiment_same_rates",
+      "metadata": {
+        "negative_category": "sentiment_same",
+        "expected_ex3_count": 0
+      }
+    },
+    {
+      "case_id": "graph-negative-sentiment_same_shipping",
+      "category": "graph_negative",
+      "article_ids": [
+        "article-reg-graph-negative-sentiment_same_shipping"
+      ],
+      "expected_outputs": [
+        {
+          "candidate_id": "fact-reg-graph-negative-sentiment_same_shipping",
+          "export_contract": "Ex-1",
+          "article_id": "article-reg-graph-negative-sentiment_same_shipping",
+          "cluster_id": "cluster-reg-graph-negative-sentiment_same_shipping",
+          "source_reference": {
+            "source_id": "regression-graph-negative",
+            "url": "https://fixtures.example.com/regression-graph-negative/graph-negative-sentiment_same_shipping",
+            "provider_key": "graph-negative-sentiment_same_shipping",
+            "original_locator": {
+              "locator_type": "fixture",
+              "locator_value": "graph-negative-sentiment_same_shipping"
+            }
+          },
+          "evidence_spans": [
+            {
+              "article_id": "article-reg-graph-negative-sentiment_same_shipping",
+              "start_char": 0,
+              "end_char": 72,
+              "quote": "Atlas Shipping and State Treasury were cited as shipping shares rallied.",
+              "locator": "body"
+            }
+          ],
+          "schema_pin": {
+            "schema_name": "news_fact_candidate",
+            "schema_version": "news_fact_candidate.v1",
+            "contract": "Ex-1",
+            "model_output_version": "news_fact_candidate.output.v1"
+          },
+          "involved_entities": [
+            {
+              "mention_text": "Atlas Shipping",
+              "canonical_id": "entity:atlas-shipping",
+              "resolution_status": "resolved",
+              "type_hint": "company"
+            },
+            {
+              "mention_text": "State Treasury",
+              "canonical_id": "entity:state-treasury",
+              "resolution_status": "resolved",
+              "type_hint": "company"
+            }
+          ]
+        }
+      ],
+      "source_reference": {
+        "source_id": "regression-graph-negative",
+        "url": "https://fixtures.example.com/regression-graph-negative/graph-negative-sentiment_same_shipping",
+        "provider_key": "graph-negative-sentiment_same_shipping",
+        "original_locator": {
+          "locator_type": "fixture",
+          "locator_value": "graph-negative-sentiment_same_shipping"
+        }
+      },
+      "version_pins": {
+        "Ex-1": {
+          "schema_name": "news_fact_candidate",
+          "schema_version": "news_fact_candidate.v1",
+          "contract": "Ex-1",
+          "model_output_version": "news_fact_candidate.output.v1"
+        },
+        "Ex-2": {
+          "schema_name": "news_signal_candidate",
+          "schema_version": "news_signal_candidate.v1",
+          "contract": "Ex-2",
+          "model_output_version": "news_signal_candidate.output.v1"
+        },
+        "Ex-3": {
+          "schema_name": "news_graph_delta_candidate",
+          "schema_version": "news_graph_delta_candidate.v1",
+          "contract": "Ex-3",
+          "model_output_version": "news_graph_delta_candidate.output.v1"
+        }
+      },
+      "baseline_path": "baseline/graph_negative.json",
+      "raw_inputs": [
+        {
+          "article_id": "article-reg-graph-negative-sentiment_same_shipping",
+          "source_reference": {
+            "source_id": "regression-graph-negative",
+            "url": "https://fixtures.example.com/regression-graph-negative/graph-negative-sentiment_same_shipping",
+            "provider_key": "graph-negative-sentiment_same_shipping",
+            "original_locator": {
+              "locator_type": "fixture",
+              "locator_value": "graph-negative-sentiment_same_shipping"
+            }
+          },
+          "title": "Graph negative sentiment_same_shipping",
+          "body_text": "Atlas Shipping and State Treasury were cited as shipping shares rallied.",
+          "published_at": "2026-03-01T00:00:00+00:00",
+          "fetched_at": "2026-03-01T00:05:00+00:00"
+        }
+      ],
+      "normalized_artifacts": [
+        {
+          "article_id": "article-reg-graph-negative-sentiment_same_shipping",
+          "source_id": "regression-graph-negative",
+          "source_reference": {
+            "source_id": "regression-graph-negative",
+            "url": "https://fixtures.example.com/regression-graph-negative/graph-negative-sentiment_same_shipping",
+            "provider_key": "graph-negative-sentiment_same_shipping",
+            "original_locator": {
+              "locator_type": "fixture",
+              "locator_value": "graph-negative-sentiment_same_shipping"
+            }
+          },
+          "title": "Graph negative sentiment_same_shipping",
+          "body_text": "Atlas Shipping and State Treasury were cited as shipping shares rallied.",
+          "published_at": "2026-03-01T00:00:00+00:00",
+          "fetched_at": "2026-03-01T00:05:00+00:00",
+          "language": "en",
+          "author_or_channel": "Regression Fixture",
+          "content_hash": "sha256:article-reg-graph-negative-sentiment_same_shipping:content",
+          "article_fingerprint": "sha256:cluster-reg-graph-negative-sentiment_same_shipping:fingerprint",
+          "license_tag": "fixture",
+          "reliability_tier": "A",
+          "cluster_id": "cluster-reg-graph-negative-sentiment_same_shipping"
+        }
+      ],
+      "expected_cluster_id": "cluster-reg-graph-negative-sentiment_same_shipping",
+      "metadata": {
+        "negative_category": "sentiment_same",
+        "expected_ex3_count": 0
+      }
+    },
+    {
+      "case_id": "graph-negative-sentiment_same_credit",
+      "category": "graph_negative",
+      "article_ids": [
+        "article-reg-graph-negative-sentiment_same_credit"
+      ],
+      "expected_outputs": [
+        {
+          "candidate_id": "fact-reg-graph-negative-sentiment_same_credit",
+          "export_contract": "Ex-1",
+          "article_id": "article-reg-graph-negative-sentiment_same_credit",
+          "cluster_id": "cluster-reg-graph-negative-sentiment_same_credit",
+          "source_reference": {
+            "source_id": "regression-graph-negative",
+            "url": "https://fixtures.example.com/regression-graph-negative/graph-negative-sentiment_same_credit",
+            "provider_key": "graph-negative-sentiment_same_credit",
+            "original_locator": {
+              "locator_type": "fixture",
+              "locator_value": "graph-negative-sentiment_same_credit"
+            }
+          },
+          "evidence_spans": [
+            {
+              "article_id": "article-reg-graph-negative-sentiment_same_credit",
+              "start_char": 0,
+              "end_char": 72,
+              "quote": "Harbor Energy and Bay Capital traded lower after credit spreads widened.",
+              "locator": "body"
+            }
+          ],
+          "schema_pin": {
+            "schema_name": "news_fact_candidate",
+            "schema_version": "news_fact_candidate.v1",
+            "contract": "Ex-1",
+            "model_output_version": "news_fact_candidate.output.v1"
+          },
+          "involved_entities": [
+            {
+              "mention_text": "Harbor Energy",
+              "canonical_id": "entity:harbor-energy",
+              "resolution_status": "resolved",
+              "type_hint": "company"
+            },
+            {
+              "mention_text": "Bay Capital",
+              "canonical_id": "entity:bay-capital",
+              "resolution_status": "resolved",
+              "type_hint": "company"
+            }
+          ]
+        }
+      ],
+      "source_reference": {
+        "source_id": "regression-graph-negative",
+        "url": "https://fixtures.example.com/regression-graph-negative/graph-negative-sentiment_same_credit",
+        "provider_key": "graph-negative-sentiment_same_credit",
+        "original_locator": {
+          "locator_type": "fixture",
+          "locator_value": "graph-negative-sentiment_same_credit"
+        }
+      },
+      "version_pins": {
+        "Ex-1": {
+          "schema_name": "news_fact_candidate",
+          "schema_version": "news_fact_candidate.v1",
+          "contract": "Ex-1",
+          "model_output_version": "news_fact_candidate.output.v1"
+        },
+        "Ex-2": {
+          "schema_name": "news_signal_candidate",
+          "schema_version": "news_signal_candidate.v1",
+          "contract": "Ex-2",
+          "model_output_version": "news_signal_candidate.output.v1"
+        },
+        "Ex-3": {
+          "schema_name": "news_graph_delta_candidate",
+          "schema_version": "news_graph_delta_candidate.v1",
+          "contract": "Ex-3",
+          "model_output_version": "news_graph_delta_candidate.output.v1"
+        }
+      },
+      "baseline_path": "baseline/graph_negative.json",
+      "raw_inputs": [
+        {
+          "article_id": "article-reg-graph-negative-sentiment_same_credit",
+          "source_reference": {
+            "source_id": "regression-graph-negative",
+            "url": "https://fixtures.example.com/regression-graph-negative/graph-negative-sentiment_same_credit",
+            "provider_key": "graph-negative-sentiment_same_credit",
+            "original_locator": {
+              "locator_type": "fixture",
+              "locator_value": "graph-negative-sentiment_same_credit"
+            }
+          },
+          "title": "Graph negative sentiment_same_credit",
+          "body_text": "Harbor Energy and Bay Capital traded lower after credit spreads widened.",
+          "published_at": "2026-03-01T00:00:00+00:00",
+          "fetched_at": "2026-03-01T00:05:00+00:00"
+        }
+      ],
+      "normalized_artifacts": [
+        {
+          "article_id": "article-reg-graph-negative-sentiment_same_credit",
+          "source_id": "regression-graph-negative",
+          "source_reference": {
+            "source_id": "regression-graph-negative",
+            "url": "https://fixtures.example.com/regression-graph-negative/graph-negative-sentiment_same_credit",
+            "provider_key": "graph-negative-sentiment_same_credit",
+            "original_locator": {
+              "locator_type": "fixture",
+              "locator_value": "graph-negative-sentiment_same_credit"
+            }
+          },
+          "title": "Graph negative sentiment_same_credit",
+          "body_text": "Harbor Energy and Bay Capital traded lower after credit spreads widened.",
+          "published_at": "2026-03-01T00:00:00+00:00",
+          "fetched_at": "2026-03-01T00:05:00+00:00",
+          "language": "en",
+          "author_or_channel": "Regression Fixture",
+          "content_hash": "sha256:article-reg-graph-negative-sentiment_same_credit:content",
+          "article_fingerprint": "sha256:cluster-reg-graph-negative-sentiment_same_credit:fingerprint",
+          "license_tag": "fixture",
+          "reliability_tier": "A",
+          "cluster_id": "cluster-reg-graph-negative-sentiment_same_credit"
+        }
+      ],
+      "expected_cluster_id": "cluster-reg-graph-negative-sentiment_same_credit",
+      "metadata": {
+        "negative_category": "sentiment_same",
+        "expected_ex3_count": 0
+      }
+    },
+    {
+      "case_id": "graph-negative-title_association_battery_race",
+      "category": "graph_negative",
+      "article_ids": [
+        "article-reg-graph-negative-title_association_battery_race"
+      ],
+      "expected_outputs": [
+        {
+          "candidate_id": "fact-reg-graph-negative-title_association_battery_race",
+          "export_contract": "Ex-1",
+          "article_id": "article-reg-graph-negative-title_association_battery_race",
+          "cluster_id": "cluster-reg-graph-negative-title_association_battery_race",
+          "source_reference": {
+            "source_id": "regression-graph-negative",
+            "url": "https://fixtures.example.com/regression-graph-negative/graph-negative-title_association_battery_race",
+            "provider_key": "graph-negative-title_association_battery_race",
+            "original_locator": {
+              "locator_type": "fixture",
+              "locator_value": "graph-negative-title_association_battery_race"
+            }
+          },
+          "evidence_spans": [
+            {
+              "article_id": "article-reg-graph-negative-title_association_battery_race",
+              "start_char": 0,
+              "end_char": 38,
+              "quote": "The article compared market positions.",
+              "locator": "body"
+            }
+          ],
+          "schema_pin": {
+            "schema_name": "news_fact_candidate",
+            "schema_version": "news_fact_candidate.v1",
+            "contract": "Ex-1",
+            "model_output_version": "news_fact_candidate.output.v1"
+          },
+          "involved_entities": [
+            {
+              "mention_text": "Acme Corp",
+              "canonical_id": "entity:acme-corp",
+              "resolution_status": "resolved",
+              "type_hint": "company"
+            },
+            {
+              "mention_text": "Globex Inc",
+              "canonical_id": "entity:globex-inc",
+              "resolution_status": "resolved",
+              "type_hint": "company"
+            }
+          ]
+        }
+      ],
+      "source_reference": {
+        "source_id": "regression-graph-negative",
+        "url": "https://fixtures.example.com/regression-graph-negative/graph-negative-title_association_battery_race",
+        "provider_key": "graph-negative-title_association_battery_race",
+        "original_locator": {
+          "locator_type": "fixture",
+          "locator_value": "graph-negative-title_association_battery_race"
+        }
+      },
+      "version_pins": {
+        "Ex-1": {
+          "schema_name": "news_fact_candidate",
+          "schema_version": "news_fact_candidate.v1",
+          "contract": "Ex-1",
+          "model_output_version": "news_fact_candidate.output.v1"
+        },
+        "Ex-2": {
+          "schema_name": "news_signal_candidate",
+          "schema_version": "news_signal_candidate.v1",
+          "contract": "Ex-2",
+          "model_output_version": "news_signal_candidate.output.v1"
+        },
+        "Ex-3": {
+          "schema_name": "news_graph_delta_candidate",
+          "schema_version": "news_graph_delta_candidate.v1",
+          "contract": "Ex-3",
+          "model_output_version": "news_graph_delta_candidate.output.v1"
+        }
+      },
+      "baseline_path": "baseline/graph_negative.json",
+      "raw_inputs": [
+        {
+          "article_id": "article-reg-graph-negative-title_association_battery_race",
+          "source_reference": {
+            "source_id": "regression-graph-negative",
+            "url": "https://fixtures.example.com/regression-graph-negative/graph-negative-title_association_battery_race",
+            "provider_key": "graph-negative-title_association_battery_race",
+            "original_locator": {
+              "locator_type": "fixture",
+              "locator_value": "graph-negative-title_association_battery_race"
+            }
+          },
+          "title": "Acme Corp, Globex Inc in battery race",
+          "body_text": "The article compared market positions.",
+          "published_at": "2026-03-01T00:00:00+00:00",
+          "fetched_at": "2026-03-01T00:05:00+00:00"
+        }
+      ],
+      "normalized_artifacts": [
+        {
+          "article_id": "article-reg-graph-negative-title_association_battery_race",
+          "source_id": "regression-graph-negative",
+          "source_reference": {
+            "source_id": "regression-graph-negative",
+            "url": "https://fixtures.example.com/regression-graph-negative/graph-negative-title_association_battery_race",
+            "provider_key": "graph-negative-title_association_battery_race",
+            "original_locator": {
+              "locator_type": "fixture",
+              "locator_value": "graph-negative-title_association_battery_race"
+            }
+          },
+          "title": "Acme Corp, Globex Inc in battery race",
+          "body_text": "The article compared market positions.",
+          "published_at": "2026-03-01T00:00:00+00:00",
+          "fetched_at": "2026-03-01T00:05:00+00:00",
+          "language": "en",
+          "author_or_channel": "Regression Fixture",
+          "content_hash": "sha256:article-reg-graph-negative-title_association_battery_race:content",
+          "article_fingerprint": "sha256:cluster-reg-graph-negative-title_association_battery_race:fingerprint",
+          "license_tag": "fixture",
+          "reliability_tier": "A",
+          "cluster_id": "cluster-reg-graph-negative-title_association_battery_race"
+        }
+      ],
+      "expected_cluster_id": "cluster-reg-graph-negative-title_association_battery_race",
+      "metadata": {
+        "negative_category": "title_association",
+        "expected_ex3_count": 0
+      }
+    },
+    {
+      "case_id": "graph-negative-title_association_grid_storage",
+      "category": "graph_negative",
+      "article_ids": [
+        "article-reg-graph-negative-title_association_grid_storage"
+      ],
+      "expected_outputs": [
+        {
+          "candidate_id": "fact-reg-graph-negative-title_association_grid_storage",
+          "export_contract": "Ex-1",
+          "article_id": "article-reg-graph-negative-title_association_grid_storage",
+          "cluster_id": "cluster-reg-graph-negative-title_association_grid_storage",
+          "source_reference": {
+            "source_id": "regression-graph-negative",
+            "url": "https://fixtures.example.com/regression-graph-negative/graph-negative-title_association_grid_storage",
+            "provider_key": "graph-negative-title_association_grid_storage",
+            "original_locator": {
+              "locator_type": "fixture",
+              "locator_value": "graph-negative-title_association_grid_storage"
+            }
+          },
+          "evidence_spans": [
+            {
+              "article_id": "article-reg-graph-negative-title_association_grid_storage",
+              "start_char": 0,
+              "end_char": 48,
+              "quote": "The article summarized separate company updates.",
+              "locator": "body"
+            }
+          ],
+          "schema_pin": {
+            "schema_name": "news_fact_candidate",
+            "schema_version": "news_fact_candidate.v1",
+            "contract": "Ex-1",
+            "model_output_version": "news_fact_candidate.output.v1"
+          },
+          "involved_entities": [
+            {
+              "mention_text": "North River Metals",
+              "canonical_id": "entity:north-river-metals",
+              "resolution_status": "resolved",
+              "type_hint": "company"
+            },
+            {
+              "mention_text": "East Power Ltd",
+              "canonical_id": "entity:east-power-ltd",
+              "resolution_status": "resolved",
+              "type_hint": "company"
+            }
+          ]
+        }
+      ],
+      "source_reference": {
+        "source_id": "regression-graph-negative",
+        "url": "https://fixtures.example.com/regression-graph-negative/graph-negative-title_association_grid_storage",
+        "provider_key": "graph-negative-title_association_grid_storage",
+        "original_locator": {
+          "locator_type": "fixture",
+          "locator_value": "graph-negative-title_association_grid_storage"
+        }
+      },
+      "version_pins": {
+        "Ex-1": {
+          "schema_name": "news_fact_candidate",
+          "schema_version": "news_fact_candidate.v1",
+          "contract": "Ex-1",
+          "model_output_version": "news_fact_candidate.output.v1"
+        },
+        "Ex-2": {
+          "schema_name": "news_signal_candidate",
+          "schema_version": "news_signal_candidate.v1",
+          "contract": "Ex-2",
+          "model_output_version": "news_signal_candidate.output.v1"
+        },
+        "Ex-3": {
+          "schema_name": "news_graph_delta_candidate",
+          "schema_version": "news_graph_delta_candidate.v1",
+          "contract": "Ex-3",
+          "model_output_version": "news_graph_delta_candidate.output.v1"
+        }
+      },
+      "baseline_path": "baseline/graph_negative.json",
+      "raw_inputs": [
+        {
+          "article_id": "article-reg-graph-negative-title_association_grid_storage",
+          "source_reference": {
+            "source_id": "regression-graph-negative",
+            "url": "https://fixtures.example.com/regression-graph-negative/graph-negative-title_association_grid_storage",
+            "provider_key": "graph-negative-title_association_grid_storage",
+            "original_locator": {
+              "locator_type": "fixture",
+              "locator_value": "graph-negative-title_association_grid_storage"
+            }
+          },
+          "title": "North River Metals, East Power Ltd eye grid storage",
+          "body_text": "The article summarized separate company updates.",
+          "published_at": "2026-03-01T00:00:00+00:00",
+          "fetched_at": "2026-03-01T00:05:00+00:00"
+        }
+      ],
+      "normalized_artifacts": [
+        {
+          "article_id": "article-reg-graph-negative-title_association_grid_storage",
+          "source_id": "regression-graph-negative",
+          "source_reference": {
+            "source_id": "regression-graph-negative",
+            "url": "https://fixtures.example.com/regression-graph-negative/graph-negative-title_association_grid_storage",
+            "provider_key": "graph-negative-title_association_grid_storage",
+            "original_locator": {
+              "locator_type": "fixture",
+              "locator_value": "graph-negative-title_association_grid_storage"
+            }
+          },
+          "title": "North River Metals, East Power Ltd eye grid storage",
+          "body_text": "The article summarized separate company updates.",
+          "published_at": "2026-03-01T00:00:00+00:00",
+          "fetched_at": "2026-03-01T00:05:00+00:00",
+          "language": "en",
+          "author_or_channel": "Regression Fixture",
+          "content_hash": "sha256:article-reg-graph-negative-title_association_grid_storage:content",
+          "article_fingerprint": "sha256:cluster-reg-graph-negative-title_association_grid_storage:fingerprint",
+          "license_tag": "fixture",
+          "reliability_tier": "A",
+          "cluster_id": "cluster-reg-graph-negative-title_association_grid_storage"
+        }
+      ],
+      "expected_cluster_id": "cluster-reg-graph-negative-title_association_grid_storage",
+      "metadata": {
+        "negative_category": "title_association",
+        "expected_ex3_count": 0
+      }
+    },
+    {
+      "case_id": "graph-negative-title_association_exports",
+      "category": "graph_negative",
+      "article_ids": [
+        "article-reg-graph-negative-title_association_exports"
+      ],
+      "expected_outputs": [
+        {
+          "candidate_id": "fact-reg-graph-negative-title_association_exports",
+          "export_contract": "Ex-1",
+          "article_id": "article-reg-graph-negative-title_association_exports",
+          "cluster_id": "cluster-reg-graph-negative-title_association_exports",
+          "source_reference": {
+            "source_id": "regression-graph-negative",
+            "url": "https://fixtures.example.com/regression-graph-negative/graph-negative-title_association_exports",
+            "provider_key": "graph-negative-title_association_exports",
+            "original_locator": {
+              "locator_type": "fixture",
+              "locator_value": "graph-negative-title_association_exports"
+            }
+          },
+          "evidence_spans": [
+            {
+              "article_id": "article-reg-graph-negative-title_association_exports",
+              "start_char": 0,
+              "end_char": 40,
+              "quote": "The brief listed public-sector meetings.",
+              "locator": "body"
+            }
+          ],
+          "schema_pin": {
+            "schema_name": "news_fact_candidate",
+            "schema_version": "news_fact_candidate.v1",
+            "contract": "Ex-1",
+            "model_output_version": "news_fact_candidate.output.v1"
+          },
+          "involved_entities": [
+            {
+              "mention_text": "Atlas Shipping",
+              "canonical_id": "entity:atlas-shipping",
+              "resolution_status": "resolved",
+              "type_hint": "company"
+            },
+            {
+              "mention_text": "State Treasury",
+              "canonical_id": "entity:state-treasury",
+              "resolution_status": "resolved",
+              "type_hint": "company"
+            }
+          ]
+        }
+      ],
+      "source_reference": {
+        "source_id": "regression-graph-negative",
+        "url": "https://fixtures.example.com/regression-graph-negative/graph-negative-title_association_exports",
+        "provider_key": "graph-negative-title_association_exports",
+        "original_locator": {
+          "locator_type": "fixture",
+          "locator_value": "graph-negative-title_association_exports"
+        }
+      },
+      "version_pins": {
+        "Ex-1": {
+          "schema_name": "news_fact_candidate",
+          "schema_version": "news_fact_candidate.v1",
+          "contract": "Ex-1",
+          "model_output_version": "news_fact_candidate.output.v1"
+        },
+        "Ex-2": {
+          "schema_name": "news_signal_candidate",
+          "schema_version": "news_signal_candidate.v1",
+          "contract": "Ex-2",
+          "model_output_version": "news_signal_candidate.output.v1"
+        },
+        "Ex-3": {
+          "schema_name": "news_graph_delta_candidate",
+          "schema_version": "news_graph_delta_candidate.v1",
+          "contract": "Ex-3",
+          "model_output_version": "news_graph_delta_candidate.output.v1"
+        }
+      },
+      "baseline_path": "baseline/graph_negative.json",
+      "raw_inputs": [
+        {
+          "article_id": "article-reg-graph-negative-title_association_exports",
+          "source_reference": {
+            "source_id": "regression-graph-negative",
+            "url": "https://fixtures.example.com/regression-graph-negative/graph-negative-title_association_exports",
+            "provider_key": "graph-negative-title_association_exports",
+            "original_locator": {
+              "locator_type": "fixture",
+              "locator_value": "graph-negative-title_association_exports"
+            }
+          },
+          "title": "Atlas Shipping, State Treasury named in exports brief",
+          "body_text": "The brief listed public-sector meetings.",
+          "published_at": "2026-03-01T00:00:00+00:00",
+          "fetched_at": "2026-03-01T00:05:00+00:00"
+        }
+      ],
+      "normalized_artifacts": [
+        {
+          "article_id": "article-reg-graph-negative-title_association_exports",
+          "source_id": "regression-graph-negative",
+          "source_reference": {
+            "source_id": "regression-graph-negative",
+            "url": "https://fixtures.example.com/regression-graph-negative/graph-negative-title_association_exports",
+            "provider_key": "graph-negative-title_association_exports",
+            "original_locator": {
+              "locator_type": "fixture",
+              "locator_value": "graph-negative-title_association_exports"
+            }
+          },
+          "title": "Atlas Shipping, State Treasury named in exports brief",
+          "body_text": "The brief listed public-sector meetings.",
+          "published_at": "2026-03-01T00:00:00+00:00",
+          "fetched_at": "2026-03-01T00:05:00+00:00",
+          "language": "en",
+          "author_or_channel": "Regression Fixture",
+          "content_hash": "sha256:article-reg-graph-negative-title_association_exports:content",
+          "article_fingerprint": "sha256:cluster-reg-graph-negative-title_association_exports:fingerprint",
+          "license_tag": "fixture",
+          "reliability_tier": "A",
+          "cluster_id": "cluster-reg-graph-negative-title_association_exports"
+        }
+      ],
+      "expected_cluster_id": "cluster-reg-graph-negative-title_association_exports",
+      "metadata": {
+        "negative_category": "title_association",
+        "expected_ex3_count": 0
+      }
+    },
+    {
+      "case_id": "graph-negative-title_association_supply_chain",
+      "category": "graph_negative",
+      "article_ids": [
+        "article-reg-graph-negative-title_association_supply_chain"
+      ],
+      "expected_outputs": [
+        {
+          "candidate_id": "fact-reg-graph-negative-title_association_supply_chain",
+          "export_contract": "Ex-1",
+          "article_id": "article-reg-graph-negative-title_association_supply_chain",
+          "cluster_id": "cluster-reg-graph-negative-title_association_supply_chain",
+          "source_reference": {
+            "source_id": "regression-graph-negative",
+            "url": "https://fixtures.example.com/regression-graph-negative/graph-negative-title_association_supply_chain",
+            "provider_key": "graph-negative-title_association_supply_chain",
+            "original_locator": {
+              "locator_type": "fixture",
+              "locator_value": "graph-negative-title_association_supply_chain"
+            }
+          },
+          "evidence_spans": [
+            {
+              "article_id": "article-reg-graph-negative-title_association_supply_chain",
+              "start_char": 0,
+              "end_char": 36,
+              "quote": "The story discussed sector capacity.",
+              "locator": "body"
+            }
+          ],
+          "schema_pin": {
+            "schema_name": "news_fact_candidate",
+            "schema_version": "news_fact_candidate.v1",
+            "contract": "Ex-1",
+            "model_output_version": "news_fact_candidate.output.v1"
+          },
+          "involved_entities": [
+            {
+              "mention_text": "Delta Components",
+              "canonical_id": "entity:delta-components",
+              "resolution_status": "resolved",
+              "type_hint": "company"
+            },
+            {
+              "mention_text": "Zenith Motors",
+              "canonical_id": "entity:zenith-motors",
+              "resolution_status": "resolved",
+              "type_hint": "company"
+            }
+          ]
+        }
+      ],
+      "source_reference": {
+        "source_id": "regression-graph-negative",
+        "url": "https://fixtures.example.com/regression-graph-negative/graph-negative-title_association_supply_chain",
+        "provider_key": "graph-negative-title_association_supply_chain",
+        "original_locator": {
+          "locator_type": "fixture",
+          "locator_value": "graph-negative-title_association_supply_chain"
+        }
+      },
+      "version_pins": {
+        "Ex-1": {
+          "schema_name": "news_fact_candidate",
+          "schema_version": "news_fact_candidate.v1",
+          "contract": "Ex-1",
+          "model_output_version": "news_fact_candidate.output.v1"
+        },
+        "Ex-2": {
+          "schema_name": "news_signal_candidate",
+          "schema_version": "news_signal_candidate.v1",
+          "contract": "Ex-2",
+          "model_output_version": "news_signal_candidate.output.v1"
+        },
+        "Ex-3": {
+          "schema_name": "news_graph_delta_candidate",
+          "schema_version": "news_graph_delta_candidate.v1",
+          "contract": "Ex-3",
+          "model_output_version": "news_graph_delta_candidate.output.v1"
+        }
+      },
+      "baseline_path": "baseline/graph_negative.json",
+      "raw_inputs": [
+        {
+          "article_id": "article-reg-graph-negative-title_association_supply_chain",
+          "source_reference": {
+            "source_id": "regression-graph-negative",
+            "url": "https://fixtures.example.com/regression-graph-negative/graph-negative-title_association_supply_chain",
+            "provider_key": "graph-negative-title_association_supply_chain",
+            "original_locator": {
+              "locator_type": "fixture",
+              "locator_value": "graph-negative-title_association_supply_chain"
+            }
+          },
+          "title": "Delta Components, Zenith Motors and the battery chain",
+          "body_text": "The story discussed sector capacity.",
+          "published_at": "2026-03-01T00:00:00+00:00",
+          "fetched_at": "2026-03-01T00:05:00+00:00"
+        }
+      ],
+      "normalized_artifacts": [
+        {
+          "article_id": "article-reg-graph-negative-title_association_supply_chain",
+          "source_id": "regression-graph-negative",
+          "source_reference": {
+            "source_id": "regression-graph-negative",
+            "url": "https://fixtures.example.com/regression-graph-negative/graph-negative-title_association_supply_chain",
+            "provider_key": "graph-negative-title_association_supply_chain",
+            "original_locator": {
+              "locator_type": "fixture",
+              "locator_value": "graph-negative-title_association_supply_chain"
+            }
+          },
+          "title": "Delta Components, Zenith Motors and the battery chain",
+          "body_text": "The story discussed sector capacity.",
+          "published_at": "2026-03-01T00:00:00+00:00",
+          "fetched_at": "2026-03-01T00:05:00+00:00",
+          "language": "en",
+          "author_or_channel": "Regression Fixture",
+          "content_hash": "sha256:article-reg-graph-negative-title_association_supply_chain:content",
+          "article_fingerprint": "sha256:cluster-reg-graph-negative-title_association_supply_chain:fingerprint",
+          "license_tag": "fixture",
+          "reliability_tier": "A",
+          "cluster_id": "cluster-reg-graph-negative-title_association_supply_chain"
+        }
+      ],
+      "expected_cluster_id": "cluster-reg-graph-negative-title_association_supply_chain",
+      "metadata": {
+        "negative_category": "title_association",
+        "expected_ex3_count": 0
+      }
+    },
+    {
+      "case_id": "graph-negative-title_association_infrastructure",
+      "category": "graph_negative",
+      "article_ids": [
+        "article-reg-graph-negative-title_association_infrastructure"
+      ],
+      "expected_outputs": [
+        {
+          "candidate_id": "fact-reg-graph-negative-title_association_infrastructure",
+          "export_contract": "Ex-1",
+          "article_id": "article-reg-graph-negative-title_association_infrastructure",
+          "cluster_id": "cluster-reg-graph-negative-title_association_infrastructure",
+          "source_reference": {
+            "source_id": "regression-graph-negative",
+            "url": "https://fixtures.example.com/regression-graph-negative/graph-negative-title_association_infrastructure",
+            "provider_key": "graph-negative-title_association_infrastructure",
+            "original_locator": {
+              "locator_type": "fixture",
+              "locator_value": "graph-negative-title_association_infrastructure"
+            }
+          },
+          "evidence_spans": [
+            {
+              "article_id": "article-reg-graph-negative-title_association_infrastructure",
+              "start_char": 0,
+              "end_char": 38,
+              "quote": "The article tracked investor interest.",
+              "locator": "body"
+            }
+          ],
+          "schema_pin": {
+            "schema_name": "news_fact_candidate",
+            "schema_version": "news_fact_candidate.v1",
+            "contract": "Ex-1",
+            "model_output_version": "news_fact_candidate.output.v1"
+          },
+          "involved_entities": [
+            {
+              "mention_text": "Harbor Energy",
+              "canonical_id": "entity:harbor-energy",
+              "resolution_status": "resolved",
+              "type_hint": "company"
+            },
+            {
+              "mention_text": "Bay Capital",
+              "canonical_id": "entity:bay-capital",
+              "resolution_status": "resolved",
+              "type_hint": "company"
+            }
+          ]
+        }
+      ],
+      "source_reference": {
+        "source_id": "regression-graph-negative",
+        "url": "https://fixtures.example.com/regression-graph-negative/graph-negative-title_association_infrastructure",
+        "provider_key": "graph-negative-title_association_infrastructure",
+        "original_locator": {
+          "locator_type": "fixture",
+          "locator_value": "graph-negative-title_association_infrastructure"
+        }
+      },
+      "version_pins": {
+        "Ex-1": {
+          "schema_name": "news_fact_candidate",
+          "schema_version": "news_fact_candidate.v1",
+          "contract": "Ex-1",
+          "model_output_version": "news_fact_candidate.output.v1"
+        },
+        "Ex-2": {
+          "schema_name": "news_signal_candidate",
+          "schema_version": "news_signal_candidate.v1",
+          "contract": "Ex-2",
+          "model_output_version": "news_signal_candidate.output.v1"
+        },
+        "Ex-3": {
+          "schema_name": "news_graph_delta_candidate",
+          "schema_version": "news_graph_delta_candidate.v1",
+          "contract": "Ex-3",
+          "model_output_version": "news_graph_delta_candidate.output.v1"
+        }
+      },
+      "baseline_path": "baseline/graph_negative.json",
+      "raw_inputs": [
+        {
+          "article_id": "article-reg-graph-negative-title_association_infrastructure",
+          "source_reference": {
+            "source_id": "regression-graph-negative",
+            "url": "https://fixtures.example.com/regression-graph-negative/graph-negative-title_association_infrastructure",
+            "provider_key": "graph-negative-title_association_infrastructure",
+            "original_locator": {
+              "locator_type": "fixture",
+              "locator_value": "graph-negative-title_association_infrastructure"
+            }
+          },
+          "title": "Harbor Energy, Bay Capital in infrastructure watch",
+          "body_text": "The article tracked investor interest.",
+          "published_at": "2026-03-01T00:00:00+00:00",
+          "fetched_at": "2026-03-01T00:05:00+00:00"
+        }
+      ],
+      "normalized_artifacts": [
+        {
+          "article_id": "article-reg-graph-negative-title_association_infrastructure",
+          "source_id": "regression-graph-negative",
+          "source_reference": {
+            "source_id": "regression-graph-negative",
+            "url": "https://fixtures.example.com/regression-graph-negative/graph-negative-title_association_infrastructure",
+            "provider_key": "graph-negative-title_association_infrastructure",
+            "original_locator": {
+              "locator_type": "fixture",
+              "locator_value": "graph-negative-title_association_infrastructure"
+            }
+          },
+          "title": "Harbor Energy, Bay Capital in infrastructure watch",
+          "body_text": "The article tracked investor interest.",
+          "published_at": "2026-03-01T00:00:00+00:00",
+          "fetched_at": "2026-03-01T00:05:00+00:00",
+          "language": "en",
+          "author_or_channel": "Regression Fixture",
+          "content_hash": "sha256:article-reg-graph-negative-title_association_infrastructure:content",
+          "article_fingerprint": "sha256:cluster-reg-graph-negative-title_association_infrastructure:fingerprint",
+          "license_tag": "fixture",
+          "reliability_tier": "A",
+          "cluster_id": "cluster-reg-graph-negative-title_association_infrastructure"
+        }
+      ],
+      "expected_cluster_id": "cluster-reg-graph-negative-title_association_infrastructure",
+      "metadata": {
+        "negative_category": "title_association",
+        "expected_ex3_count": 0
+      }
+    },
+    {
+      "case_id": "graph-negative-summary_only_buy_rumor",
+      "category": "graph_negative",
+      "article_ids": [
+        "article-reg-graph-negative-summary_only_buy_rumor"
+      ],
+      "expected_outputs": [
+        {
+          "candidate_id": "fact-reg-graph-negative-summary_only_buy_rumor",
+          "export_contract": "Ex-1",
+          "article_id": "article-reg-graph-negative-summary_only_buy_rumor",
+          "cluster_id": "cluster-reg-graph-negative-summary_only_buy_rumor",
+          "source_reference": {
+            "source_id": "regression-graph-negative",
+            "url": "https://fixtures.example.com/regression-graph-negative/graph-negative-summary_only_buy_rumor",
+            "provider_key": "graph-negative-summary_only_buy_rumor",
+            "original_locator": {
+              "locator_type": "fixture",
+              "locator_value": "graph-negative-summary_only_buy_rumor"
+            }
+          },
+          "evidence_spans": [
+            {
+              "article_id": "article-reg-graph-negative-summary_only_buy_rumor",
+              "start_char": 0,
+              "end_char": 66,
+              "quote": "Summary: traders discussed whether Acme Corp could buy Globex Inc.",
+              "locator": "body"
+            }
+          ],
+          "schema_pin": {
+            "schema_name": "news_fact_candidate",
+            "schema_version": "news_fact_candidate.v1",
+            "contract": "Ex-1",
+            "model_output_version": "news_fact_candidate.output.v1"
+          },
+          "involved_entities": [
+            {
+              "mention_text": "Acme Corp",
+              "canonical_id": "entity:acme-corp",
+              "resolution_status": "resolved",
+              "type_hint": "company"
+            },
+            {
+              "mention_text": "Globex Inc",
+              "canonical_id": "entity:globex-inc",
+              "resolution_status": "resolved",
+              "type_hint": "company"
+            }
+          ]
+        }
+      ],
+      "source_reference": {
+        "source_id": "regression-graph-negative",
+        "url": "https://fixtures.example.com/regression-graph-negative/graph-negative-summary_only_buy_rumor",
+        "provider_key": "graph-negative-summary_only_buy_rumor",
+        "original_locator": {
+          "locator_type": "fixture",
+          "locator_value": "graph-negative-summary_only_buy_rumor"
+        }
+      },
+      "version_pins": {
+        "Ex-1": {
+          "schema_name": "news_fact_candidate",
+          "schema_version": "news_fact_candidate.v1",
+          "contract": "Ex-1",
+          "model_output_version": "news_fact_candidate.output.v1"
+        },
+        "Ex-2": {
+          "schema_name": "news_signal_candidate",
+          "schema_version": "news_signal_candidate.v1",
+          "contract": "Ex-2",
+          "model_output_version": "news_signal_candidate.output.v1"
+        },
+        "Ex-3": {
+          "schema_name": "news_graph_delta_candidate",
+          "schema_version": "news_graph_delta_candidate.v1",
+          "contract": "Ex-3",
+          "model_output_version": "news_graph_delta_candidate.output.v1"
+        }
+      },
+      "baseline_path": "baseline/graph_negative.json",
+      "raw_inputs": [
+        {
+          "article_id": "article-reg-graph-negative-summary_only_buy_rumor",
+          "source_reference": {
+            "source_id": "regression-graph-negative",
+            "url": "https://fixtures.example.com/regression-graph-negative/graph-negative-summary_only_buy_rumor",
+            "provider_key": "graph-negative-summary_only_buy_rumor",
+            "original_locator": {
+              "locator_type": "fixture",
+              "locator_value": "graph-negative-summary_only_buy_rumor"
+            }
+          },
+          "title": "Graph negative summary_only_buy_rumor",
+          "body_text": "Summary: traders discussed whether Acme Corp could buy Globex Inc.",
+          "published_at": "2026-03-01T00:00:00+00:00",
+          "fetched_at": "2026-03-01T00:05:00+00:00"
+        }
+      ],
+      "normalized_artifacts": [
+        {
+          "article_id": "article-reg-graph-negative-summary_only_buy_rumor",
+          "source_id": "regression-graph-negative",
+          "source_reference": {
+            "source_id": "regression-graph-negative",
+            "url": "https://fixtures.example.com/regression-graph-negative/graph-negative-summary_only_buy_rumor",
+            "provider_key": "graph-negative-summary_only_buy_rumor",
+            "original_locator": {
+              "locator_type": "fixture",
+              "locator_value": "graph-negative-summary_only_buy_rumor"
+            }
+          },
+          "title": "Graph negative summary_only_buy_rumor",
+          "body_text": "Summary: traders discussed whether Acme Corp could buy Globex Inc.",
+          "published_at": "2026-03-01T00:00:00+00:00",
+          "fetched_at": "2026-03-01T00:05:00+00:00",
+          "language": "en",
+          "author_or_channel": "Regression Fixture",
+          "content_hash": "sha256:article-reg-graph-negative-summary_only_buy_rumor:content",
+          "article_fingerprint": "sha256:cluster-reg-graph-negative-summary_only_buy_rumor:fingerprint",
+          "license_tag": "fixture",
+          "reliability_tier": "A",
+          "cluster_id": "cluster-reg-graph-negative-summary_only_buy_rumor"
+        }
+      ],
+      "expected_cluster_id": "cluster-reg-graph-negative-summary_only_buy_rumor",
+      "metadata": {
+        "negative_category": "summary_only",
+        "expected_ex3_count": 0
+      }
+    },
+    {
+      "case_id": "graph-negative-summary_only_partnership_chatter",
+      "category": "graph_negative",
+      "article_ids": [
+        "article-reg-graph-negative-summary_only_partnership_chatter"
+      ],
+      "expected_outputs": [
+        {
+          "candidate_id": "fact-reg-graph-negative-summary_only_partnership_chatter",
+          "export_contract": "Ex-1",
+          "article_id": "article-reg-graph-negative-summary_only_partnership_chatter",
+          "cluster_id": "cluster-reg-graph-negative-summary_only_partnership_chatter",
+          "source_reference": {
+            "source_id": "regression-graph-negative",
+            "url": "https://fixtures.example.com/regression-graph-negative/graph-negative-summary_only_partnership_chatter",
+            "provider_key": "graph-negative-summary_only_partnership_chatter",
+            "original_locator": {
+              "locator_type": "fixture",
+              "locator_value": "graph-negative-summary_only_partnership_chatter"
+            }
+          },
+          "evidence_spans": [
+            {
+              "article_id": "article-reg-graph-negative-summary_only_partnership_chatter",
+              "start_char": 0,
+              "end_char": 100,
+              "quote": "Summary: market chatter linked North River Metals and East Power Ltd to potential partnership talks.",
+              "locator": "body"
+            }
+          ],
+          "schema_pin": {
+            "schema_name": "news_fact_candidate",
+            "schema_version": "news_fact_candidate.v1",
+            "contract": "Ex-1",
+            "model_output_version": "news_fact_candidate.output.v1"
+          },
+          "involved_entities": [
+            {
+              "mention_text": "North River Metals",
+              "canonical_id": "entity:north-river-metals",
+              "resolution_status": "resolved",
+              "type_hint": "company"
+            },
+            {
+              "mention_text": "East Power Ltd",
+              "canonical_id": "entity:east-power-ltd",
+              "resolution_status": "resolved",
+              "type_hint": "company"
+            }
+          ]
+        }
+      ],
+      "source_reference": {
+        "source_id": "regression-graph-negative",
+        "url": "https://fixtures.example.com/regression-graph-negative/graph-negative-summary_only_partnership_chatter",
+        "provider_key": "graph-negative-summary_only_partnership_chatter",
+        "original_locator": {
+          "locator_type": "fixture",
+          "locator_value": "graph-negative-summary_only_partnership_chatter"
+        }
+      },
+      "version_pins": {
+        "Ex-1": {
+          "schema_name": "news_fact_candidate",
+          "schema_version": "news_fact_candidate.v1",
+          "contract": "Ex-1",
+          "model_output_version": "news_fact_candidate.output.v1"
+        },
+        "Ex-2": {
+          "schema_name": "news_signal_candidate",
+          "schema_version": "news_signal_candidate.v1",
+          "contract": "Ex-2",
+          "model_output_version": "news_signal_candidate.output.v1"
+        },
+        "Ex-3": {
+          "schema_name": "news_graph_delta_candidate",
+          "schema_version": "news_graph_delta_candidate.v1",
+          "contract": "Ex-3",
+          "model_output_version": "news_graph_delta_candidate.output.v1"
+        }
+      },
+      "baseline_path": "baseline/graph_negative.json",
+      "raw_inputs": [
+        {
+          "article_id": "article-reg-graph-negative-summary_only_partnership_chatter",
+          "source_reference": {
+            "source_id": "regression-graph-negative",
+            "url": "https://fixtures.example.com/regression-graph-negative/graph-negative-summary_only_partnership_chatter",
+            "provider_key": "graph-negative-summary_only_partnership_chatter",
+            "original_locator": {
+              "locator_type": "fixture",
+              "locator_value": "graph-negative-summary_only_partnership_chatter"
+            }
+          },
+          "title": "Graph negative summary_only_partnership_chatter",
+          "body_text": "Summary: market chatter linked North River Metals and East Power Ltd to potential partnership talks.",
+          "published_at": "2026-03-01T00:00:00+00:00",
+          "fetched_at": "2026-03-01T00:05:00+00:00"
+        }
+      ],
+      "normalized_artifacts": [
+        {
+          "article_id": "article-reg-graph-negative-summary_only_partnership_chatter",
+          "source_id": "regression-graph-negative",
+          "source_reference": {
+            "source_id": "regression-graph-negative",
+            "url": "https://fixtures.example.com/regression-graph-negative/graph-negative-summary_only_partnership_chatter",
+            "provider_key": "graph-negative-summary_only_partnership_chatter",
+            "original_locator": {
+              "locator_type": "fixture",
+              "locator_value": "graph-negative-summary_only_partnership_chatter"
+            }
+          },
+          "title": "Graph negative summary_only_partnership_chatter",
+          "body_text": "Summary: market chatter linked North River Metals and East Power Ltd to potential partnership talks.",
+          "published_at": "2026-03-01T00:00:00+00:00",
+          "fetched_at": "2026-03-01T00:05:00+00:00",
+          "language": "en",
+          "author_or_channel": "Regression Fixture",
+          "content_hash": "sha256:article-reg-graph-negative-summary_only_partnership_chatter:content",
+          "article_fingerprint": "sha256:cluster-reg-graph-negative-summary_only_partnership_chatter:fingerprint",
+          "license_tag": "fixture",
+          "reliability_tier": "A",
+          "cluster_id": "cluster-reg-graph-negative-summary_only_partnership_chatter"
+        }
+      ],
+      "expected_cluster_id": "cluster-reg-graph-negative-summary_only_partnership_chatter",
+      "metadata": {
+        "negative_category": "summary_only",
+        "expected_ex3_count": 0
+      }
+    },
+    {
+      "case_id": "graph-negative-summary_only_policy_risk",
+      "category": "graph_negative",
+      "article_ids": [
+        "article-reg-graph-negative-summary_only_policy_risk"
+      ],
+      "expected_outputs": [
+        {
+          "candidate_id": "fact-reg-graph-negative-summary_only_policy_risk",
+          "export_contract": "Ex-1",
+          "article_id": "article-reg-graph-negative-summary_only_policy_risk",
+          "cluster_id": "cluster-reg-graph-negative-summary_only_policy_risk",
+          "source_reference": {
+            "source_id": "regression-graph-negative",
+            "url": "https://fixtures.example.com/regression-graph-negative/graph-negative-summary_only_policy_risk",
+            "provider_key": "graph-negative-summary_only_policy_risk",
+            "original_locator": {
+              "locator_type": "fixture",
+              "locator_value": "graph-negative-summary_only_policy_risk"
+            }
+          },
+          "evidence_spans": [
+            {
+              "article_id": "article-reg-graph-negative-summary_only_policy_risk",
+              "start_char": 0,
+              "end_char": 75,
+              "quote": "Summary: Atlas Shipping could face policy risk from State Treasury reviews.",
+              "locator": "body"
+            }
+          ],
+          "schema_pin": {
+            "schema_name": "news_fact_candidate",
+            "schema_version": "news_fact_candidate.v1",
+            "contract": "Ex-1",
+            "model_output_version": "news_fact_candidate.output.v1"
+          },
+          "involved_entities": [
+            {
+              "mention_text": "Atlas Shipping",
+              "canonical_id": "entity:atlas-shipping",
+              "resolution_status": "resolved",
+              "type_hint": "company"
+            },
+            {
+              "mention_text": "State Treasury",
+              "canonical_id": "entity:state-treasury",
+              "resolution_status": "resolved",
+              "type_hint": "company"
+            }
+          ]
+        }
+      ],
+      "source_reference": {
+        "source_id": "regression-graph-negative",
+        "url": "https://fixtures.example.com/regression-graph-negative/graph-negative-summary_only_policy_risk",
+        "provider_key": "graph-negative-summary_only_policy_risk",
+        "original_locator": {
+          "locator_type": "fixture",
+          "locator_value": "graph-negative-summary_only_policy_risk"
+        }
+      },
+      "version_pins": {
+        "Ex-1": {
+          "schema_name": "news_fact_candidate",
+          "schema_version": "news_fact_candidate.v1",
+          "contract": "Ex-1",
+          "model_output_version": "news_fact_candidate.output.v1"
+        },
+        "Ex-2": {
+          "schema_name": "news_signal_candidate",
+          "schema_version": "news_signal_candidate.v1",
+          "contract": "Ex-2",
+          "model_output_version": "news_signal_candidate.output.v1"
+        },
+        "Ex-3": {
+          "schema_name": "news_graph_delta_candidate",
+          "schema_version": "news_graph_delta_candidate.v1",
+          "contract": "Ex-3",
+          "model_output_version": "news_graph_delta_candidate.output.v1"
+        }
+      },
+      "baseline_path": "baseline/graph_negative.json",
+      "raw_inputs": [
+        {
+          "article_id": "article-reg-graph-negative-summary_only_policy_risk",
+          "source_reference": {
+            "source_id": "regression-graph-negative",
+            "url": "https://fixtures.example.com/regression-graph-negative/graph-negative-summary_only_policy_risk",
+            "provider_key": "graph-negative-summary_only_policy_risk",
+            "original_locator": {
+              "locator_type": "fixture",
+              "locator_value": "graph-negative-summary_only_policy_risk"
+            }
+          },
+          "title": "Graph negative summary_only_policy_risk",
+          "body_text": "Summary: Atlas Shipping could face policy risk from State Treasury reviews.",
+          "published_at": "2026-03-01T00:00:00+00:00",
+          "fetched_at": "2026-03-01T00:05:00+00:00"
+        }
+      ],
+      "normalized_artifacts": [
+        {
+          "article_id": "article-reg-graph-negative-summary_only_policy_risk",
+          "source_id": "regression-graph-negative",
+          "source_reference": {
+            "source_id": "regression-graph-negative",
+            "url": "https://fixtures.example.com/regression-graph-negative/graph-negative-summary_only_policy_risk",
+            "provider_key": "graph-negative-summary_only_policy_risk",
+            "original_locator": {
+              "locator_type": "fixture",
+              "locator_value": "graph-negative-summary_only_policy_risk"
+            }
+          },
+          "title": "Graph negative summary_only_policy_risk",
+          "body_text": "Summary: Atlas Shipping could face policy risk from State Treasury reviews.",
+          "published_at": "2026-03-01T00:00:00+00:00",
+          "fetched_at": "2026-03-01T00:05:00+00:00",
+          "language": "en",
+          "author_or_channel": "Regression Fixture",
+          "content_hash": "sha256:article-reg-graph-negative-summary_only_policy_risk:content",
+          "article_fingerprint": "sha256:cluster-reg-graph-negative-summary_only_policy_risk:fingerprint",
+          "license_tag": "fixture",
+          "reliability_tier": "A",
+          "cluster_id": "cluster-reg-graph-negative-summary_only_policy_risk"
+        }
+      ],
+      "expected_cluster_id": "cluster-reg-graph-negative-summary_only_policy_risk",
+      "metadata": {
+        "negative_category": "summary_only",
+        "expected_ex3_count": 0
+      }
+    },
+    {
+      "case_id": "graph-negative-summary_only_supply_rumor",
+      "category": "graph_negative",
+      "article_ids": [
+        "article-reg-graph-negative-summary_only_supply_rumor"
+      ],
+      "expected_outputs": [
+        {
+          "candidate_id": "fact-reg-graph-negative-summary_only_supply_rumor",
+          "export_contract": "Ex-1",
+          "article_id": "article-reg-graph-negative-summary_only_supply_rumor",
+          "cluster_id": "cluster-reg-graph-negative-summary_only_supply_rumor",
+          "source_reference": {
+            "source_id": "regression-graph-negative",
+            "url": "https://fixtures.example.com/regression-graph-negative/graph-negative-summary_only_supply_rumor",
+            "provider_key": "graph-negative-summary_only_supply_rumor",
+            "original_locator": {
+              "locator_type": "fixture",
+              "locator_value": "graph-negative-summary_only_supply_rumor"
+            }
+          },
+          "evidence_spans": [
+            {
+              "article_id": "article-reg-graph-negative-summary_only_supply_rumor",
+              "start_char": 0,
+              "end_char": 77,
+              "quote": "Summary: Delta Components was rumored as a possible vendor for Zenith Motors.",
+              "locator": "body"
+            }
+          ],
+          "schema_pin": {
+            "schema_name": "news_fact_candidate",
+            "schema_version": "news_fact_candidate.v1",
+            "contract": "Ex-1",
+            "model_output_version": "news_fact_candidate.output.v1"
+          },
+          "involved_entities": [
+            {
+              "mention_text": "Delta Components",
+              "canonical_id": "entity:delta-components",
+              "resolution_status": "resolved",
+              "type_hint": "company"
+            },
+            {
+              "mention_text": "Zenith Motors",
+              "canonical_id": "entity:zenith-motors",
+              "resolution_status": "resolved",
+              "type_hint": "company"
+            }
+          ]
+        }
+      ],
+      "source_reference": {
+        "source_id": "regression-graph-negative",
+        "url": "https://fixtures.example.com/regression-graph-negative/graph-negative-summary_only_supply_rumor",
+        "provider_key": "graph-negative-summary_only_supply_rumor",
+        "original_locator": {
+          "locator_type": "fixture",
+          "locator_value": "graph-negative-summary_only_supply_rumor"
+        }
+      },
+      "version_pins": {
+        "Ex-1": {
+          "schema_name": "news_fact_candidate",
+          "schema_version": "news_fact_candidate.v1",
+          "contract": "Ex-1",
+          "model_output_version": "news_fact_candidate.output.v1"
+        },
+        "Ex-2": {
+          "schema_name": "news_signal_candidate",
+          "schema_version": "news_signal_candidate.v1",
+          "contract": "Ex-2",
+          "model_output_version": "news_signal_candidate.output.v1"
+        },
+        "Ex-3": {
+          "schema_name": "news_graph_delta_candidate",
+          "schema_version": "news_graph_delta_candidate.v1",
+          "contract": "Ex-3",
+          "model_output_version": "news_graph_delta_candidate.output.v1"
+        }
+      },
+      "baseline_path": "baseline/graph_negative.json",
+      "raw_inputs": [
+        {
+          "article_id": "article-reg-graph-negative-summary_only_supply_rumor",
+          "source_reference": {
+            "source_id": "regression-graph-negative",
+            "url": "https://fixtures.example.com/regression-graph-negative/graph-negative-summary_only_supply_rumor",
+            "provider_key": "graph-negative-summary_only_supply_rumor",
+            "original_locator": {
+              "locator_type": "fixture",
+              "locator_value": "graph-negative-summary_only_supply_rumor"
+            }
+          },
+          "title": "Graph negative summary_only_supply_rumor",
+          "body_text": "Summary: Delta Components was rumored as a possible vendor for Zenith Motors.",
+          "published_at": "2026-03-01T00:00:00+00:00",
+          "fetched_at": "2026-03-01T00:05:00+00:00"
+        }
+      ],
+      "normalized_artifacts": [
+        {
+          "article_id": "article-reg-graph-negative-summary_only_supply_rumor",
+          "source_id": "regression-graph-negative",
+          "source_reference": {
+            "source_id": "regression-graph-negative",
+            "url": "https://fixtures.example.com/regression-graph-negative/graph-negative-summary_only_supply_rumor",
+            "provider_key": "graph-negative-summary_only_supply_rumor",
+            "original_locator": {
+              "locator_type": "fixture",
+              "locator_value": "graph-negative-summary_only_supply_rumor"
+            }
+          },
+          "title": "Graph negative summary_only_supply_rumor",
+          "body_text": "Summary: Delta Components was rumored as a possible vendor for Zenith Motors.",
+          "published_at": "2026-03-01T00:00:00+00:00",
+          "fetched_at": "2026-03-01T00:05:00+00:00",
+          "language": "en",
+          "author_or_channel": "Regression Fixture",
+          "content_hash": "sha256:article-reg-graph-negative-summary_only_supply_rumor:content",
+          "article_fingerprint": "sha256:cluster-reg-graph-negative-summary_only_supply_rumor:fingerprint",
+          "license_tag": "fixture",
+          "reliability_tier": "A",
+          "cluster_id": "cluster-reg-graph-negative-summary_only_supply_rumor"
+        }
+      ],
+      "expected_cluster_id": "cluster-reg-graph-negative-summary_only_supply_rumor",
+      "metadata": {
+        "negative_category": "summary_only",
+        "expected_ex3_count": 0
+      }
+    },
+    {
+      "case_id": "graph-negative-summary_only_asset_rumor",
+      "category": "graph_negative",
+      "article_ids": [
+        "article-reg-graph-negative-summary_only_asset_rumor"
+      ],
+      "expected_outputs": [
+        {
+          "candidate_id": "fact-reg-graph-negative-summary_only_asset_rumor",
+          "export_contract": "Ex-1",
+          "article_id": "article-reg-graph-negative-summary_only_asset_rumor",
+          "cluster_id": "cluster-reg-graph-negative-summary_only_asset_rumor",
+          "source_reference": {
+            "source_id": "regression-graph-negative",
+            "url": "https://fixtures.example.com/regression-graph-negative/graph-negative-summary_only_asset_rumor",
+            "provider_key": "graph-negative-summary_only_asset_rumor",
+            "original_locator": {
+              "locator_type": "fixture",
+              "locator_value": "graph-negative-summary_only_asset_rumor"
+            }
+          },
+          "evidence_spans": [
+            {
+              "article_id": "article-reg-graph-negative-summary_only_asset_rumor",
+              "start_char": 0,
+              "end_char": 75,
+              "quote": "Summary: Harbor Energy and Bay Capital were linked to possible asset talks.",
+              "locator": "body"
+            }
+          ],
+          "schema_pin": {
+            "schema_name": "news_fact_candidate",
+            "schema_version": "news_fact_candidate.v1",
+            "contract": "Ex-1",
+            "model_output_version": "news_fact_candidate.output.v1"
+          },
+          "involved_entities": [
+            {
+              "mention_text": "Harbor Energy",
+              "canonical_id": "entity:harbor-energy",
+              "resolution_status": "resolved",
+              "type_hint": "company"
+            },
+            {
+              "mention_text": "Bay Capital",
+              "canonical_id": "entity:bay-capital",
+              "resolution_status": "resolved",
+              "type_hint": "company"
+            }
+          ]
+        }
+      ],
+      "source_reference": {
+        "source_id": "regression-graph-negative",
+        "url": "https://fixtures.example.com/regression-graph-negative/graph-negative-summary_only_asset_rumor",
+        "provider_key": "graph-negative-summary_only_asset_rumor",
+        "original_locator": {
+          "locator_type": "fixture",
+          "locator_value": "graph-negative-summary_only_asset_rumor"
+        }
+      },
+      "version_pins": {
+        "Ex-1": {
+          "schema_name": "news_fact_candidate",
+          "schema_version": "news_fact_candidate.v1",
+          "contract": "Ex-1",
+          "model_output_version": "news_fact_candidate.output.v1"
+        },
+        "Ex-2": {
+          "schema_name": "news_signal_candidate",
+          "schema_version": "news_signal_candidate.v1",
+          "contract": "Ex-2",
+          "model_output_version": "news_signal_candidate.output.v1"
+        },
+        "Ex-3": {
+          "schema_name": "news_graph_delta_candidate",
+          "schema_version": "news_graph_delta_candidate.v1",
+          "contract": "Ex-3",
+          "model_output_version": "news_graph_delta_candidate.output.v1"
+        }
+      },
+      "baseline_path": "baseline/graph_negative.json",
+      "raw_inputs": [
+        {
+          "article_id": "article-reg-graph-negative-summary_only_asset_rumor",
+          "source_reference": {
+            "source_id": "regression-graph-negative",
+            "url": "https://fixtures.example.com/regression-graph-negative/graph-negative-summary_only_asset_rumor",
+            "provider_key": "graph-negative-summary_only_asset_rumor",
+            "original_locator": {
+              "locator_type": "fixture",
+              "locator_value": "graph-negative-summary_only_asset_rumor"
+            }
+          },
+          "title": "Graph negative summary_only_asset_rumor",
+          "body_text": "Summary: Harbor Energy and Bay Capital were linked to possible asset talks.",
+          "published_at": "2026-03-01T00:00:00+00:00",
+          "fetched_at": "2026-03-01T00:05:00+00:00"
+        }
+      ],
+      "normalized_artifacts": [
+        {
+          "article_id": "article-reg-graph-negative-summary_only_asset_rumor",
+          "source_id": "regression-graph-negative",
+          "source_reference": {
+            "source_id": "regression-graph-negative",
+            "url": "https://fixtures.example.com/regression-graph-negative/graph-negative-summary_only_asset_rumor",
+            "provider_key": "graph-negative-summary_only_asset_rumor",
+            "original_locator": {
+              "locator_type": "fixture",
+              "locator_value": "graph-negative-summary_only_asset_rumor"
+            }
+          },
+          "title": "Graph negative summary_only_asset_rumor",
+          "body_text": "Summary: Harbor Energy and Bay Capital were linked to possible asset talks.",
+          "published_at": "2026-03-01T00:00:00+00:00",
+          "fetched_at": "2026-03-01T00:05:00+00:00",
+          "language": "en",
+          "author_or_channel": "Regression Fixture",
+          "content_hash": "sha256:article-reg-graph-negative-summary_only_asset_rumor:content",
+          "article_fingerprint": "sha256:cluster-reg-graph-negative-summary_only_asset_rumor:fingerprint",
+          "license_tag": "fixture",
+          "reliability_tier": "A",
+          "cluster_id": "cluster-reg-graph-negative-summary_only_asset_rumor"
+        }
+      ],
+      "expected_cluster_id": "cluster-reg-graph-negative-summary_only_asset_rumor",
+      "metadata": {
+        "negative_category": "summary_only",
+        "expected_ex3_count": 0
+      }
+    },
+    {
+      "case_id": "graph-negative-unresolved_object_acquired",
+      "category": "graph_negative",
+      "article_ids": [
+        "article-reg-graph-negative-unresolved_object_acquired"
+      ],
+      "expected_outputs": [
+        {
+          "candidate_id": "fact-reg-graph-negative-unresolved_object_acquired",
+          "export_contract": "Ex-1",
+          "article_id": "article-reg-graph-negative-unresolved_object_acquired",
+          "cluster_id": "cluster-reg-graph-negative-unresolved_object_acquired",
+          "source_reference": {
+            "source_id": "regression-graph-negative",
+            "url": "https://fixtures.example.com/regression-graph-negative/graph-negative-unresolved_object_acquired",
+            "provider_key": "graph-negative-unresolved_object_acquired",
+            "original_locator": {
+              "locator_type": "fixture",
+              "locator_value": "graph-negative-unresolved_object_acquired"
+            }
+          },
+          "evidence_spans": [
+            {
+              "article_id": "article-reg-graph-negative-unresolved_object_acquired",
+              "start_char": 0,
+              "end_char": 52,
+              "quote": "Acme Corp acquired Globex Inc in a cash transaction.",
+              "locator": "body"
+            }
+          ],
+          "schema_pin": {
+            "schema_name": "news_fact_candidate",
+            "schema_version": "news_fact_candidate.v1",
+            "contract": "Ex-1",
+            "model_output_version": "news_fact_candidate.output.v1"
+          },
+          "involved_entities": [
+            {
+              "mention_text": "Acme Corp",
+              "canonical_id": "entity:acme-corp",
+              "resolution_status": "resolved",
+              "type_hint": "company"
+            },
+            {
+              "mention_text": "Globex Inc",
+              "canonical_id": null,
+              "resolution_status": "unresolved",
+              "type_hint": "company"
+            }
+          ]
+        }
+      ],
+      "source_reference": {
+        "source_id": "regression-graph-negative",
+        "url": "https://fixtures.example.com/regression-graph-negative/graph-negative-unresolved_object_acquired",
+        "provider_key": "graph-negative-unresolved_object_acquired",
+        "original_locator": {
+          "locator_type": "fixture",
+          "locator_value": "graph-negative-unresolved_object_acquired"
+        }
+      },
+      "version_pins": {
+        "Ex-1": {
+          "schema_name": "news_fact_candidate",
+          "schema_version": "news_fact_candidate.v1",
+          "contract": "Ex-1",
+          "model_output_version": "news_fact_candidate.output.v1"
+        },
+        "Ex-2": {
+          "schema_name": "news_signal_candidate",
+          "schema_version": "news_signal_candidate.v1",
+          "contract": "Ex-2",
+          "model_output_version": "news_signal_candidate.output.v1"
+        },
+        "Ex-3": {
+          "schema_name": "news_graph_delta_candidate",
+          "schema_version": "news_graph_delta_candidate.v1",
+          "contract": "Ex-3",
+          "model_output_version": "news_graph_delta_candidate.output.v1"
+        }
+      },
+      "baseline_path": "baseline/graph_negative.json",
+      "raw_inputs": [
+        {
+          "article_id": "article-reg-graph-negative-unresolved_object_acquired",
+          "source_reference": {
+            "source_id": "regression-graph-negative",
+            "url": "https://fixtures.example.com/regression-graph-negative/graph-negative-unresolved_object_acquired",
+            "provider_key": "graph-negative-unresolved_object_acquired",
+            "original_locator": {
+              "locator_type": "fixture",
+              "locator_value": "graph-negative-unresolved_object_acquired"
+            }
+          },
+          "title": "Graph negative unresolved_object_acquired",
+          "body_text": "Acme Corp acquired Globex Inc in a cash transaction.",
+          "published_at": "2026-03-01T00:00:00+00:00",
+          "fetched_at": "2026-03-01T00:05:00+00:00"
+        }
+      ],
+      "normalized_artifacts": [
+        {
+          "article_id": "article-reg-graph-negative-unresolved_object_acquired",
+          "source_id": "regression-graph-negative",
+          "source_reference": {
+            "source_id": "regression-graph-negative",
+            "url": "https://fixtures.example.com/regression-graph-negative/graph-negative-unresolved_object_acquired",
+            "provider_key": "graph-negative-unresolved_object_acquired",
+            "original_locator": {
+              "locator_type": "fixture",
+              "locator_value": "graph-negative-unresolved_object_acquired"
+            }
+          },
+          "title": "Graph negative unresolved_object_acquired",
+          "body_text": "Acme Corp acquired Globex Inc in a cash transaction.",
+          "published_at": "2026-03-01T00:00:00+00:00",
+          "fetched_at": "2026-03-01T00:05:00+00:00",
+          "language": "en",
+          "author_or_channel": "Regression Fixture",
+          "content_hash": "sha256:article-reg-graph-negative-unresolved_object_acquired:content",
+          "article_fingerprint": "sha256:cluster-reg-graph-negative-unresolved_object_acquired:fingerprint",
+          "license_tag": "fixture",
+          "reliability_tier": "A",
+          "cluster_id": "cluster-reg-graph-negative-unresolved_object_acquired"
+        }
+      ],
+      "expected_cluster_id": "cluster-reg-graph-negative-unresolved_object_acquired",
+      "metadata": {
+        "negative_category": "unresolved_entity",
+        "expected_ex3_count": 0
+      }
+    },
+    {
+      "case_id": "graph-negative-ambiguous_subject_partner",
+      "category": "graph_negative",
+      "article_ids": [
+        "article-reg-graph-negative-ambiguous_subject_partner"
+      ],
+      "expected_outputs": [
+        {
+          "candidate_id": "fact-reg-graph-negative-ambiguous_subject_partner",
+          "export_contract": "Ex-1",
+          "article_id": "article-reg-graph-negative-ambiguous_subject_partner",
+          "cluster_id": "cluster-reg-graph-negative-ambiguous_subject_partner",
+          "source_reference": {
+            "source_id": "regression-graph-negative",
+            "url": "https://fixtures.example.com/regression-graph-negative/graph-negative-ambiguous_subject_partner",
+            "provider_key": "graph-negative-ambiguous_subject_partner",
+            "original_locator": {
+              "locator_type": "fixture",
+              "locator_value": "graph-negative-ambiguous_subject_partner"
+            }
+          },
+          "evidence_spans": [
+            {
+              "article_id": "article-reg-graph-negative-ambiguous_subject_partner",
+              "start_char": 0,
+              "end_char": 71,
+              "quote": "North River Metals entered a strategic partnership with East Power Ltd.",
+              "locator": "body"
+            }
+          ],
+          "schema_pin": {
+            "schema_name": "news_fact_candidate",
+            "schema_version": "news_fact_candidate.v1",
+            "contract": "Ex-1",
+            "model_output_version": "news_fact_candidate.output.v1"
+          },
+          "involved_entities": [
+            {
+              "mention_text": "North River Metals",
+              "canonical_id": null,
+              "resolution_status": "ambiguous",
+              "type_hint": "company"
+            },
+            {
+              "mention_text": "East Power Ltd",
+              "canonical_id": "entity:east-power-ltd",
+              "resolution_status": "resolved",
+              "type_hint": "company"
+            }
+          ]
+        }
+      ],
+      "source_reference": {
+        "source_id": "regression-graph-negative",
+        "url": "https://fixtures.example.com/regression-graph-negative/graph-negative-ambiguous_subject_partner",
+        "provider_key": "graph-negative-ambiguous_subject_partner",
+        "original_locator": {
+          "locator_type": "fixture",
+          "locator_value": "graph-negative-ambiguous_subject_partner"
+        }
+      },
+      "version_pins": {
+        "Ex-1": {
+          "schema_name": "news_fact_candidate",
+          "schema_version": "news_fact_candidate.v1",
+          "contract": "Ex-1",
+          "model_output_version": "news_fact_candidate.output.v1"
+        },
+        "Ex-2": {
+          "schema_name": "news_signal_candidate",
+          "schema_version": "news_signal_candidate.v1",
+          "contract": "Ex-2",
+          "model_output_version": "news_signal_candidate.output.v1"
+        },
+        "Ex-3": {
+          "schema_name": "news_graph_delta_candidate",
+          "schema_version": "news_graph_delta_candidate.v1",
+          "contract": "Ex-3",
+          "model_output_version": "news_graph_delta_candidate.output.v1"
+        }
+      },
+      "baseline_path": "baseline/graph_negative.json",
+      "raw_inputs": [
+        {
+          "article_id": "article-reg-graph-negative-ambiguous_subject_partner",
+          "source_reference": {
+            "source_id": "regression-graph-negative",
+            "url": "https://fixtures.example.com/regression-graph-negative/graph-negative-ambiguous_subject_partner",
+            "provider_key": "graph-negative-ambiguous_subject_partner",
+            "original_locator": {
+              "locator_type": "fixture",
+              "locator_value": "graph-negative-ambiguous_subject_partner"
+            }
+          },
+          "title": "Graph negative ambiguous_subject_partner",
+          "body_text": "North River Metals entered a strategic partnership with East Power Ltd.",
+          "published_at": "2026-03-01T00:00:00+00:00",
+          "fetched_at": "2026-03-01T00:05:00+00:00"
+        }
+      ],
+      "normalized_artifacts": [
+        {
+          "article_id": "article-reg-graph-negative-ambiguous_subject_partner",
+          "source_id": "regression-graph-negative",
+          "source_reference": {
+            "source_id": "regression-graph-negative",
+            "url": "https://fixtures.example.com/regression-graph-negative/graph-negative-ambiguous_subject_partner",
+            "provider_key": "graph-negative-ambiguous_subject_partner",
+            "original_locator": {
+              "locator_type": "fixture",
+              "locator_value": "graph-negative-ambiguous_subject_partner"
+            }
+          },
+          "title": "Graph negative ambiguous_subject_partner",
+          "body_text": "North River Metals entered a strategic partnership with East Power Ltd.",
+          "published_at": "2026-03-01T00:00:00+00:00",
+          "fetched_at": "2026-03-01T00:05:00+00:00",
+          "language": "en",
+          "author_or_channel": "Regression Fixture",
+          "content_hash": "sha256:article-reg-graph-negative-ambiguous_subject_partner:content",
+          "article_fingerprint": "sha256:cluster-reg-graph-negative-ambiguous_subject_partner:fingerprint",
+          "license_tag": "fixture",
+          "reliability_tier": "A",
+          "cluster_id": "cluster-reg-graph-negative-ambiguous_subject_partner"
+        }
+      ],
+      "expected_cluster_id": "cluster-reg-graph-negative-ambiguous_subject_partner",
+      "metadata": {
+        "negative_category": "unresolved_entity",
+        "expected_ex3_count": 0
+      }
+    },
+    {
+      "case_id": "graph-negative-unresolved_regulator_sanction",
+      "category": "graph_negative",
+      "article_ids": [
+        "article-reg-graph-negative-unresolved_regulator_sanction"
+      ],
+      "expected_outputs": [
+        {
+          "candidate_id": "fact-reg-graph-negative-unresolved_regulator_sanction",
+          "export_contract": "Ex-1",
+          "article_id": "article-reg-graph-negative-unresolved_regulator_sanction",
+          "cluster_id": "cluster-reg-graph-negative-unresolved_regulator_sanction",
+          "source_reference": {
+            "source_id": "regression-graph-negative",
+            "url": "https://fixtures.example.com/regression-graph-negative/graph-negative-unresolved_regulator_sanction",
+            "provider_key": "graph-negative-unresolved_regulator_sanction",
+            "original_locator": {
+              "locator_type": "fixture",
+              "locator_value": "graph-negative-unresolved_regulator_sanction"
+            }
+          },
+          "evidence_spans": [
+            {
+              "article_id": "article-reg-graph-negative-unresolved_regulator_sanction",
+              "start_char": 0,
+              "end_char": 72,
+              "quote": "Atlas Shipping was sanctioned by State Treasury over restricted exports.",
+              "locator": "body"
+            }
+          ],
+          "schema_pin": {
+            "schema_name": "news_fact_candidate",
+            "schema_version": "news_fact_candidate.v1",
+            "contract": "Ex-1",
+            "model_output_version": "news_fact_candidate.output.v1"
+          },
+          "involved_entities": [
+            {
+              "mention_text": "Atlas Shipping",
+              "canonical_id": "entity:atlas-shipping",
+              "resolution_status": "resolved",
+              "type_hint": "company"
+            },
+            {
+              "mention_text": "State Treasury",
+              "canonical_id": null,
+              "resolution_status": "unresolved",
+              "type_hint": "company"
+            }
+          ]
+        }
+      ],
+      "source_reference": {
+        "source_id": "regression-graph-negative",
+        "url": "https://fixtures.example.com/regression-graph-negative/graph-negative-unresolved_regulator_sanction",
+        "provider_key": "graph-negative-unresolved_regulator_sanction",
+        "original_locator": {
+          "locator_type": "fixture",
+          "locator_value": "graph-negative-unresolved_regulator_sanction"
+        }
+      },
+      "version_pins": {
+        "Ex-1": {
+          "schema_name": "news_fact_candidate",
+          "schema_version": "news_fact_candidate.v1",
+          "contract": "Ex-1",
+          "model_output_version": "news_fact_candidate.output.v1"
+        },
+        "Ex-2": {
+          "schema_name": "news_signal_candidate",
+          "schema_version": "news_signal_candidate.v1",
+          "contract": "Ex-2",
+          "model_output_version": "news_signal_candidate.output.v1"
+        },
+        "Ex-3": {
+          "schema_name": "news_graph_delta_candidate",
+          "schema_version": "news_graph_delta_candidate.v1",
+          "contract": "Ex-3",
+          "model_output_version": "news_graph_delta_candidate.output.v1"
+        }
+      },
+      "baseline_path": "baseline/graph_negative.json",
+      "raw_inputs": [
+        {
+          "article_id": "article-reg-graph-negative-unresolved_regulator_sanction",
+          "source_reference": {
+            "source_id": "regression-graph-negative",
+            "url": "https://fixtures.example.com/regression-graph-negative/graph-negative-unresolved_regulator_sanction",
+            "provider_key": "graph-negative-unresolved_regulator_sanction",
+            "original_locator": {
+              "locator_type": "fixture",
+              "locator_value": "graph-negative-unresolved_regulator_sanction"
+            }
+          },
+          "title": "Graph negative unresolved_regulator_sanction",
+          "body_text": "Atlas Shipping was sanctioned by State Treasury over restricted exports.",
+          "published_at": "2026-03-01T00:00:00+00:00",
+          "fetched_at": "2026-03-01T00:05:00+00:00"
+        }
+      ],
+      "normalized_artifacts": [
+        {
+          "article_id": "article-reg-graph-negative-unresolved_regulator_sanction",
+          "source_id": "regression-graph-negative",
+          "source_reference": {
+            "source_id": "regression-graph-negative",
+            "url": "https://fixtures.example.com/regression-graph-negative/graph-negative-unresolved_regulator_sanction",
+            "provider_key": "graph-negative-unresolved_regulator_sanction",
+            "original_locator": {
+              "locator_type": "fixture",
+              "locator_value": "graph-negative-unresolved_regulator_sanction"
+            }
+          },
+          "title": "Graph negative unresolved_regulator_sanction",
+          "body_text": "Atlas Shipping was sanctioned by State Treasury over restricted exports.",
+          "published_at": "2026-03-01T00:00:00+00:00",
+          "fetched_at": "2026-03-01T00:05:00+00:00",
+          "language": "en",
+          "author_or_channel": "Regression Fixture",
+          "content_hash": "sha256:article-reg-graph-negative-unresolved_regulator_sanction:content",
+          "article_fingerprint": "sha256:cluster-reg-graph-negative-unresolved_regulator_sanction:fingerprint",
+          "license_tag": "fixture",
+          "reliability_tier": "A",
+          "cluster_id": "cluster-reg-graph-negative-unresolved_regulator_sanction"
+        }
+      ],
+      "expected_cluster_id": "cluster-reg-graph-negative-unresolved_regulator_sanction",
+      "metadata": {
+        "negative_category": "unresolved_entity",
+        "expected_ex3_count": 0
+      }
+    },
+    {
+      "case_id": "graph-negative-ambiguous_supplier",
+      "category": "graph_negative",
+      "article_ids": [
+        "article-reg-graph-negative-ambiguous_supplier"
+      ],
+      "expected_outputs": [
+        {
+          "candidate_id": "fact-reg-graph-negative-ambiguous_supplier",
+          "export_contract": "Ex-1",
+          "article_id": "article-reg-graph-negative-ambiguous_supplier",
+          "cluster_id": "cluster-reg-graph-negative-ambiguous_supplier",
+          "source_reference": {
+            "source_id": "regression-graph-negative",
+            "url": "https://fixtures.example.com/regression-graph-negative/graph-negative-ambiguous_supplier",
+            "provider_key": "graph-negative-ambiguous_supplier",
+            "original_locator": {
+              "locator_type": "fixture",
+              "locator_value": "graph-negative-ambiguous_supplier"
+            }
+          },
+          "evidence_spans": [
+            {
+              "article_id": "article-reg-graph-negative-ambiguous_supplier",
+              "start_char": 0,
+              "end_char": 62,
+              "quote": "Delta Components will supply battery modules to Zenith Motors.",
+              "locator": "body"
+            }
+          ],
+          "schema_pin": {
+            "schema_name": "news_fact_candidate",
+            "schema_version": "news_fact_candidate.v1",
+            "contract": "Ex-1",
+            "model_output_version": "news_fact_candidate.output.v1"
+          },
+          "involved_entities": [
+            {
+              "mention_text": "Delta Components",
+              "canonical_id": null,
+              "resolution_status": "ambiguous",
+              "type_hint": "company"
+            },
+            {
+              "mention_text": "Zenith Motors",
+              "canonical_id": "entity:zenith-motors",
+              "resolution_status": "resolved",
+              "type_hint": "company"
+            }
+          ]
+        }
+      ],
+      "source_reference": {
+        "source_id": "regression-graph-negative",
+        "url": "https://fixtures.example.com/regression-graph-negative/graph-negative-ambiguous_supplier",
+        "provider_key": "graph-negative-ambiguous_supplier",
+        "original_locator": {
+          "locator_type": "fixture",
+          "locator_value": "graph-negative-ambiguous_supplier"
+        }
+      },
+      "version_pins": {
+        "Ex-1": {
+          "schema_name": "news_fact_candidate",
+          "schema_version": "news_fact_candidate.v1",
+          "contract": "Ex-1",
+          "model_output_version": "news_fact_candidate.output.v1"
+        },
+        "Ex-2": {
+          "schema_name": "news_signal_candidate",
+          "schema_version": "news_signal_candidate.v1",
+          "contract": "Ex-2",
+          "model_output_version": "news_signal_candidate.output.v1"
+        },
+        "Ex-3": {
+          "schema_name": "news_graph_delta_candidate",
+          "schema_version": "news_graph_delta_candidate.v1",
+          "contract": "Ex-3",
+          "model_output_version": "news_graph_delta_candidate.output.v1"
+        }
+      },
+      "baseline_path": "baseline/graph_negative.json",
+      "raw_inputs": [
+        {
+          "article_id": "article-reg-graph-negative-ambiguous_supplier",
+          "source_reference": {
+            "source_id": "regression-graph-negative",
+            "url": "https://fixtures.example.com/regression-graph-negative/graph-negative-ambiguous_supplier",
+            "provider_key": "graph-negative-ambiguous_supplier",
+            "original_locator": {
+              "locator_type": "fixture",
+              "locator_value": "graph-negative-ambiguous_supplier"
+            }
+          },
+          "title": "Graph negative ambiguous_supplier",
+          "body_text": "Delta Components will supply battery modules to Zenith Motors.",
+          "published_at": "2026-03-01T00:00:00+00:00",
+          "fetched_at": "2026-03-01T00:05:00+00:00"
+        }
+      ],
+      "normalized_artifacts": [
+        {
+          "article_id": "article-reg-graph-negative-ambiguous_supplier",
+          "source_id": "regression-graph-negative",
+          "source_reference": {
+            "source_id": "regression-graph-negative",
+            "url": "https://fixtures.example.com/regression-graph-negative/graph-negative-ambiguous_supplier",
+            "provider_key": "graph-negative-ambiguous_supplier",
+            "original_locator": {
+              "locator_type": "fixture",
+              "locator_value": "graph-negative-ambiguous_supplier"
+            }
+          },
+          "title": "Graph negative ambiguous_supplier",
+          "body_text": "Delta Components will supply battery modules to Zenith Motors.",
+          "published_at": "2026-03-01T00:00:00+00:00",
+          "fetched_at": "2026-03-01T00:05:00+00:00",
+          "language": "en",
+          "author_or_channel": "Regression Fixture",
+          "content_hash": "sha256:article-reg-graph-negative-ambiguous_supplier:content",
+          "article_fingerprint": "sha256:cluster-reg-graph-negative-ambiguous_supplier:fingerprint",
+          "license_tag": "fixture",
+          "reliability_tier": "A",
+          "cluster_id": "cluster-reg-graph-negative-ambiguous_supplier"
+        }
+      ],
+      "expected_cluster_id": "cluster-reg-graph-negative-ambiguous_supplier",
+      "metadata": {
+        "negative_category": "unresolved_entity",
+        "expected_ex3_count": 0
+      }
+    },
+    {
+      "case_id": "graph-negative-unresolved_buyer_divested",
+      "category": "graph_negative",
+      "article_ids": [
+        "article-reg-graph-negative-unresolved_buyer_divested"
+      ],
+      "expected_outputs": [
+        {
+          "candidate_id": "fact-reg-graph-negative-unresolved_buyer_divested",
+          "export_contract": "Ex-1",
+          "article_id": "article-reg-graph-negative-unresolved_buyer_divested",
+          "cluster_id": "cluster-reg-graph-negative-unresolved_buyer_divested",
+          "source_reference": {
+            "source_id": "regression-graph-negative",
+            "url": "https://fixtures.example.com/regression-graph-negative/graph-negative-unresolved_buyer_divested",
+            "provider_key": "graph-negative-unresolved_buyer_divested",
+            "original_locator": {
+              "locator_type": "fixture",
+              "locator_value": "graph-negative-unresolved_buyer_divested"
+            }
+          },
+          "evidence_spans": [
+            {
+              "article_id": "article-reg-graph-negative-unresolved_buyer_divested",
+              "start_char": 0,
+              "end_char": 56,
+              "quote": "Harbor Energy divested its pipeline unit to Bay Capital.",
+              "locator": "body"
+            }
+          ],
+          "schema_pin": {
+            "schema_name": "news_fact_candidate",
+            "schema_version": "news_fact_candidate.v1",
+            "contract": "Ex-1",
+            "model_output_version": "news_fact_candidate.output.v1"
+          },
+          "involved_entities": [
+            {
+              "mention_text": "Harbor Energy",
+              "canonical_id": "entity:harbor-energy",
+              "resolution_status": "resolved",
+              "type_hint": "company"
+            },
+            {
+              "mention_text": "Bay Capital",
+              "canonical_id": null,
+              "resolution_status": "unresolved",
+              "type_hint": "company"
+            }
+          ]
+        }
+      ],
+      "source_reference": {
+        "source_id": "regression-graph-negative",
+        "url": "https://fixtures.example.com/regression-graph-negative/graph-negative-unresolved_buyer_divested",
+        "provider_key": "graph-negative-unresolved_buyer_divested",
+        "original_locator": {
+          "locator_type": "fixture",
+          "locator_value": "graph-negative-unresolved_buyer_divested"
+        }
+      },
+      "version_pins": {
+        "Ex-1": {
+          "schema_name": "news_fact_candidate",
+          "schema_version": "news_fact_candidate.v1",
+          "contract": "Ex-1",
+          "model_output_version": "news_fact_candidate.output.v1"
+        },
+        "Ex-2": {
+          "schema_name": "news_signal_candidate",
+          "schema_version": "news_signal_candidate.v1",
+          "contract": "Ex-2",
+          "model_output_version": "news_signal_candidate.output.v1"
+        },
+        "Ex-3": {
+          "schema_name": "news_graph_delta_candidate",
+          "schema_version": "news_graph_delta_candidate.v1",
+          "contract": "Ex-3",
+          "model_output_version": "news_graph_delta_candidate.output.v1"
+        }
+      },
+      "baseline_path": "baseline/graph_negative.json",
+      "raw_inputs": [
+        {
+          "article_id": "article-reg-graph-negative-unresolved_buyer_divested",
+          "source_reference": {
+            "source_id": "regression-graph-negative",
+            "url": "https://fixtures.example.com/regression-graph-negative/graph-negative-unresolved_buyer_divested",
+            "provider_key": "graph-negative-unresolved_buyer_divested",
+            "original_locator": {
+              "locator_type": "fixture",
+              "locator_value": "graph-negative-unresolved_buyer_divested"
+            }
+          },
+          "title": "Graph negative unresolved_buyer_divested",
+          "body_text": "Harbor Energy divested its pipeline unit to Bay Capital.",
+          "published_at": "2026-03-01T00:00:00+00:00",
+          "fetched_at": "2026-03-01T00:05:00+00:00"
+        }
+      ],
+      "normalized_artifacts": [
+        {
+          "article_id": "article-reg-graph-negative-unresolved_buyer_divested",
+          "source_id": "regression-graph-negative",
+          "source_reference": {
+            "source_id": "regression-graph-negative",
+            "url": "https://fixtures.example.com/regression-graph-negative/graph-negative-unresolved_buyer_divested",
+            "provider_key": "graph-negative-unresolved_buyer_divested",
+            "original_locator": {
+              "locator_type": "fixture",
+              "locator_value": "graph-negative-unresolved_buyer_divested"
+            }
+          },
+          "title": "Graph negative unresolved_buyer_divested",
+          "body_text": "Harbor Energy divested its pipeline unit to Bay Capital.",
+          "published_at": "2026-03-01T00:00:00+00:00",
+          "fetched_at": "2026-03-01T00:05:00+00:00",
+          "language": "en",
+          "author_or_channel": "Regression Fixture",
+          "content_hash": "sha256:article-reg-graph-negative-unresolved_buyer_divested:content",
+          "article_fingerprint": "sha256:cluster-reg-graph-negative-unresolved_buyer_divested:fingerprint",
+          "license_tag": "fixture",
+          "reliability_tier": "A",
+          "cluster_id": "cluster-reg-graph-negative-unresolved_buyer_divested"
+        }
+      ],
+      "expected_cluster_id": "cluster-reg-graph-negative-unresolved_buyer_divested",
+      "metadata": {
+        "negative_category": "unresolved_entity",
+        "expected_ex3_count": 0
+      }
+    },
+    {
+      "case_id": "graph-negative-secondhand_acquired_repost",
+      "category": "graph_negative",
+      "article_ids": [
+        "article-reg-graph-negative-secondhand_acquired_repost"
+      ],
+      "expected_outputs": [
+        {
+          "candidate_id": "fact-reg-graph-negative-secondhand_acquired_repost",
+          "export_contract": "Ex-1",
+          "article_id": "article-reg-graph-negative-secondhand_acquired_repost",
+          "cluster_id": "cluster-reg-graph-negative-secondhand_acquired_repost",
+          "source_reference": {
+            "source_id": "regression-graph-negative",
+            "url": "https://fixtures.example.com/regression-graph-negative/graph-negative-secondhand_acquired_repost",
+            "provider_key": "graph-negative-secondhand_acquired_repost",
+            "original_locator": {
+              "locator_type": "fixture",
+              "locator_value": "graph-negative-secondhand_acquired_repost"
+            }
+          },
+          "evidence_spans": [
+            {
+              "article_id": "article-reg-graph-negative-secondhand_acquired_repost",
+              "start_char": 0,
+              "end_char": 65,
+              "quote": "Acme Corp acquired Globex Inc, according to an unverified repost.",
+              "locator": "body"
+            }
+          ],
+          "schema_pin": {
+            "schema_name": "news_fact_candidate",
+            "schema_version": "news_fact_candidate.v1",
+            "contract": "Ex-1",
+            "model_output_version": "news_fact_candidate.output.v1"
+          },
+          "involved_entities": [
+            {
+              "mention_text": "Acme Corp",
+              "canonical_id": "entity:acme-corp",
+              "resolution_status": "resolved",
+              "type_hint": "company"
+            },
+            {
+              "mention_text": "Globex Inc",
+              "canonical_id": "entity:globex-inc",
+              "resolution_status": "resolved",
+              "type_hint": "company"
+            }
+          ]
+        }
+      ],
+      "source_reference": {
+        "source_id": "regression-graph-negative",
+        "url": "https://fixtures.example.com/regression-graph-negative/graph-negative-secondhand_acquired_repost",
+        "provider_key": "graph-negative-secondhand_acquired_repost",
+        "original_locator": {
+          "locator_type": "fixture",
+          "locator_value": "graph-negative-secondhand_acquired_repost"
+        }
+      },
+      "version_pins": {
+        "Ex-1": {
+          "schema_name": "news_fact_candidate",
+          "schema_version": "news_fact_candidate.v1",
+          "contract": "Ex-1",
+          "model_output_version": "news_fact_candidate.output.v1"
+        },
+        "Ex-2": {
+          "schema_name": "news_signal_candidate",
+          "schema_version": "news_signal_candidate.v1",
+          "contract": "Ex-2",
+          "model_output_version": "news_signal_candidate.output.v1"
+        },
+        "Ex-3": {
+          "schema_name": "news_graph_delta_candidate",
+          "schema_version": "news_graph_delta_candidate.v1",
+          "contract": "Ex-3",
+          "model_output_version": "news_graph_delta_candidate.output.v1"
+        }
+      },
+      "baseline_path": "baseline/graph_negative.json",
+      "raw_inputs": [
+        {
+          "article_id": "article-reg-graph-negative-secondhand_acquired_repost",
+          "source_reference": {
+            "source_id": "regression-graph-negative",
+            "url": "https://fixtures.example.com/regression-graph-negative/graph-negative-secondhand_acquired_repost",
+            "provider_key": "graph-negative-secondhand_acquired_repost",
+            "original_locator": {
+              "locator_type": "fixture",
+              "locator_value": "graph-negative-secondhand_acquired_repost"
+            }
+          },
+          "title": "Graph negative secondhand_acquired_repost",
+          "body_text": "Acme Corp acquired Globex Inc, according to an unverified repost.",
+          "published_at": "2026-03-01T00:00:00+00:00",
+          "fetched_at": "2026-03-01T00:05:00+00:00"
+        }
+      ],
+      "normalized_artifacts": [
+        {
+          "article_id": "article-reg-graph-negative-secondhand_acquired_repost",
+          "source_id": "regression-graph-negative",
+          "source_reference": {
+            "source_id": "regression-graph-negative",
+            "url": "https://fixtures.example.com/regression-graph-negative/graph-negative-secondhand_acquired_repost",
+            "provider_key": "graph-negative-secondhand_acquired_repost",
+            "original_locator": {
+              "locator_type": "fixture",
+              "locator_value": "graph-negative-secondhand_acquired_repost"
+            }
+          },
+          "title": "Graph negative secondhand_acquired_repost",
+          "body_text": "Acme Corp acquired Globex Inc, according to an unverified repost.",
+          "published_at": "2026-03-01T00:00:00+00:00",
+          "fetched_at": "2026-03-01T00:05:00+00:00",
+          "language": "en",
+          "author_or_channel": "Regression Fixture",
+          "content_hash": "sha256:article-reg-graph-negative-secondhand_acquired_repost:content",
+          "article_fingerprint": "sha256:cluster-reg-graph-negative-secondhand_acquired_repost:fingerprint",
+          "license_tag": "fixture",
+          "reliability_tier": "A",
+          "cluster_id": "cluster-reg-graph-negative-secondhand_acquired_repost"
+        }
+      ],
+      "expected_cluster_id": "cluster-reg-graph-negative-secondhand_acquired_repost",
+      "metadata": {
+        "negative_category": "single_secondhand_evidence",
+        "expected_ex3_count": 0
+      }
+    },
+    {
+      "case_id": "graph-negative-secondhand_partner_repost",
+      "category": "graph_negative",
+      "article_ids": [
+        "article-reg-graph-negative-secondhand_partner_repost"
+      ],
+      "expected_outputs": [
+        {
+          "candidate_id": "fact-reg-graph-negative-secondhand_partner_repost",
+          "export_contract": "Ex-1",
+          "article_id": "article-reg-graph-negative-secondhand_partner_repost",
+          "cluster_id": "cluster-reg-graph-negative-secondhand_partner_repost",
+          "source_reference": {
+            "source_id": "regression-graph-negative",
+            "url": "https://fixtures.example.com/regression-graph-negative/graph-negative-secondhand_partner_repost",
+            "provider_key": "graph-negative-secondhand_partner_repost",
+            "original_locator": {
+              "locator_type": "fixture",
+              "locator_value": "graph-negative-secondhand_partner_repost"
+            }
+          },
+          "evidence_spans": [
+            {
+              "article_id": "article-reg-graph-negative-secondhand_partner_repost",
+              "start_char": 0,
+              "end_char": 96,
+              "quote": "North River Metals entered a partnership with East Power Ltd, according to an unverified repost.",
+              "locator": "body"
+            }
+          ],
+          "schema_pin": {
+            "schema_name": "news_fact_candidate",
+            "schema_version": "news_fact_candidate.v1",
+            "contract": "Ex-1",
+            "model_output_version": "news_fact_candidate.output.v1"
+          },
+          "involved_entities": [
+            {
+              "mention_text": "North River Metals",
+              "canonical_id": "entity:north-river-metals",
+              "resolution_status": "resolved",
+              "type_hint": "company"
+            },
+            {
+              "mention_text": "East Power Ltd",
+              "canonical_id": "entity:east-power-ltd",
+              "resolution_status": "resolved",
+              "type_hint": "company"
+            }
+          ]
+        }
+      ],
+      "source_reference": {
+        "source_id": "regression-graph-negative",
+        "url": "https://fixtures.example.com/regression-graph-negative/graph-negative-secondhand_partner_repost",
+        "provider_key": "graph-negative-secondhand_partner_repost",
+        "original_locator": {
+          "locator_type": "fixture",
+          "locator_value": "graph-negative-secondhand_partner_repost"
+        }
+      },
+      "version_pins": {
+        "Ex-1": {
+          "schema_name": "news_fact_candidate",
+          "schema_version": "news_fact_candidate.v1",
+          "contract": "Ex-1",
+          "model_output_version": "news_fact_candidate.output.v1"
+        },
+        "Ex-2": {
+          "schema_name": "news_signal_candidate",
+          "schema_version": "news_signal_candidate.v1",
+          "contract": "Ex-2",
+          "model_output_version": "news_signal_candidate.output.v1"
+        },
+        "Ex-3": {
+          "schema_name": "news_graph_delta_candidate",
+          "schema_version": "news_graph_delta_candidate.v1",
+          "contract": "Ex-3",
+          "model_output_version": "news_graph_delta_candidate.output.v1"
+        }
+      },
+      "baseline_path": "baseline/graph_negative.json",
+      "raw_inputs": [
+        {
+          "article_id": "article-reg-graph-negative-secondhand_partner_repost",
+          "source_reference": {
+            "source_id": "regression-graph-negative",
+            "url": "https://fixtures.example.com/regression-graph-negative/graph-negative-secondhand_partner_repost",
+            "provider_key": "graph-negative-secondhand_partner_repost",
+            "original_locator": {
+              "locator_type": "fixture",
+              "locator_value": "graph-negative-secondhand_partner_repost"
+            }
+          },
+          "title": "Graph negative secondhand_partner_repost",
+          "body_text": "North River Metals entered a partnership with East Power Ltd, according to an unverified repost.",
+          "published_at": "2026-03-01T00:00:00+00:00",
+          "fetched_at": "2026-03-01T00:05:00+00:00"
+        }
+      ],
+      "normalized_artifacts": [
+        {
+          "article_id": "article-reg-graph-negative-secondhand_partner_repost",
+          "source_id": "regression-graph-negative",
+          "source_reference": {
+            "source_id": "regression-graph-negative",
+            "url": "https://fixtures.example.com/regression-graph-negative/graph-negative-secondhand_partner_repost",
+            "provider_key": "graph-negative-secondhand_partner_repost",
+            "original_locator": {
+              "locator_type": "fixture",
+              "locator_value": "graph-negative-secondhand_partner_repost"
+            }
+          },
+          "title": "Graph negative secondhand_partner_repost",
+          "body_text": "North River Metals entered a partnership with East Power Ltd, according to an unverified repost.",
+          "published_at": "2026-03-01T00:00:00+00:00",
+          "fetched_at": "2026-03-01T00:05:00+00:00",
+          "language": "en",
+          "author_or_channel": "Regression Fixture",
+          "content_hash": "sha256:article-reg-graph-negative-secondhand_partner_repost:content",
+          "article_fingerprint": "sha256:cluster-reg-graph-negative-secondhand_partner_repost:fingerprint",
+          "license_tag": "fixture",
+          "reliability_tier": "A",
+          "cluster_id": "cluster-reg-graph-negative-secondhand_partner_repost"
+        }
+      ],
+      "expected_cluster_id": "cluster-reg-graph-negative-secondhand_partner_repost",
+      "metadata": {
+        "negative_category": "single_secondhand_evidence",
+        "expected_ex3_count": 0
+      }
+    },
+    {
+      "case_id": "graph-negative-secondhand_sanction_repost",
+      "category": "graph_negative",
+      "article_ids": [
+        "article-reg-graph-negative-secondhand_sanction_repost"
+      ],
+      "expected_outputs": [
+        {
+          "candidate_id": "fact-reg-graph-negative-secondhand_sanction_repost",
+          "export_contract": "Ex-1",
+          "article_id": "article-reg-graph-negative-secondhand_sanction_repost",
+          "cluster_id": "cluster-reg-graph-negative-secondhand_sanction_repost",
+          "source_reference": {
+            "source_id": "regression-graph-negative",
+            "url": "https://fixtures.example.com/regression-graph-negative/graph-negative-secondhand_sanction_repost",
+            "provider_key": "graph-negative-secondhand_sanction_repost",
+            "original_locator": {
+              "locator_type": "fixture",
+              "locator_value": "graph-negative-secondhand_sanction_repost"
+            }
+          },
+          "evidence_spans": [
+            {
+              "article_id": "article-reg-graph-negative-secondhand_sanction_repost",
+              "start_char": 0,
+              "end_char": 83,
+              "quote": "Atlas Shipping was sanctioned by State Treasury, according to an unverified repost.",
+              "locator": "body"
+            }
+          ],
+          "schema_pin": {
+            "schema_name": "news_fact_candidate",
+            "schema_version": "news_fact_candidate.v1",
+            "contract": "Ex-1",
+            "model_output_version": "news_fact_candidate.output.v1"
+          },
+          "involved_entities": [
+            {
+              "mention_text": "Atlas Shipping",
+              "canonical_id": "entity:atlas-shipping",
+              "resolution_status": "resolved",
+              "type_hint": "company"
+            },
+            {
+              "mention_text": "State Treasury",
+              "canonical_id": "entity:state-treasury",
+              "resolution_status": "resolved",
+              "type_hint": "company"
+            }
+          ]
+        }
+      ],
+      "source_reference": {
+        "source_id": "regression-graph-negative",
+        "url": "https://fixtures.example.com/regression-graph-negative/graph-negative-secondhand_sanction_repost",
+        "provider_key": "graph-negative-secondhand_sanction_repost",
+        "original_locator": {
+          "locator_type": "fixture",
+          "locator_value": "graph-negative-secondhand_sanction_repost"
+        }
+      },
+      "version_pins": {
+        "Ex-1": {
+          "schema_name": "news_fact_candidate",
+          "schema_version": "news_fact_candidate.v1",
+          "contract": "Ex-1",
+          "model_output_version": "news_fact_candidate.output.v1"
+        },
+        "Ex-2": {
+          "schema_name": "news_signal_candidate",
+          "schema_version": "news_signal_candidate.v1",
+          "contract": "Ex-2",
+          "model_output_version": "news_signal_candidate.output.v1"
+        },
+        "Ex-3": {
+          "schema_name": "news_graph_delta_candidate",
+          "schema_version": "news_graph_delta_candidate.v1",
+          "contract": "Ex-3",
+          "model_output_version": "news_graph_delta_candidate.output.v1"
+        }
+      },
+      "baseline_path": "baseline/graph_negative.json",
+      "raw_inputs": [
+        {
+          "article_id": "article-reg-graph-negative-secondhand_sanction_repost",
+          "source_reference": {
+            "source_id": "regression-graph-negative",
+            "url": "https://fixtures.example.com/regression-graph-negative/graph-negative-secondhand_sanction_repost",
+            "provider_key": "graph-negative-secondhand_sanction_repost",
+            "original_locator": {
+              "locator_type": "fixture",
+              "locator_value": "graph-negative-secondhand_sanction_repost"
+            }
+          },
+          "title": "Graph negative secondhand_sanction_repost",
+          "body_text": "Atlas Shipping was sanctioned by State Treasury, according to an unverified repost.",
+          "published_at": "2026-03-01T00:00:00+00:00",
+          "fetched_at": "2026-03-01T00:05:00+00:00"
+        }
+      ],
+      "normalized_artifacts": [
+        {
+          "article_id": "article-reg-graph-negative-secondhand_sanction_repost",
+          "source_id": "regression-graph-negative",
+          "source_reference": {
+            "source_id": "regression-graph-negative",
+            "url": "https://fixtures.example.com/regression-graph-negative/graph-negative-secondhand_sanction_repost",
+            "provider_key": "graph-negative-secondhand_sanction_repost",
+            "original_locator": {
+              "locator_type": "fixture",
+              "locator_value": "graph-negative-secondhand_sanction_repost"
+            }
+          },
+          "title": "Graph negative secondhand_sanction_repost",
+          "body_text": "Atlas Shipping was sanctioned by State Treasury, according to an unverified repost.",
+          "published_at": "2026-03-01T00:00:00+00:00",
+          "fetched_at": "2026-03-01T00:05:00+00:00",
+          "language": "en",
+          "author_or_channel": "Regression Fixture",
+          "content_hash": "sha256:article-reg-graph-negative-secondhand_sanction_repost:content",
+          "article_fingerprint": "sha256:cluster-reg-graph-negative-secondhand_sanction_repost:fingerprint",
+          "license_tag": "fixture",
+          "reliability_tier": "A",
+          "cluster_id": "cluster-reg-graph-negative-secondhand_sanction_repost"
+        }
+      ],
+      "expected_cluster_id": "cluster-reg-graph-negative-secondhand_sanction_repost",
+      "metadata": {
+        "negative_category": "single_secondhand_evidence",
+        "expected_ex3_count": 0
+      }
+    },
+    {
+      "case_id": "graph-negative-secondhand_supply_repost",
+      "category": "graph_negative",
+      "article_ids": [
+        "article-reg-graph-negative-secondhand_supply_repost"
+      ],
+      "expected_outputs": [
+        {
+          "candidate_id": "fact-reg-graph-negative-secondhand_supply_repost",
+          "export_contract": "Ex-1",
+          "article_id": "article-reg-graph-negative-secondhand_supply_repost",
+          "cluster_id": "cluster-reg-graph-negative-secondhand_supply_repost",
+          "source_reference": {
+            "source_id": "regression-graph-negative",
+            "url": "https://fixtures.example.com/regression-graph-negative/graph-negative-secondhand_supply_repost",
+            "provider_key": "graph-negative-secondhand_supply_repost",
+            "original_locator": {
+              "locator_type": "fixture",
+              "locator_value": "graph-negative-secondhand_supply_repost"
+            }
+          },
+          "evidence_spans": [
+            {
+              "article_id": "article-reg-graph-negative-secondhand_supply_repost",
+              "start_char": 0,
+              "end_char": 97,
+              "quote": "Delta Components will supply battery modules to Zenith Motors, according to an unverified repost.",
+              "locator": "body"
+            }
+          ],
+          "schema_pin": {
+            "schema_name": "news_fact_candidate",
+            "schema_version": "news_fact_candidate.v1",
+            "contract": "Ex-1",
+            "model_output_version": "news_fact_candidate.output.v1"
+          },
+          "involved_entities": [
+            {
+              "mention_text": "Delta Components",
+              "canonical_id": "entity:delta-components",
+              "resolution_status": "resolved",
+              "type_hint": "company"
+            },
+            {
+              "mention_text": "Zenith Motors",
+              "canonical_id": "entity:zenith-motors",
+              "resolution_status": "resolved",
+              "type_hint": "company"
+            }
+          ]
+        }
+      ],
+      "source_reference": {
+        "source_id": "regression-graph-negative",
+        "url": "https://fixtures.example.com/regression-graph-negative/graph-negative-secondhand_supply_repost",
+        "provider_key": "graph-negative-secondhand_supply_repost",
+        "original_locator": {
+          "locator_type": "fixture",
+          "locator_value": "graph-negative-secondhand_supply_repost"
+        }
+      },
+      "version_pins": {
+        "Ex-1": {
+          "schema_name": "news_fact_candidate",
+          "schema_version": "news_fact_candidate.v1",
+          "contract": "Ex-1",
+          "model_output_version": "news_fact_candidate.output.v1"
+        },
+        "Ex-2": {
+          "schema_name": "news_signal_candidate",
+          "schema_version": "news_signal_candidate.v1",
+          "contract": "Ex-2",
+          "model_output_version": "news_signal_candidate.output.v1"
+        },
+        "Ex-3": {
+          "schema_name": "news_graph_delta_candidate",
+          "schema_version": "news_graph_delta_candidate.v1",
+          "contract": "Ex-3",
+          "model_output_version": "news_graph_delta_candidate.output.v1"
+        }
+      },
+      "baseline_path": "baseline/graph_negative.json",
+      "raw_inputs": [
+        {
+          "article_id": "article-reg-graph-negative-secondhand_supply_repost",
+          "source_reference": {
+            "source_id": "regression-graph-negative",
+            "url": "https://fixtures.example.com/regression-graph-negative/graph-negative-secondhand_supply_repost",
+            "provider_key": "graph-negative-secondhand_supply_repost",
+            "original_locator": {
+              "locator_type": "fixture",
+              "locator_value": "graph-negative-secondhand_supply_repost"
+            }
+          },
+          "title": "Graph negative secondhand_supply_repost",
+          "body_text": "Delta Components will supply battery modules to Zenith Motors, according to an unverified repost.",
+          "published_at": "2026-03-01T00:00:00+00:00",
+          "fetched_at": "2026-03-01T00:05:00+00:00"
+        }
+      ],
+      "normalized_artifacts": [
+        {
+          "article_id": "article-reg-graph-negative-secondhand_supply_repost",
+          "source_id": "regression-graph-negative",
+          "source_reference": {
+            "source_id": "regression-graph-negative",
+            "url": "https://fixtures.example.com/regression-graph-negative/graph-negative-secondhand_supply_repost",
+            "provider_key": "graph-negative-secondhand_supply_repost",
+            "original_locator": {
+              "locator_type": "fixture",
+              "locator_value": "graph-negative-secondhand_supply_repost"
+            }
+          },
+          "title": "Graph negative secondhand_supply_repost",
+          "body_text": "Delta Components will supply battery modules to Zenith Motors, according to an unverified repost.",
+          "published_at": "2026-03-01T00:00:00+00:00",
+          "fetched_at": "2026-03-01T00:05:00+00:00",
+          "language": "en",
+          "author_or_channel": "Regression Fixture",
+          "content_hash": "sha256:article-reg-graph-negative-secondhand_supply_repost:content",
+          "article_fingerprint": "sha256:cluster-reg-graph-negative-secondhand_supply_repost:fingerprint",
+          "license_tag": "fixture",
+          "reliability_tier": "A",
+          "cluster_id": "cluster-reg-graph-negative-secondhand_supply_repost"
+        }
+      ],
+      "expected_cluster_id": "cluster-reg-graph-negative-secondhand_supply_repost",
+      "metadata": {
+        "negative_category": "single_secondhand_evidence",
+        "expected_ex3_count": 0
+      }
+    },
+    {
+      "case_id": "graph-negative-secondhand_divested_repost",
+      "category": "graph_negative",
+      "article_ids": [
+        "article-reg-graph-negative-secondhand_divested_repost"
+      ],
+      "expected_outputs": [
+        {
+          "candidate_id": "fact-reg-graph-negative-secondhand_divested_repost",
+          "export_contract": "Ex-1",
+          "article_id": "article-reg-graph-negative-secondhand_divested_repost",
+          "cluster_id": "cluster-reg-graph-negative-secondhand_divested_repost",
+          "source_reference": {
+            "source_id": "regression-graph-negative",
+            "url": "https://fixtures.example.com/regression-graph-negative/graph-negative-secondhand_divested_repost",
+            "provider_key": "graph-negative-secondhand_divested_repost",
+            "original_locator": {
+              "locator_type": "fixture",
+              "locator_value": "graph-negative-secondhand_divested_repost"
+            }
+          },
+          "evidence_spans": [
+            {
+              "article_id": "article-reg-graph-negative-secondhand_divested_repost",
+              "start_char": 0,
+              "end_char": 91,
+              "quote": "Harbor Energy divested its pipeline unit to Bay Capital, according to an unverified repost.",
+              "locator": "body"
+            }
+          ],
+          "schema_pin": {
+            "schema_name": "news_fact_candidate",
+            "schema_version": "news_fact_candidate.v1",
+            "contract": "Ex-1",
+            "model_output_version": "news_fact_candidate.output.v1"
+          },
+          "involved_entities": [
+            {
+              "mention_text": "Harbor Energy",
+              "canonical_id": "entity:harbor-energy",
+              "resolution_status": "resolved",
+              "type_hint": "company"
+            },
+            {
+              "mention_text": "Bay Capital",
+              "canonical_id": "entity:bay-capital",
+              "resolution_status": "resolved",
+              "type_hint": "company"
+            }
+          ]
+        }
+      ],
+      "source_reference": {
+        "source_id": "regression-graph-negative",
+        "url": "https://fixtures.example.com/regression-graph-negative/graph-negative-secondhand_divested_repost",
+        "provider_key": "graph-negative-secondhand_divested_repost",
+        "original_locator": {
+          "locator_type": "fixture",
+          "locator_value": "graph-negative-secondhand_divested_repost"
+        }
+      },
+      "version_pins": {
+        "Ex-1": {
+          "schema_name": "news_fact_candidate",
+          "schema_version": "news_fact_candidate.v1",
+          "contract": "Ex-1",
+          "model_output_version": "news_fact_candidate.output.v1"
+        },
+        "Ex-2": {
+          "schema_name": "news_signal_candidate",
+          "schema_version": "news_signal_candidate.v1",
+          "contract": "Ex-2",
+          "model_output_version": "news_signal_candidate.output.v1"
+        },
+        "Ex-3": {
+          "schema_name": "news_graph_delta_candidate",
+          "schema_version": "news_graph_delta_candidate.v1",
+          "contract": "Ex-3",
+          "model_output_version": "news_graph_delta_candidate.output.v1"
+        }
+      },
+      "baseline_path": "baseline/graph_negative.json",
+      "raw_inputs": [
+        {
+          "article_id": "article-reg-graph-negative-secondhand_divested_repost",
+          "source_reference": {
+            "source_id": "regression-graph-negative",
+            "url": "https://fixtures.example.com/regression-graph-negative/graph-negative-secondhand_divested_repost",
+            "provider_key": "graph-negative-secondhand_divested_repost",
+            "original_locator": {
+              "locator_type": "fixture",
+              "locator_value": "graph-negative-secondhand_divested_repost"
+            }
+          },
+          "title": "Graph negative secondhand_divested_repost",
+          "body_text": "Harbor Energy divested its pipeline unit to Bay Capital, according to an unverified repost.",
+          "published_at": "2026-03-01T00:00:00+00:00",
+          "fetched_at": "2026-03-01T00:05:00+00:00"
+        }
+      ],
+      "normalized_artifacts": [
+        {
+          "article_id": "article-reg-graph-negative-secondhand_divested_repost",
+          "source_id": "regression-graph-negative",
+          "source_reference": {
+            "source_id": "regression-graph-negative",
+            "url": "https://fixtures.example.com/regression-graph-negative/graph-negative-secondhand_divested_repost",
+            "provider_key": "graph-negative-secondhand_divested_repost",
+            "original_locator": {
+              "locator_type": "fixture",
+              "locator_value": "graph-negative-secondhand_divested_repost"
+            }
+          },
+          "title": "Graph negative secondhand_divested_repost",
+          "body_text": "Harbor Energy divested its pipeline unit to Bay Capital, according to an unverified repost.",
+          "published_at": "2026-03-01T00:00:00+00:00",
+          "fetched_at": "2026-03-01T00:05:00+00:00",
+          "language": "en",
+          "author_or_channel": "Regression Fixture",
+          "content_hash": "sha256:article-reg-graph-negative-secondhand_divested_repost:content",
+          "article_fingerprint": "sha256:cluster-reg-graph-negative-secondhand_divested_repost:fingerprint",
+          "license_tag": "fixture",
+          "reliability_tier": "A",
+          "cluster_id": "cluster-reg-graph-negative-secondhand_divested_repost"
+        }
+      ],
+      "expected_cluster_id": "cluster-reg-graph-negative-secondhand_divested_repost",
+      "metadata": {
+        "negative_category": "single_secondhand_evidence",
+        "expected_ex3_count": 0
+      }
+    }
+  ]
+}

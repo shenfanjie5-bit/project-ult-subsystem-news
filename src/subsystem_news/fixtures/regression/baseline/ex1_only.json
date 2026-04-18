@@ -1,0 +1,212 @@
+{
+  "replay_id": "baseline-ex1_only",
+  "input_kind": "trace",
+  "input_path": "src/subsystem_news/fixtures/regression/ex1_only/cases.json",
+  "source_run_id": "baseline-run-ex1_only",
+  "started_at": "2026-03-01T00:00:00Z",
+  "completed_at": "2026-03-01T00:05:00Z",
+  "article_results": [
+    {
+      "article_id": "article-reg-ex1-only",
+      "source_reference": {
+        "source_id": "regression-topic",
+        "url": "https://fixtures.example.com/regression-topic/ex1-only-unresolved",
+        "provider_key": "ex1-only-unresolved",
+        "original_locator": {
+          "locator_type": "fixture",
+          "locator_value": "ex1-only-unresolved"
+        }
+      },
+      "status": "processed",
+      "baseline_available": true,
+      "has_changes": false,
+      "baseline": {
+        "article_id": "article-reg-ex1-only",
+        "cluster_id": "cluster-reg-ex1-only",
+        "representative_article_id": "article-reg-ex1-only",
+        "source_reference": {
+          "source_id": "regression-topic",
+          "url": "https://fixtures.example.com/regression-topic/ex1-only-unresolved",
+          "provider_key": "ex1-only-unresolved",
+          "original_locator": {
+            "locator_type": "fixture",
+            "locator_value": "ex1-only-unresolved"
+          }
+        },
+        "candidate_ids": [
+          "Ex-1:fact-reg-ex1-only-unresolved"
+        ],
+        "schema_pins": {
+          "Ex-1": {
+            "schema_name": "news_fact_candidate",
+            "schema_version": "news_fact_candidate.v1",
+            "contract": "Ex-1",
+            "model_output_version": "news_fact_candidate.output.v1"
+          },
+          "Ex-2": {
+            "schema_name": "news_signal_candidate",
+            "schema_version": "news_signal_candidate.v1",
+            "contract": "Ex-2",
+            "model_output_version": "news_signal_candidate.output.v1"
+          },
+          "Ex-3": {
+            "schema_name": "news_graph_delta_candidate",
+            "schema_version": "news_graph_delta_candidate.v1",
+            "contract": "Ex-3",
+            "model_output_version": "news_graph_delta_candidate.output.v1"
+          }
+        }
+      },
+      "replayed": {
+        "article_id": "article-reg-ex1-only",
+        "cluster_id": "cluster-reg-ex1-only",
+        "representative_article_id": "article-reg-ex1-only",
+        "source_reference": {
+          "source_id": "regression-topic",
+          "url": "https://fixtures.example.com/regression-topic/ex1-only-unresolved",
+          "provider_key": "ex1-only-unresolved",
+          "original_locator": {
+            "locator_type": "fixture",
+            "locator_value": "ex1-only-unresolved"
+          }
+        },
+        "candidate_ids": [
+          "Ex-1:fact-reg-ex1-only-unresolved"
+        ],
+        "schema_pins": {
+          "Ex-1": {
+            "schema_name": "news_fact_candidate",
+            "schema_version": "news_fact_candidate.v1",
+            "contract": "Ex-1",
+            "model_output_version": "news_fact_candidate.output.v1"
+          },
+          "Ex-2": {
+            "schema_name": "news_signal_candidate",
+            "schema_version": "news_signal_candidate.v1",
+            "contract": "Ex-2",
+            "model_output_version": "news_signal_candidate.output.v1"
+          },
+          "Ex-3": {
+            "schema_name": "news_graph_delta_candidate",
+            "schema_version": "news_graph_delta_candidate.v1",
+            "contract": "Ex-3",
+            "model_output_version": "news_graph_delta_candidate.output.v1"
+          }
+        }
+      },
+      "candidate_diffs": [],
+      "evidence_span_diffs": [],
+      "entity_resolution_diffs": [],
+      "version_metadata_diffs": [],
+      "error_stage": null,
+      "error_message": null
+    }
+  ],
+  "changed_count": 0,
+  "error_count": 0,
+  "has_changes": false,
+  "stage_order": [
+    "fixture_baseline"
+  ],
+  "metadata": {
+    "category": "ex1_only",
+    "case_count": 1,
+    "article_count": 1,
+    "candidate_payloads": [
+      {
+        "candidate_id": "fact-reg-ex1-only-unresolved",
+        "article_id": "article-reg-ex1-only",
+        "cluster_id": "cluster-reg-ex1-only",
+        "source_reference": {
+          "source_id": "regression-topic",
+          "url": "https://fixtures.example.com/regression-topic/ex1-only-unresolved",
+          "provider_key": "ex1-only-unresolved",
+          "original_locator": {
+            "locator_type": "fixture",
+            "locator_value": "ex1-only-unresolved"
+          }
+        },
+        "fact_type": "product",
+        "summary": "Unlisted Battery Venture announced a storage roadmap.",
+        "involved_entities": [
+          {
+            "mention_text": "Unlisted Battery Venture",
+            "canonical_id": null,
+            "resolution_status": "unresolved",
+            "type_hint": "company"
+          },
+          {
+            "mention_text": "customer",
+            "canonical_id": null,
+            "resolution_status": "unresolved",
+            "type_hint": "company"
+          }
+        ],
+        "event_time": null,
+        "confidence": 0.8,
+        "source_reliability_tier": "C",
+        "export_contract": "Ex-1",
+        "evidence_spans": [
+          {
+            "article_id": "article-reg-ex1-only",
+            "start_char": 0,
+            "end_char": 91,
+            "quote": "Unlisted Battery Venture announced a storage roadmap without naming any customer or ticker.",
+            "locator": "body"
+          }
+        ]
+      }
+    ],
+    "schema_pins": {
+      "Ex-1": {
+        "schema_name": "news_fact_candidate",
+        "schema_version": "news_fact_candidate.v1",
+        "contract": "Ex-1",
+        "model_output_version": "news_fact_candidate.output.v1"
+      },
+      "Ex-2": {
+        "schema_name": "news_signal_candidate",
+        "schema_version": "news_signal_candidate.v1",
+        "contract": "Ex-2",
+        "model_output_version": "news_signal_candidate.output.v1"
+      },
+      "Ex-3": {
+        "schema_name": "news_graph_delta_candidate",
+        "schema_version": "news_graph_delta_candidate.v1",
+        "contract": "Ex-3",
+        "model_output_version": "news_graph_delta_candidate.output.v1"
+      }
+    },
+    "evidence_spans": {
+      "Ex-1:fact-reg-ex1-only-unresolved:evidence:0": {
+        "article_id": "article-reg-ex1-only",
+        "start_char": 0,
+        "end_char": 91,
+        "quote": "Unlisted Battery Venture announced a storage roadmap without naming any customer or ticker.",
+        "locator": "body"
+      }
+    },
+    "entity_resolutions": {
+      "fact-reg-ex1-only-unresolved:Unlisted Battery Venture": {
+        "mention_text": "Unlisted Battery Venture",
+        "canonical_id": null,
+        "resolution_status": "unresolved",
+        "type_hint": "company"
+      },
+      "fact-reg-ex1-only-unresolved:customer": {
+        "mention_text": "customer",
+        "canonical_id": null,
+        "resolution_status": "unresolved",
+        "type_hint": "company"
+      }
+    },
+    "replay_version": "fixture-baseline.v1",
+    "metrics_summary": {
+      "evidence_coverage": 1.0,
+      "dedupe_precision": 1.0,
+      "unresolved_explicitness": 1.0,
+      "ex2_contract_completeness": 1.0,
+      "ex3_false_positive_rate": 0.0
+    }
+  }
+}
