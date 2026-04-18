@@ -1,0 +1,50 @@
+[
+  {
+    "article_id": "fixture-conflict-01-a",
+    "source_id": "fixture-wire-a",
+    "source_reference": {"source_id": "fixture-wire-a", "url": "https://wire-a.example.com/news/conflict-a", "provider_key": "conflict-shared-key", "original_locator": {"locator_type": "fixture", "locator_value": "conflict-a"}},
+    "title": "Orion Motors signs battery supply deal",
+    "body_text": "Orion Motors said it signed a battery supply deal with VoltWorks for electric delivery vans. Executives said shipments begin in June and the deal supports the existing production plan.",
+    "published_at": "2026-04-01T09:00:00Z",
+    "fetched_at": "2026-04-01T09:04:00Z",
+    "language": "en",
+    "author_or_channel": "Fixture Desk",
+    "content_hash": "sha256:conflict01a",
+    "article_fingerprint": "sha256:conflict01a-fp",
+    "license_tag": "fixture-license",
+    "reliability_tier": "A",
+    "cluster_id": null
+  },
+  {
+    "article_id": "fixture-conflict-01-b",
+    "source_id": "fixture-wire-b",
+    "source_reference": {"source_id": "fixture-wire-b", "url": "https://wire-b.example.com/news/conflict-b", "provider_key": "conflict-shared-key", "original_locator": {"locator_type": "fixture", "locator_value": "conflict-b"}},
+    "title": "Orion Motors denies battery supply deal",
+    "body_text": "Orion Motors said no battery supply deal with VoltWorks has been signed for electric delivery vans. Executives said talks continue and the production plan remains under review.",
+    "published_at": "2026-04-04T09:00:00Z",
+    "fetched_at": "2026-04-04T09:04:00Z",
+    "language": "en",
+    "author_or_channel": "Fixture Wire",
+    "content_hash": "sha256:conflict01b",
+    "article_fingerprint": "sha256:conflict01b-fp",
+    "license_tag": "fixture-license",
+    "reliability_tier": "B",
+    "cluster_id": null
+  },
+  {
+    "article_id": "fixture-conflict-01-c",
+    "source_id": "fixture-wire-c",
+    "source_reference": {"source_id": "fixture-wire-c", "url": "https://wire-c.example.com/news/conflict-c", "provider_key": "conflict-third-key", "original_locator": {"locator_type": "fixture", "locator_value": "conflict-c"}},
+    "title": "Orion reviews electric van battery suppliers",
+    "body_text": "Orion Motors is reviewing battery suppliers for electric delivery vans after procurement teams requested fresh bids. Executives said production timing will be updated later.",
+    "published_at": "2026-04-04T11:00:00Z",
+    "fetched_at": "2026-04-04T11:04:00Z",
+    "language": "en",
+    "author_or_channel": "Fixture Wire",
+    "content_hash": "sha256:conflict01c",
+    "article_fingerprint": "sha256:conflict01c-fp",
+    "license_tag": "fixture-license",
+    "reliability_tier": "C",
+    "cluster_id": null
+  }
+]
