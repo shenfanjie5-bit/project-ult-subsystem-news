@@ -13,7 +13,7 @@ from subsystem_news.dedupe.cluster import (
 )
 from subsystem_news.dedupe.store import DedupeStore
 
-from .helpers import load_pair_fixture, make_artifact
+from .helpers import load_group_fixture, load_pair_fixture, make_artifact
 
 
 def test_exact_match_merges_on_content_hash(tmp_path: Path) -> None:
@@ -42,9 +42,8 @@ def test_cluster_candidates_returns_exact_match_before_weak_match(tmp_path: Path
     first = make_artifact(article_id="exact-provider-a", provider_key="shared-provider-key")
     second = make_artifact(
         article_id="exact-provider-b",
-        source_id="source-b",
         provider_key="shared-provider-key",
-        url="https://source-b.example.com/exact-provider-b",
+        url="https://source-a.example.com/exact-provider-b",
         content_hash="sha256:provider-b",
         article_fingerprint="sha256:provider-b-fp",
     )
@@ -56,6 +55,21 @@ def test_cluster_candidates_returns_exact_match_before_weak_match(tmp_path: Path
     assert matches[0].cluster == cluster
     assert matches[0].reason == "exact"
     assert matches[0].score == 1.0
+
+
+def test_provider_key_collision_across_sources_does_not_exact_merge(tmp_path: Path) -> None:
+    store = DedupeStore(tmp_path)
+    first, second, *_ = load_group_fixture("conflict_group.json")
+    first_cluster = merge_into_cluster(first, store)
+
+    assert exact_match(second, store) is None
+    assert cluster_candidates(second, store) == []
+
+    second_cluster = merge_into_cluster(second, store)
+
+    assert second_cluster.cluster_id != first_cluster.cluster_id
+    assert store.cluster_for_article(first.article_id) == first_cluster
+    assert store.cluster_for_article(second.article_id) == second_cluster
 
 
 def test_exact_match_uses_normalized_url(tmp_path: Path) -> None:
