@@ -2,9 +2,11 @@
 
 from __future__ import annotations
 
+import re
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from email.utils import parsedate_to_datetime
+from html import escape
 from typing import Mapping
 from xml.etree import ElementTree
 
@@ -31,6 +33,9 @@ class _FeedEntry:
     author_or_channel: str | None
 
 
+_HTML_TAG_PATTERN = re.compile(r"</?[A-Za-z][A-Za-z0-9:-]*(?:\s[^<>]*)?/?>")
+
+
 def _text(element: ElementTree.Element | None) -> str | None:
     if element is None or element.text is None:
         return None
@@ -51,6 +56,62 @@ def _child(element: ElementTree.Element, local_name: str) -> ElementTree.Element
 
 def _child_text(element: ElementTree.Element, local_name: str) -> str | None:
     return _text(_child(element, local_name))
+
+
+def _classify_content(content: str | None) -> tuple[str | None, str | None]:
+    if content is None:
+        return None, None
+    if _HTML_TAG_PATTERN.search(content):
+        return None, content
+    return content, None
+
+
+def _serialize_markup(element: ElementTree.Element) -> str:
+    tag = _local_name(element.tag)
+    attrs = "".join(
+        f' {_local_name(name)}="{escape(value, quote=True)}"'
+        for name, value in element.attrib.items()
+    )
+    parts = [f"<{tag}{attrs}>"]
+    if element.text is not None:
+        parts.append(escape(element.text))
+    for child in element:
+        parts.append(_serialize_markup(child))
+        if child.tail is not None:
+            parts.append(escape(child.tail))
+    parts.append(f"</{tag}>")
+    return "".join(parts)
+
+
+def _inner_markup(element: ElementTree.Element) -> str | None:
+    parts: list[str] = []
+    if element.text is not None:
+        parts.append(escape(element.text))
+    for child in element:
+        parts.append(_serialize_markup(child))
+        if child.tail is not None:
+            parts.append(escape(child.tail))
+    markup = "".join(parts).strip()
+    return markup or None
+
+
+def _content_fields(element: ElementTree.Element | None) -> tuple[str | None, str | None]:
+    if element is None:
+        return None, None
+    if len(element) > 0:
+        return None, _inner_markup(element)
+    return _classify_content(_text(element))
+
+
+def _first_content_fields(
+    element: ElementTree.Element,
+    local_names: tuple[str, ...],
+) -> tuple[str | None, str | None]:
+    for local_name in local_names:
+        raw_body, raw_html = _content_fields(_child(element, local_name))
+        if raw_body is not None or raw_html is not None:
+            return raw_body, raw_html
+    return None, None
 
 
 def _parse_datetime(value: str | None) -> datetime | None:
@@ -138,7 +199,7 @@ def _rss_entries(root: ElementTree.Element, source: NewsSourceConfig) -> list[_F
         guid = _child_text(item, "guid")
         pub_date = _child_text(item, "pubDate") or _child_text(item, "published")
         description = _child_text(item, "description")
-        content = _child_text(item, "encoded") or _child_text(item, "content")
+        raw_body, raw_html = _first_content_fields(item, ("encoded", "content"))
         author = _child_text(item, "author") or _child_text(item, "creator") or channel_title
         provider_key = guid or link
         if provider_key is None and link is None:
@@ -166,8 +227,8 @@ def _rss_entries(root: ElementTree.Element, source: NewsSourceConfig) -> list[_F
                     cursor=guid or link,
                 ),
                 raw_title=title,
-                raw_body=content,
-                raw_html=content if content and "<" in content else None,
+                raw_body=raw_body,
+                raw_html=raw_html,
                 summary=description,
                 published_at_raw=pub_date,
                 author_or_channel=author,
@@ -187,7 +248,7 @@ def _atom_entries(root: ElementTree.Element, source: NewsSourceConfig) -> list[_
         entry_id = _child_text(entry, "id")
         published = _child_text(entry, "published") or _child_text(entry, "updated")
         summary = _child_text(entry, "summary")
-        content = _child_text(entry, "content")
+        raw_body, raw_html = _content_fields(_child(entry, "content"))
         author_element = _child(entry, "author")
         author = _child_text(author_element if author_element is not None else entry, "name") or feed_title
         provider_key = entry_id or link
@@ -216,8 +277,8 @@ def _atom_entries(root: ElementTree.Element, source: NewsSourceConfig) -> list[_
                     cursor=entry_id or link,
                 ),
                 raw_title=title,
-                raw_body=content,
-                raw_html=content if content and "<" in content else None,
+                raw_body=raw_body,
+                raw_html=raw_html,
                 summary=summary,
                 published_at_raw=published,
                 author_or_channel=author,
