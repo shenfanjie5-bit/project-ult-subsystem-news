@@ -1,0 +1,39 @@
+{
+  "candidate_id": "golden-ex2-sector-negative",
+  "article_id": "golden-article-sector-negative",
+  "cluster_id": "golden-cluster-sector-negative",
+  "source_reference": {
+    "source_id": "golden-wire",
+    "url": "https://golden.example.com/sector-negative",
+    "provider_key": "sector-negative",
+    "original_locator": {
+      "locator_type": "fixture",
+      "locator_value": "sector-negative"
+    }
+  },
+  "signal_type": "sector_rotation",
+  "direction": "negative",
+  "magnitude": 0.74,
+  "affected_entities": [
+    {
+      "mention_text": "Solar suppliers",
+      "canonical_id": null,
+      "resolution_status": "unresolved",
+      "type_hint": "sector"
+    }
+  ],
+  "impact_scope": "sector",
+  "time_horizon": "medium",
+  "rationale": "The article describes a regulatory delay affecting solar suppliers.",
+  "confidence": 0.82,
+  "evidence_spans": [
+    {
+      "article_id": "golden-article-sector-negative",
+      "start_char": 10,
+      "end_char": 75,
+      "quote": "Regulators delayed approvals for solar supplier expansion plans.",
+      "locator": "body"
+    }
+  ],
+  "export_contract": "Ex-2"
+}
