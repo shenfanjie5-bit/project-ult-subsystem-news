@@ -6,7 +6,13 @@ import pytest
 from pydantic import ValidationError
 
 from subsystem_news.contracts import NewsSourceConfig, SourceReference
-from subsystem_news.sources.base import NewsArticleRef, RawArticleFetch, raw_content_hash, trace_id_for
+from subsystem_news.sources.base import (
+    NewsArticleRef,
+    RawArticleFetch,
+    raw_content_hash,
+    same_article_ref,
+    trace_id_for,
+)
 
 
 def source_config(source_id: str = "global-wire-rss") -> NewsSourceConfig:
@@ -100,6 +106,48 @@ def test_article_ref_rejects_malformed_source_reference() -> None:
                 "source_reference": {},
             }
         )
+
+
+def test_same_article_ref_covers_exact_provider_key_url_and_mismatch() -> None:
+    left = article_ref()
+    exact = article_ref()
+    provider_match = NewsArticleRef(
+        source_id=left.source_id,
+        source_reference=SourceReference.model_validate(
+            {
+                "source_id": left.source_id,
+                "url": "https://news.example.com/articles/other",
+                "provider_key": left.provider_key,
+                "original_locator": {
+                    "locator_type": "rss_guid",
+                    "locator_value": left.provider_key,
+                },
+            }
+        ),
+    )
+    url_match = NewsArticleRef(
+        source_id=left.source_id,
+        source_reference=SourceReference.model_validate(
+            {
+                "source_id": left.source_id,
+                "url": left.url,
+                "provider_key": "wire-other",
+                "original_locator": {
+                    "locator_type": "rss_guid",
+                    "locator_value": "wire-other",
+                },
+            }
+        ),
+    )
+    source_collision = NewsArticleRef(
+        source_id="other-source",
+        source_reference=source_reference("other-source"),
+    )
+
+    assert same_article_ref(left, exact) is True
+    assert same_article_ref(left, provider_match) is True
+    assert same_article_ref(left, url_match) is True
+    assert same_article_ref(left, source_collision) is False
 
 
 @pytest.mark.parametrize(

@@ -4,6 +4,8 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any
 
+from pydantic import BaseModel, ConfigDict
+
 from subsystem_news.contracts.candidates import NewsFactCandidate
 from subsystem_news.entities.resolution import EntityResolutionResult
 from subsystem_news.extract.runtime_client import StructuredGenerationRequest
@@ -18,7 +20,15 @@ Extract only Ex-1 news facts supported by exact spans in the representative arti
 Use the provided entity resolution trace; do not invent canonical entities.
 Return draft NewsFactCandidate objects under facts. Each draft must include
 candidate_id, fact_type, summary, involved_entities, event_time, evidence_spans,
-and confidence. Evidence quotes must exactly match title/body slices."""
+	and confidence. Evidence quotes must exactly match title/body slices."""
+
+
+class FactExtractionResponse(BaseModel):
+    """Structured Ex-1 runtime response wrapper."""
+
+    model_config = ConfigDict(frozen=True, extra="forbid")
+
+    facts: list[NewsFactCandidate]
 
 
 def build_fact_extraction_request(
@@ -33,7 +43,7 @@ def build_fact_extraction_request(
         schema_version=schema_pin.schema_version,
         contract=schema_pin.contract,
         model_output_version=schema_pin.model_output_version,
-        response_schema=NewsFactCandidate.model_json_schema(),
+        response_schema=FactExtractionResponse.model_json_schema(),
         prompt=_FACT_EXTRACTION_PROMPT,
         input_payload={
             "schema_pin": schema_pin.model_dump(mode="json"),

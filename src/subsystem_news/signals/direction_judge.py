@@ -75,6 +75,7 @@ def _build_signal_judgement_request(
     *,
     schema_pin: SchemaPin,
 ) -> StructuredGenerationRequest:
+    _require_signal_schema_pin(schema_pin)
     return StructuredGenerationRequest(
         schema_name=schema_pin.schema_name,
         schema_version=schema_pin.schema_version,
@@ -118,6 +119,15 @@ def _build_signal_judgement_request(
             ],
         },
     )
+
+
+def _require_signal_schema_pin(schema_pin: SchemaPin) -> None:
+    for field_name in ("contract", "schema_name", "schema_version", "model_output_version"):
+        if getattr(schema_pin, field_name) != getattr(SIGNAL_SCHEMA_PIN, field_name):
+            raise ContractViolationError(
+                "Ex-2 signal judgement requires SIGNAL_SCHEMA_PIN; "
+                f"{field_name}={getattr(schema_pin, field_name)!r}"
+            )
 
 
 def _judgement_draft(response: Mapping[str, object]) -> Mapping[str, object]:

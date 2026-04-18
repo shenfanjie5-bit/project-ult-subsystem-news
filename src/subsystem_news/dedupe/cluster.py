@@ -5,7 +5,6 @@ from __future__ import annotations
 import hashlib
 from collections.abc import Sequence
 from typing import Literal
-from urllib.parse import urlsplit, urlunsplit
 
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -17,6 +16,11 @@ from subsystem_news.dedupe.conflict import (
     write_conflict_trace,
 )
 from subsystem_news.dedupe.fingerprint import article_fingerprint as dedupe_article_fingerprint
+from subsystem_news.dedupe.identity import (
+    has_exact_key_match,
+    normalized_article_url,
+    select_representative_member,
+)
 from subsystem_news.dedupe.similarity import article_similarity
 from subsystem_news.dedupe.store import DedupeStore
 from subsystem_news.errors import ContractViolationError
@@ -101,18 +105,7 @@ def select_representative(
 ) -> NewsArticleArtifact:
     """Select a deterministic cluster representative."""
 
-    if not members:
-        raise ContractViolationError("dedupe cluster requires at least one member")
-    reliability_rank = {"A": 0, "B": 1, "C": 2}
-    return sorted(
-        members,
-        key=lambda artifact: (
-            reliability_rank[artifact.reliability_tier],
-            artifact.published_at,
-            -len(artifact.body_text),
-            artifact.article_id,
-        ),
-    )[0]
+    return select_representative_member(members)
 
 
 def build_cluster(
@@ -149,15 +142,35 @@ def merge_into_cluster(
     """Merge an artifact into a dedupe cluster or create a new one."""
 
     with store.locked_merge():
-        return _merge_into_cluster_locked(artifact, store, threshold=threshold)
+        return _merge_into_cluster_decision_locked(
+            artifact,
+            store,
+            threshold=threshold,
+        ).cluster
 
 
-def _merge_into_cluster_locked(
+def merge_into_cluster_with_decision(
+    artifact: NewsArticleArtifact,
+    store: DedupeStore,
+    *,
+    threshold: float = 0.82,
+) -> DedupeDecision:
+    """Merge an artifact and return the runtime-facing dedupe decision trace."""
+
+    with store.locked_merge():
+        return _merge_into_cluster_decision_locked(
+            artifact,
+            store,
+            threshold=threshold,
+        )
+
+
+def _merge_into_cluster_decision_locked(
     artifact: NewsArticleArtifact,
     store: DedupeStore,
     *,
     threshold: float,
-) -> NewsDedupeCluster:
+) -> DedupeDecision:
     matches = cluster_candidates(artifact, store, threshold=threshold)
     match = matches[0] if matches else None
     if match is None:
@@ -174,7 +187,12 @@ def _merge_into_cluster_locked(
         ]
         members = _unique_members([*existing_members, artifact])
         if {member.article_id for member in members} == set(match.cluster.member_article_ids):
-            return match.cluster
+            return DedupeDecision(
+                cluster=match.cluster,
+                created=False,
+                match=match,
+                conflicts=[],
+            )
         confidence = 1.0 if match.reason == "exact" else min(
             match.cluster.cluster_confidence,
             match.score,
@@ -198,7 +216,12 @@ def _merge_into_cluster_locked(
     for member in members:
         store.save_article_snapshot(member.model_copy(update={"cluster_id": cluster.cluster_id}))
     write_conflict_trace(cluster, conflicts, store.trace_dir)
-    return cluster
+    return DedupeDecision(
+        cluster=cluster,
+        created=match is None,
+        match=match,
+        conflicts=conflicts,
+    )
 
 
 def _exact_cluster_match(
@@ -214,9 +237,9 @@ def _exact_cluster_match(
             matched_article_ids=[artifact.article_id],
         )
 
-    artifact_url = _normalized_url(artifact)
+    artifact_url = normalized_article_url(artifact)
     for snapshot in store.iter_article_snapshots():
-        if _has_exact_key_match(artifact, snapshot, artifact_url):
+        if has_exact_key_match(artifact, snapshot, left_url=artifact_url):
             cluster = store.cluster_for_article(snapshot.article_id)
             if cluster is not None:
                 return ClusterMatch(
@@ -226,44 +249,6 @@ def _exact_cluster_match(
                     matched_article_ids=[snapshot.article_id],
                 )
     return None
-
-
-def _has_exact_key_match(
-    artifact: NewsArticleArtifact,
-    snapshot: NewsArticleArtifact,
-    artifact_url: str | None,
-) -> bool:
-    artifact_provider_key = artifact.source_reference.provider_key
-    snapshot_provider_key = snapshot.source_reference.provider_key
-    if (
-        artifact_provider_key is not None
-        and snapshot_provider_key is not None
-        and artifact_provider_key == snapshot_provider_key
-        and artifact.source_reference.source_id == snapshot.source_reference.source_id
-    ):
-        return True
-    snapshot_url = _normalized_url(snapshot)
-    if artifact_url is not None and snapshot_url is not None and artifact_url == snapshot_url:
-        return True
-    if artifact.content_hash == snapshot.content_hash:
-        return True
-    return artifact.article_fingerprint == snapshot.article_fingerprint
-
-
-def _normalized_url(artifact: NewsArticleArtifact) -> str | None:
-    if artifact.source_reference.url is None:
-        return None
-    parsed = urlsplit(str(artifact.source_reference.url))
-    path = parsed.path.rstrip("/") or "/"
-    return urlunsplit(
-        (
-            parsed.scheme.lower(),
-            parsed.netloc.lower(),
-            path,
-            parsed.query,
-            "",
-        )
-    )
 
 
 def _unique_members(

@@ -34,6 +34,12 @@ def test_regression_manifest_declares_required_categories_and_scale() -> None:
         for case in suite.cases
         for output in case.expected_outputs
     )
+    assert all(
+        output.relation_type is not None and output.delta_action is not None
+        for case in suite.cases
+        for output in case.expected_outputs
+        if output.export_contract == "Ex-3"
+    )
 
 
 def test_fixture_validator_rejects_evidence_quote_mismatch() -> None:

@@ -16,7 +16,7 @@ from subsystem_news.contracts import NewsSourceConfig
 from subsystem_news.contracts.article import NewsArticleArtifact
 from subsystem_news.contracts.cluster import NewsDedupeCluster
 from subsystem_news.contracts.source_reference import SourceReference
-from subsystem_news.dedupe.cluster import merge_into_cluster
+from subsystem_news.dedupe.cluster import DedupeDecision, merge_into_cluster_with_decision
 from subsystem_news.dedupe.store import DedupeStore
 from subsystem_news.entities.mention import Mention, detect_mentions
 from subsystem_news.entities.resolution import EntityResolutionResult, resolve_detected_mentions
@@ -387,11 +387,12 @@ def _replay_article_context(
     artifact = _renormalize_artifact(context.artifact)
 
     stage_order.append("dedupe")
-    cluster = merge_into_cluster(
+    dedupe_decision = merge_into_cluster_with_decision(
         artifact,
         dedupe_store,
         threshold=dedupe_threshold,
     )
+    cluster = dedupe_decision.cluster
     clustered_artifact = dedupe_store.load_article_snapshot(artifact.article_id)
     representative = dedupe_store.load_article_snapshot(cluster.representative_article_id)
 
@@ -439,13 +440,10 @@ def _replay_article_context(
         signals=signals,
         graph_deltas=graph_deltas,
         schema_pins=schema_pins,
-        dedupe_metadata={
-            "threshold": dedupe_threshold,
-            "cluster_id": cluster.cluster_id,
-            "representative_article_id": cluster.representative_article_id,
-            "member_count": len(cluster.member_article_ids),
-            "cluster_confidence": cluster.cluster_confidence,
-        },
+        dedupe_metadata=_dedupe_metadata(
+            dedupe_decision,
+            threshold=dedupe_threshold,
+        ),
         entity_metadata={
             "mention_count": len(entity_resolution.mentions),
             "resolved_count": sum(
@@ -580,8 +578,19 @@ def _schema_pins_for_replay(pins: Mapping[str, SchemaPin]) -> dict[str, SchemaPi
 
 
 def _require_schema_pin(contract: Literal["Ex-1", "Ex-2", "Ex-3"], pin: SchemaPin) -> None:
+    expected = {
+        "Ex-1": FACT_SCHEMA_PIN,
+        "Ex-2": SIGNAL_SCHEMA_PIN,
+        "Ex-3": GRAPH_SCHEMA_PIN,
+    }[contract]
     if pin.contract != contract:
         raise ContractViolationError(f"{contract} replay schema pin has contract {pin.contract}")
+    for field_name in ("schema_name", "schema_version", "model_output_version"):
+        if getattr(pin, field_name) != getattr(expected, field_name):
+            raise ContractViolationError(
+                f"{contract} replay schema pin has unsupported {field_name}: "
+                f"{getattr(pin, field_name)}"
+            )
 
 
 def _summary_for_context(context: PipelineArticleContext) -> ReplayArticleSummary:
@@ -658,8 +667,10 @@ def _metadata_for_replayed_contexts(
     evidence_spans: dict[str, Any] = {}
     entity_resolutions: dict[str, Any] = {}
     schema_pins: dict[str, Any] = {}
+    dedupe_decisions: dict[str, Any] = {}
 
     for context in contexts:
+        dedupe_decisions[context.article_id] = context.dedupe_metadata
         for candidate in _context_candidates(context):
             candidates.append(candidate.model_dump(mode="json"))
             for index, span in enumerate(candidate.evidence_spans):
@@ -678,6 +689,7 @@ def _metadata_for_replayed_contexts(
         "evidence_spans": evidence_spans,
         "entity_resolutions": entity_resolutions,
         "schema_pins": schema_pins,
+        "dedupe_decisions": dedupe_decisions,
     }
 
 
@@ -806,6 +818,29 @@ def _single_artifact_placeholder_cluster(
         fingerprint_family=artifact.article_fingerprint,
         cluster_confidence=1.0,
     )
+
+
+def _dedupe_metadata(
+    decision: DedupeDecision,
+    *,
+    threshold: float,
+) -> dict[str, object]:
+    cluster = decision.cluster
+    return {
+        "threshold": threshold,
+        "cluster_id": cluster.cluster_id,
+        "representative_article_id": cluster.representative_article_id,
+        "member_count": len(cluster.member_article_ids),
+        "cluster_confidence": cluster.cluster_confidence,
+        "created": decision.created,
+        "match_reason": None if decision.match is None else decision.match.reason,
+        "match_confidence": None if decision.match is None else decision.match.score,
+        "matched_article_ids": []
+        if decision.match is None
+        else list(decision.match.matched_article_ids),
+        "conflict_count": len(decision.conflicts),
+        "conflicts": [conflict.model_dump(mode="json") for conflict in decision.conflicts],
+    }
 
 
 def _replay_id(started_at: datetime, input_path: Path) -> str:

@@ -7,6 +7,7 @@ from subsystem_news.dedupe.cluster import (
     cluster_candidates,
     exact_match,
     merge_into_cluster,
+    merge_into_cluster_with_decision,
     select_representative,
 )
 from subsystem_news.dedupe.conflict import (
@@ -41,6 +42,7 @@ __all__ = [
     "exact_match",
     "jaccard_similarity",
     "merge_into_cluster",
+    "merge_into_cluster_with_decision",
     "normalized_terms",
     "select_representative",
     "shingle_set",

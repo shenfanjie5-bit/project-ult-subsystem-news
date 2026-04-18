@@ -3044,20 +3044,22 @@
             "contract": "Ex-3",
             "model_output_version": "news_graph_delta_candidate.output.v1"
           },
-          "subject_entity": {
-            "mention_text": "Atlas Shipping",
-            "canonical_id": "entity:atlas-shipping",
-            "resolution_status": "resolved",
-            "type_hint": "company"
-          },
-          "object_entity": {
-            "mention_text": "State Treasury",
-            "canonical_id": "entity:state-treasury",
-            "resolution_status": "resolved",
-            "type_hint": "regulator"
-          },
-          "requires_manual_review": true
-        }
+      "subject_entity": {
+        "mention_text": "Atlas Shipping",
+        "canonical_id": "entity:atlas-shipping",
+        "resolution_status": "resolved",
+        "type_hint": "company"
+      },
+      "relation_type": "sanctioned_by",
+      "object_entity": {
+        "mention_text": "State Treasury",
+        "canonical_id": "entity:state-treasury",
+        "resolution_status": "resolved",
+        "type_hint": "regulator"
+      },
+      "delta_action": "add",
+      "requires_manual_review": true
+    }
       ],
       "source_reference": {
         "source_id": "regression-graph",

@@ -64,4 +64,24 @@ def test_all_unresolved_ex1_only_boundary_does_not_promote() -> None:
 
     assert decision.promote is False
     assert decision.signal_type is None
-    assert "unresolved" in decision.reason
+    assert "canonical_id" in decision.reason
+
+
+def test_all_ambiguous_entities_do_not_promote_to_ex2() -> None:
+    ambiguous = {
+        "mention_text": "Mercury Energy",
+        "canonical_id": None,
+        "resolution_status": "ambiguous",
+        "type_hint": "company",
+    }
+    fact = clone_fact(
+        load_fact("positive_operating_event.json"),
+        involved_entities=[ambiguous],
+        confidence=0.9,
+    )
+
+    decision = should_promote_fact(fact)
+
+    assert decision.promote is False
+    assert decision.signal_type is None
+    assert "canonical_id" in decision.reason

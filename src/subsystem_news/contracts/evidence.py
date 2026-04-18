@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import Literal
 
-from pydantic import BaseModel, ConfigDict, model_validator
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 
 class EvidenceSpan(BaseModel):
@@ -13,8 +13,8 @@ class EvidenceSpan(BaseModel):
     model_config = ConfigDict(frozen=True, extra="forbid")
 
     article_id: str
-    start_char: int
-    end_char: int
+    start_char: int = Field(ge=0)
+    end_char: int = Field(ge=0)
     quote: str
     locator: Literal["title", "body"]
 

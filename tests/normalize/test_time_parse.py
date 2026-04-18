@@ -2,6 +2,9 @@ from __future__ import annotations
 
 from datetime import datetime, timedelta, timezone
 
+import pytest
+
+from subsystem_news.errors import ContractViolationError
 from subsystem_news.normalize.time_parse import parse_published_at
 
 
@@ -33,3 +36,8 @@ def test_parse_published_at_adds_default_timezone_to_naive_datetime() -> None:
 def test_parse_published_at_uses_fetched_at_for_missing_values() -> None:
     assert parse_published_at(None, fetched_at=FETCHED_AT) == FETCHED_AT
     assert parse_published_at("  ", fetched_at=FETCHED_AT) == FETCHED_AT
+
+
+def test_parse_published_at_rejects_malformed_timestamp_with_contract_error() -> None:
+    with pytest.raises(ContractViolationError, match="invalid source timestamp"):
+        parse_published_at("not-a-timestamp", fetched_at=FETCHED_AT)

@@ -12,6 +12,7 @@ from subsystem_news.contracts.article import NewsArticleArtifact
 from subsystem_news.contracts.candidates import InvolvedEntity
 from subsystem_news.contracts.evidence import EvidenceSpan
 from subsystem_news.contracts.source_reference import SourceReference
+from subsystem_news.contracts.taxonomy import DeltaAction, RelationType
 from subsystem_news.extract.schema_pin import SchemaPin
 from subsystem_news.runtime.replay import ReplayDiff
 
@@ -54,6 +55,8 @@ class ExpectedCandidateSummary(BaseModel):
     affected_entities: list[InvolvedEntity] = Field(default_factory=list)
     subject_entity: InvolvedEntity | None = None
     object_entity: InvolvedEntity | None = None
+    relation_type: RelationType | None = None
+    delta_action: DeltaAction | None = None
     direction: str | None = None
     magnitude: str | float | None = None
     requires_manual_review: bool | None = None
@@ -74,6 +77,10 @@ class ExpectedCandidateSummary(BaseModel):
         if self.export_contract == "Ex-3":
             if self.subject_entity is None or self.object_entity is None:
                 raise ValueError("Ex-3 expected output requires subject and object entities")
+            if self.relation_type is None:
+                raise ValueError("Ex-3 expected output requires relation_type")
+            if self.delta_action is None:
+                raise ValueError("Ex-3 expected output requires delta_action")
             if self.requires_manual_review is not True:
                 raise ValueError("Ex-3 expected output requires manual review")
         return self

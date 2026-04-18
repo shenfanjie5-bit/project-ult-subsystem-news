@@ -39,10 +39,16 @@ def main(argv: Sequence[str] | None = None) -> int:
     parser.add_argument("--positive", required=True, type=Path)
     parser.add_argument("--negative", required=True, type=Path)
     parser.add_argument("--max-fp-rate", type=float, default=0.01)
+    parser.add_argument("--min-negative-cases", type=int, default=30)
     args = parser.parse_args(argv)
 
     positives = _load_cases(args.positive)
     negatives = _load_cases(args.negative)
+    _validate_fixture_coverage(
+        positives,
+        negatives,
+        min_negative_cases=args.min_negative_cases,
+    )
     positive_results = [_run_case(case) for case in positives]
     negative_results = [_run_case(case) for case in negatives]
 
@@ -80,6 +86,11 @@ def main(argv: Sequence[str] | None = None) -> int:
 
 
 def _load_cases(root: Path) -> list[Mapping[str, object]]:
+    if not root.exists():
+        raise FileNotFoundError(f"fixture directory does not exist: {root}")
+    if not root.is_dir():
+        raise NotADirectoryError(f"fixture path must be a directory: {root}")
+
     cases: list[Mapping[str, object]] = []
     for path in sorted(root.glob("*.json")):
         payload = json.loads(path.read_text(encoding="utf-8"))
@@ -97,6 +108,23 @@ def _load_cases(root: Path) -> list[Mapping[str, object]]:
                 raise ValueError(f"fixture case must be an object: {path}")
             cases.append(raw_case)
     return cases
+
+
+def _validate_fixture_coverage(
+    positives: Sequence[Mapping[str, object]],
+    negatives: Sequence[Mapping[str, object]],
+    *,
+    min_negative_cases: int,
+) -> None:
+    if not positives:
+        raise ValueError("graph_positive fixture set must contain at least one case")
+    if not negatives:
+        raise ValueError("graph_negative fixture set must contain at least one case")
+    if len(negatives) < min_negative_cases:
+        raise ValueError(
+            "graph_negative fixture set must contain at least "
+            f"{min_negative_cases} reviewed cases"
+        )
 
 
 def _run_case(case: Mapping[str, object]) -> dict[str, object]:

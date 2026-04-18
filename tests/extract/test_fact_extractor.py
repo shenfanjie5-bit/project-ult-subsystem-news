@@ -9,13 +9,13 @@ from typing import Any
 import pytest
 
 from subsystem_news.contracts.article import NewsArticleArtifact
-from subsystem_news.contracts.candidates import NewsFactCandidate
 from subsystem_news.contracts.cluster import NewsDedupeCluster
 from subsystem_news.entities.resolution import EntityResolutionResult
 from subsystem_news.errors import ContractViolationError, EvidenceMissingError
 from subsystem_news.extract import (
     FACT_SCHEMA_PIN,
     FactExtractionInput,
+    FactExtractionResponse,
     ReasonerRuntimeClient,
     SchemaPin,
     StructuredGenerationRequest,
@@ -80,7 +80,9 @@ def test_build_request_includes_schema_pin_contract_schema_source_and_entity_spa
     assert request.schema_name == FACT_SCHEMA_PIN.schema_name
     assert request.schema_version == "news_fact_candidate.v1"
     assert request.contract == "Ex-1"
-    assert request.response_schema == NewsFactCandidate.model_json_schema()
+    assert request.response_schema == FactExtractionResponse.model_json_schema()
+    assert "facts" in request.response_schema["properties"]
+    assert "facts" in request.response_schema["required"]
     assert request.input_payload["source_reference"] == article.source_reference.model_dump(
         mode="json"
     )

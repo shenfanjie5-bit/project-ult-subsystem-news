@@ -8,6 +8,7 @@ from pathlib import Path
 
 import pytest
 
+from subsystem_news.contracts.article import NewsArticleArtifact
 from scripts.replay_diff import main
 from subsystem_news.contracts.source_reference import SourceReference
 from subsystem_news.entities.resolver_client import RegistryLookup, StubEntityRegistryClient
@@ -16,7 +17,11 @@ from subsystem_news.extract.runtime_client import StructuredGenerationRequest
 from subsystem_news.extract.schema_pin import FACT_SCHEMA_PIN
 from subsystem_news.fixtures.catalog import FixtureArticleInput, FixtureCase
 from subsystem_news.fixtures.loader import load_fixture_suite
-from subsystem_news.fixtures.runner import fixture_replay_runner, run_regression_suite
+from subsystem_news.fixtures.runner import (
+    fixture_replay_runner,
+    replay_fixture_case,
+    run_regression_suite,
+)
 from subsystem_news.graph import GRAPH_SCHEMA_PIN
 from subsystem_news.runtime.replay import (
     ReplayRequest,
@@ -206,6 +211,129 @@ def test_fixture_replay_runner_executes_runtime_path_from_fixture_inputs(
     } == {"Ex-1", "Ex-2"}
 
 
+def test_fixture_replay_uses_normalized_artifact_when_raw_input_missing(
+    tmp_path: Path,
+) -> None:
+    published_at = datetime(2026, 3, 1, tzinfo=timezone.utc)
+    fetched_at = datetime(2026, 3, 1, 0, 5, tzinfo=timezone.utc)
+    raw_reference = _source_reference("raw-acme-contract")
+    normalized_reference = _source_reference("normalized-acme-contract")
+    raw_input = FixtureArticleInput(
+        article_id="article-fixture-raw",
+        source_reference=raw_reference,
+        title="Raw Acme contract",
+        body_text="Acme Corp signed a supply contract with Beta Inc.",
+        published_at=published_at,
+        fetched_at=fetched_at,
+    )
+    normalized_artifact = NewsArticleArtifact(
+        article_id="article-fixture-normalized",
+        source_id=normalized_reference.source_id,
+        source_reference=normalized_reference,
+        title="Normalized Acme contract",
+        body_text="Acme Corp signed a supply contract with Beta Inc.",
+        published_at=published_at,
+        fetched_at=fetched_at,
+        language="en",
+        author_or_channel="Fixture",
+        content_hash="sha256:normalized-acme-contract",
+        article_fingerprint="sha256:normalized-acme-contract-fp",
+        license_tag="fixture",
+        reliability_tier="A",
+        cluster_id=None,
+    )
+    case = FixtureCase(
+        case_id="fixture-mixed-replay",
+        category="single_source",
+        article_ids=[raw_input.article_id, normalized_artifact.article_id],
+        expected_outputs=[],
+        source_reference=raw_reference,
+        version_pins={
+            "Ex-1": FACT_SCHEMA_PIN,
+            "Ex-2": SIGNAL_SCHEMA_PIN,
+            "Ex-3": GRAPH_SCHEMA_PIN,
+        },
+        baseline_path=str(tmp_path / "baseline.json"),
+        raw_inputs=[raw_input],
+        normalized_artifacts=[normalized_artifact],
+    )
+    runner = fixture_replay_runner(
+        entity_client=StubEntityRegistryClient(
+            alias_results={
+                "Acme Corp": RegistryLookup(
+                    canonical_id="entity:acme-corp",
+                    canonical_name="Acme Corp",
+                    entity_type="company",
+                    confidence=0.99,
+                ),
+                "Beta Inc": RegistryLookup(
+                    canonical_id="entity:beta-inc",
+                    canonical_name="Beta Inc",
+                    entity_type="company",
+                    confidence=0.99,
+                ),
+            }
+        ),
+        reasoner_client=_FixtureReplayReasoner(),
+    )
+
+    result = runner(
+        ReplayRequest(
+            case_id=case.case_id,
+            category=case.category,
+            article_ids=case.article_ids,
+            input_path=Path("fixture-mixed-replay/cases.json"),
+            baseline_path=tmp_path / "baseline.json",
+            metadata={"fixture_case": case.model_dump(mode="json")},
+        )
+    )
+
+    assert result.error_count == 0
+    assert result.metadata["article_count"] == 2
+    assert {article.article_id for article in result.article_results} == set(case.article_ids)
+
+
+def test_fixture_replay_rejects_schema_pin_contract_mismatch(tmp_path: Path) -> None:
+    published_at = datetime(2026, 3, 1, tzinfo=timezone.utc)
+    source_reference = _source_reference("schema-pin-mismatch")
+    raw_input = FixtureArticleInput(
+        article_id="article-schema-pin-mismatch",
+        source_reference=source_reference,
+        title="Acme contract",
+        body_text="Acme Corp signed a supply contract with Beta Inc.",
+        published_at=published_at,
+        fetched_at=published_at,
+    )
+    case = FixtureCase(
+        case_id="fixture-schema-pin-mismatch",
+        category="single_source",
+        article_ids=[raw_input.article_id],
+        expected_outputs=[],
+        source_reference=source_reference,
+        version_pins={
+            "Ex-1": FACT_SCHEMA_PIN,
+            "Ex-2": FACT_SCHEMA_PIN,
+            "Ex-3": GRAPH_SCHEMA_PIN,
+        },
+        baseline_path=str(tmp_path / "baseline.json"),
+        raw_inputs=[raw_input],
+    )
+
+    with pytest.raises(ContractViolationError, match="Ex-2 fixture schema pin"):
+        replay_fixture_case(
+            ReplayRequest(
+                case_id=case.case_id,
+                category=case.category,
+                article_ids=case.article_ids,
+                input_path=Path("fixture-schema-pin-mismatch/cases.json"),
+                baseline_path=tmp_path / "baseline.json",
+                metadata={"fixture_case": case.model_dump(mode="json")},
+            ),
+            entity_client=StubEntityRegistryClient(),
+            reasoner_client=_FixtureReplayReasoner(),
+        )
+
+
 def test_replay_diff_cli_fails_fast_without_replay_dependencies(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
@@ -356,6 +484,20 @@ class _FixtureReplayReasoner:
                 "confidence": 0.84,
             }
         }
+
+
+def _source_reference(provider_key: str) -> SourceReference:
+    return SourceReference.model_validate(
+        {
+            "source_id": "fixture-wire",
+            "url": f"https://fixtures.example.com/news/{provider_key}",
+            "provider_key": provider_key,
+            "original_locator": {
+                "locator_type": "fixture",
+                "locator_value": provider_key,
+            },
+        }
+    )
 
 
 def _entity_named(entities: list[object], mention_text: str) -> dict[str, object]:

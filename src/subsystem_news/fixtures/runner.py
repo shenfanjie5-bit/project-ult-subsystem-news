@@ -19,7 +19,7 @@ from subsystem_news.contracts.candidates import (
     NewsGraphDeltaCandidate,
     NewsSignalCandidate,
 )
-from subsystem_news.dedupe.cluster import merge_into_cluster
+from subsystem_news.dedupe.cluster import DedupeDecision, merge_into_cluster_with_decision
 from subsystem_news.dedupe.store import DedupeStore
 from subsystem_news.entities.mention import detect_mentions
 from subsystem_news.entities.resolution import (
@@ -36,7 +36,8 @@ from subsystem_news.extract.runtime_client import (
     DefaultReasonerRuntimeClient,
     ReasonerRuntimeClient,
 )
-from subsystem_news.graph import extract_graph_deltas
+from subsystem_news.extract.schema_pin import FACT_SCHEMA_PIN, SchemaPin
+from subsystem_news.graph import GRAPH_SCHEMA_PIN, extract_graph_deltas
 from subsystem_news.fixtures.catalog import (
     FixtureArticleInput,
     FixtureCase,
@@ -64,6 +65,7 @@ from subsystem_news.runtime.replay import (
     replay_article,
 )
 from subsystem_news.signals.aggregator import generate_signals
+from subsystem_news.signals.schema_pin import SIGNAL_SCHEMA_PIN
 from subsystem_news.sources.base import (
     NewsArticleRef,
     RawArticleFetch,
@@ -285,11 +287,12 @@ def replay_fixture_case(
             try:
                 last_stage = "dedupe"
                 stage_order.append("dedupe")
-                cluster = merge_into_cluster(
+                dedupe_decision = merge_into_cluster_with_decision(
                     artifact,
                     dedupe_store,
                     threshold=dedupe_threshold,
                 )
+                cluster = dedupe_decision.cluster
                 clustered_artifact = dedupe_store.load_article_snapshot(artifact.article_id)
                 representative = dedupe_store.load_article_snapshot(
                     cluster.representative_article_id
@@ -346,6 +349,10 @@ def replay_fixture_case(
                     signals=signals,
                     graph_deltas=graph_deltas,
                     schema_pins=schema_pins,
+                    dedupe_metadata=_dedupe_metadata(
+                        dedupe_decision,
+                        threshold=dedupe_threshold,
+                    ),
                 )
                 contexts.append(context)
                 article_results.append(_article_result_for_context(context))
@@ -399,6 +406,7 @@ class _FixtureReplayContext:
         signals: list[NewsSignalCandidate],
         graph_deltas: list[NewsGraphDeltaCandidate],
         schema_pins: dict[str, Any],
+        dedupe_metadata: dict[str, Any],
     ) -> None:
         self.article_id = article_id
         self.cluster_id = cluster_id
@@ -410,6 +418,7 @@ class _FixtureReplayContext:
         self.signals = signals
         self.graph_deltas = graph_deltas
         self.schema_pins = schema_pins
+        self.dedupe_metadata = dedupe_metadata
 
 
 def _case_metrics(
@@ -623,42 +632,65 @@ def _fixture_case_from_request(request: ReplayRequest) -> FixtureCase:
         raise ContractViolationError("fixture_case metadata violates FixtureCase") from exc
 
 
-def _schema_pins_for_case(case: FixtureCase) -> dict[str, Any]:
-    required = {"Ex-1", "Ex-2", "Ex-3"}
-    missing = required - set(case.version_pins)
+def _schema_pins_for_case(case: FixtureCase) -> dict[str, SchemaPin]:
+    required = {"Ex-1": FACT_SCHEMA_PIN, "Ex-2": SIGNAL_SCHEMA_PIN, "Ex-3": GRAPH_SCHEMA_PIN}
+    missing = set(required) - set(case.version_pins)
     if missing:
         raise ContractViolationError(
             "fixture replay requires schema pins for "
             + ", ".join(sorted(missing))
         )
-    return {contract: case.version_pins[contract] for contract in sorted(required)}
+    pins = {contract: case.version_pins[contract] for contract in sorted(required)}
+    for contract, expected in required.items():
+        _require_fixture_schema_pin(contract, pins[contract], expected)
+    return pins
+
+
+def _require_fixture_schema_pin(
+    contract: str,
+    pin: SchemaPin,
+    expected: SchemaPin,
+) -> None:
+    if pin.contract != contract:
+        raise ContractViolationError(
+            f"{contract} fixture schema pin has contract {pin.contract}"
+        )
+    for field_name in ("schema_name", "schema_version", "model_output_version"):
+        if getattr(pin, field_name) != getattr(expected, field_name):
+            raise ContractViolationError(
+                f"{contract} fixture schema pin has unsupported {field_name}: "
+                f"{getattr(pin, field_name)}"
+            )
 
 
 def _fixture_artifacts(
     case: FixtureCase,
 ) -> tuple[list[NewsArticleArtifact], bool]:
+    raw_inputs = {raw_input.article_id: raw_input for raw_input in case.raw_inputs}
     artifact_hints = {
         artifact.article_id: artifact for artifact in case.normalized_artifacts
     }
-    if case.raw_inputs:
-        return (
-            [
-                _artifact_from_raw_input(raw_input, artifact_hints.get(raw_input.article_id))
-                for raw_input in case.raw_inputs
-            ],
-            True,
+    artifacts: list[NewsArticleArtifact] = []
+    normalized_from_input = False
+    for article_id in case.article_ids:
+        raw_input = raw_inputs.get(article_id)
+        if raw_input is not None:
+            artifacts.append(_artifact_from_raw_input(raw_input, artifact_hints.get(article_id)))
+            normalized_from_input = True
+            continue
+
+        artifact = artifact_hints.get(article_id)
+        if artifact is not None:
+            artifacts.append(_artifact_from_normalized_artifact(artifact))
+            normalized_from_input = True
+            continue
+
+        raise ContractViolationError(
+            f"{case.case_id} fixture replay has no raw_input or normalized_artifact "
+            f"for article_id {article_id}"
         )
-    if case.normalized_artifacts:
-        return (
-            [
-                _artifact_from_normalized_artifact(artifact)
-                for artifact in case.normalized_artifacts
-            ],
-            True,
-        )
-    raise ContractViolationError(
-        f"{case.case_id} fixture replay requires raw_inputs or normalized_artifacts"
-    )
+
+    return artifacts, normalized_from_input
 
 
 def _artifact_from_raw_input(
@@ -817,8 +849,10 @@ def _metadata_for_fixture_contexts(
     evidence_spans: dict[str, Any] = {}
     entity_resolutions: dict[str, Any] = {}
     schema_pins: dict[str, Any] = {}
+    dedupe_decisions: dict[str, Any] = {}
 
     for context in contexts:
+        dedupe_decisions[context.article_id] = context.dedupe_metadata
         for candidate in _context_candidates(context):
             candidates.append(candidate.model_dump(mode="json"))
             for index, span in enumerate(candidate.evidence_spans):
@@ -837,6 +871,7 @@ def _metadata_for_fixture_contexts(
         "evidence_spans": evidence_spans,
         "entity_resolutions": entity_resolutions,
         "schema_pins": schema_pins,
+        "dedupe_decisions": dedupe_decisions,
     }
 
 
@@ -852,6 +887,29 @@ def _version_map(context: _FixtureReplayContext) -> dict[str, dict[str, Any]]:
     return {
         name: pin.model_dump(mode="json")
         for name, pin in sorted(context.schema_pins.items())
+    }
+
+
+def _dedupe_metadata(
+    decision: DedupeDecision,
+    *,
+    threshold: float,
+) -> dict[str, Any]:
+    cluster = decision.cluster
+    return {
+        "threshold": threshold,
+        "cluster_id": cluster.cluster_id,
+        "representative_article_id": cluster.representative_article_id,
+        "member_count": len(cluster.member_article_ids),
+        "cluster_confidence": cluster.cluster_confidence,
+        "created": decision.created,
+        "match_reason": None if decision.match is None else decision.match.reason,
+        "match_confidence": None if decision.match is None else decision.match.score,
+        "matched_article_ids": []
+        if decision.match is None
+        else list(decision.match.matched_article_ids),
+        "conflict_count": len(decision.conflicts),
+        "conflicts": [conflict.model_dump(mode="json") for conflict in decision.conflicts],
     }
 
 

@@ -5,7 +5,11 @@ from typing import Any
 
 import pytest
 
-from subsystem_news.dedupe.cluster import build_cluster, merge_into_cluster
+from subsystem_news.dedupe.cluster import (
+    build_cluster,
+    merge_into_cluster,
+    merge_into_cluster_with_decision,
+)
 from subsystem_news.dedupe.store import DedupeStore
 from subsystem_news.errors import ContractViolationError
 
@@ -163,6 +167,45 @@ def test_cluster_for_article_roundtrips_after_merge(tmp_path: Path) -> None:
 
     assert reloaded_store.cluster_for_article(artifact.article_id) == cluster
     assert reloaded_store.load_article_snapshot(artifact.article_id).cluster_id == cluster.cluster_id
+
+
+def test_cross_source_provider_key_collision_can_persist_as_weak_merge(
+    tmp_path: Path,
+) -> None:
+    store = DedupeStore(tmp_path)
+    first = make_artifact(
+        article_id="provider-collision-a",
+        source_id="source-a",
+        provider_key="shared-provider-key",
+        url="https://source-a.example.com/provider-collision",
+        title="Acme signs battery module contract",
+        body_text="Acme Corp signed a battery module supply contract with Globex Inc.",
+        content_hash="sha256:provider-collision-a",
+        article_fingerprint="sha256:provider-collision-a-fp",
+    )
+    second = make_artifact(
+        article_id="provider-collision-b",
+        source_id="source-b",
+        provider_key="shared-provider-key",
+        url="https://source-b.example.com/provider-collision",
+        title="Acme signs battery module contract",
+        body_text="Acme Corp signed a battery module supply agreement with Globex Inc.",
+        content_hash="sha256:provider-collision-b",
+        article_fingerprint="sha256:provider-collision-b-fp",
+    )
+
+    first_decision = merge_into_cluster_with_decision(first, store, threshold=0.6)
+    second_decision = merge_into_cluster_with_decision(second, store, threshold=0.6)
+
+    assert first_decision.created is True
+    assert second_decision.created is False
+    assert second_decision.match is not None
+    assert second_decision.match.reason == "weak"
+    assert second_decision.match.score < 1.0
+    assert second_decision.cluster.cluster_id == first_decision.cluster.cluster_id
+    assert second_decision.cluster.cluster_confidence < 1.0
+    assert store.load_cluster(second_decision.cluster.cluster_id) == second_decision.cluster
+    assert store.cluster_for_article(second.article_id) == second_decision.cluster
 
 
 def test_store_rejects_bad_json_on_load(tmp_path: Path) -> None:

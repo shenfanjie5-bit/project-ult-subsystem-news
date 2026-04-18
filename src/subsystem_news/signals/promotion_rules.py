@@ -83,11 +83,14 @@ def should_promote_fact(
             base_confidence=base_confidence,
         )
 
-    if all(entity.resolution_status == "unresolved" for entity in fact.involved_entities):
+    if not any(
+        entity.resolution_status == "resolved" and entity.canonical_id is not None
+        for entity in fact.involved_entities
+    ):
         return PromotionDecision(
             promote=False,
             signal_type=None,
-            reason="all involved entities are unresolved",
+            reason="no involved entity has a resolved canonical_id",
             base_confidence=base_confidence,
         )
 

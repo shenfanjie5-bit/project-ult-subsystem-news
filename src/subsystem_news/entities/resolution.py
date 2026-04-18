@@ -5,7 +5,7 @@ from __future__ import annotations
 from collections.abc import Sequence
 from typing import Literal
 
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field
 
 from subsystem_news.contracts.article import NewsArticleArtifact
 from subsystem_news.contracts.candidates import InvolvedEntity
@@ -30,6 +30,7 @@ class ResolvedMention(BaseModel):
     entity: InvolvedEntity
     resolution_source: Literal["quick_path", "registry", "fallback"]
     registry_resolution: RegistryResolution | None = None
+    trace_error: str | None = Field(default=None)
 
 
 class EntityResolutionResult(BaseModel):
@@ -132,12 +133,13 @@ def _resolved_mention_from_registry(
     else:
         entity = unresolved_entity(mention)
 
-    _record_resolution_case(mention, resolution, client)
+    trace_error = _record_resolution_case(mention, resolution, client)
     return ResolvedMention(
         mention=mention,
         entity=entity,
         resolution_source="fallback",
         registry_resolution=resolution,
+        trace_error=trace_error,
     )
 
 
@@ -145,7 +147,7 @@ def _record_resolution_case(
     mention: Mention,
     resolution: RegistryResolution,
     client: EntityRegistryClient,
-) -> None:
+) -> str | None:
     registry_mention = RegistryMention.from_mention(mention)
     case = ResolutionCase(
         article_id=mention.article_id,
@@ -160,10 +162,9 @@ def _record_resolution_case(
     )
     try:
         client.record_resolution_case(case)
-    except EntityResolutionError:
-        raise
     except Exception as exc:
-        raise EntityResolutionError("entity-registry record_resolution_case failed") from exc
+        return f"{exc.__class__.__name__}: {exc}"
+    return None
 
 
 def _mention_order_key(mention: Mention) -> tuple[int, int, int, str]:

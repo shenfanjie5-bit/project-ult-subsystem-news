@@ -4,7 +4,13 @@ import pytest
 
 from subsystem_news.contracts.candidates import NewsSignalCandidate
 from subsystem_news.errors import ContractViolationError
-from subsystem_news.signals import SIGNAL_SCHEMA_PIN, SignalJudgement, judge_direction
+from subsystem_news.extract.schema_pin import FACT_SCHEMA_PIN
+from subsystem_news.signals import (
+    SIGNAL_SCHEMA_PIN,
+    SignalJudgement,
+    generate_signals,
+    judge_direction,
+)
 
 from .helpers import FakeReasonerRuntimeClient, load_fact, load_fixture
 
@@ -55,6 +61,30 @@ def test_judge_direction_rejects_null_runtime_semantic_fields() -> None:
 
     with pytest.raises(ContractViolationError, match="semantic fields"):
         judge_direction(fact, client)
+
+
+def test_judge_direction_rejects_fact_schema_pin_before_runtime_call() -> None:
+    fact = load_fact("positive_operating_event.json")
+    client = FakeReasonerRuntimeClient(
+        {"judgement": load_fixture("positive_operating_event.json")["judgement"]}
+    )
+
+    with pytest.raises(ContractViolationError, match="SIGNAL_SCHEMA_PIN"):
+        judge_direction(fact, client, schema_pin=FACT_SCHEMA_PIN)
+
+    assert client.requests == []
+
+
+def test_generate_signals_rejects_fact_schema_pin_before_runtime_call() -> None:
+    fact = load_fact("positive_operating_event.json")
+    client = FakeReasonerRuntimeClient(
+        {"judgement": load_fixture("positive_operating_event.json")["judgement"]}
+    )
+
+    with pytest.raises(ContractViolationError, match="SIGNAL_SCHEMA_PIN"):
+        generate_signals([fact], client, schema_pin=FACT_SCHEMA_PIN)
+
+    assert client.requests == []
 
 
 def test_signals_modules_do_not_import_prohibited_runtime_dependencies() -> None:

@@ -25,6 +25,10 @@ def coerce_evidence_spans(
         try:
             spans.append(EvidenceSpan.model_validate(raw_span))
         except ValidationError as exc:
+            if _is_negative_offset_error(exc):
+                raise ContractViolationError(
+                    "evidence span offsets must be non-negative"
+                ) from exc
             raise ContractViolationError("runtime evidence span violates contract") from exc
     return validate_evidence_spans(article, spans)
 
@@ -61,3 +65,11 @@ def _source_text(article: NewsArticleArtifact, locator: str) -> str:
     if locator == "body":
         return article.body_text
     raise ContractViolationError(f"unsupported evidence locator: {locator}")
+
+
+def _is_negative_offset_error(exc: ValidationError) -> bool:
+    for error in exc.errors():
+        loc = error.get("loc", ())
+        if loc in {("start_char",), ("end_char",)} and error.get("type") == "greater_than_equal":
+            return True
+    return False

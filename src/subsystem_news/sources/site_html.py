@@ -15,6 +15,7 @@ from subsystem_news.sources.base import (
     UrllibHttpTransport,
     raw_content_hash,
     trace_id_for,
+    validate_response_url_within_source,
 )
 
 
@@ -110,8 +111,7 @@ class SiteHtmlSourceAdapter:
         response = http.get(approved_url)
         if response.status_code >= 400:
             raise ContractViolationError(f"site_html source returned status {response.status_code}")
-        if response.url != approved_url:
-            raise ContractViolationError("site_html redirect target must match approved base_url")
+        validate_response_url_within_source(response.url, source, adapter_name="site_html")
 
         parser = _TitleAndBodyParser()
         parser.feed(response.text)
