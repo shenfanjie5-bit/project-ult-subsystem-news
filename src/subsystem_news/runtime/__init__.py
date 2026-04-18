@@ -10,6 +10,14 @@ from subsystem_news.runtime.models import (
 )
 from subsystem_news.runtime.orchestrator import run_once
 from subsystem_news.runtime.pipeline import Pipeline
+from subsystem_news.runtime.replay import (
+    ReplayArticleResult,
+    ReplayArticleSummary,
+    ReplayRunResult,
+    ReplayValueDiff,
+    replay_artifact_snapshot,
+    replay_trace,
+)
 from subsystem_news.runtime.submit import (
     DefaultSubsystemSdkClient,
     SubmitReceipt,
@@ -32,10 +40,16 @@ __all__ = [
     "PipelineArticleResult",
     "PipelineConfig",
     "PipelineRunResult",
+    "ReplayArticleResult",
+    "ReplayArticleSummary",
+    "ReplayRunResult",
+    "ReplayValueDiff",
     "SubmitReceipt",
     "SubsystemSdkClient",
     "candidate_idempotency_key",
     "load_pipeline_trace",
+    "replay_artifact_snapshot",
+    "replay_trace",
     "run_once",
     "submit_candidates",
     "validate_candidate_batch",

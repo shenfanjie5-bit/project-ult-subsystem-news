@@ -4,12 +4,20 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 from collections.abc import Mapping, Sequence
 from pathlib import Path
+from urllib.parse import urlparse
 
+from subsystem_news.entities.resolver_client import (
+    HttpEntityRegistryClient,
+    StubEntityRegistryClient,
+)
 from subsystem_news.errors import ContractViolationError
+from subsystem_news.extract.runtime_client import DefaultReasonerRuntimeClient
 from subsystem_news.runtime.models import PipelineConfig
 from subsystem_news.runtime.orchestrator import run_once
+from subsystem_news.runtime.replay import replay_artifact_snapshot, replay_trace
 from subsystem_news.sources.base import HttpResponse
 
 
@@ -24,7 +32,30 @@ def main(argv: Sequence[str] | None = None) -> int:
     ingest.add_argument("--cursor-json")
     ingest.add_argument("--dry-run", action="store_true")
 
+    replay = subparsers.add_parser("replay")
+    replay_input = replay.add_mutually_exclusive_group(required=True)
+    replay_input.add_argument("--trace")
+    replay_input.add_argument("--artifact")
+    replay.add_argument("--dry-run", action="store_true")
+
     args = parser.parse_args(argv)
+    if args.command == "replay":
+        entity_client, reasoner_client = _replay_clients(dry_run=args.dry_run)
+        if args.trace is not None:
+            result = replay_trace(
+                Path(args.trace),
+                entity_client=entity_client,
+                reasoner_client=reasoner_client,
+            )
+        else:
+            result = replay_artifact_snapshot(
+                Path(args.artifact),
+                entity_client=entity_client,
+                reasoner_client=reasoner_client,
+            )
+        print(result.model_dump_json(indent=2))
+        return 1 if result.error_count or result.changed_count else 0
+
     if args.command != "ingest":
         parser.error(f"unsupported command: {args.command}")
 
@@ -97,6 +128,30 @@ def _sample_fixture_transport() -> _StaticTransport:
             ).read_text(encoding="utf-8"),
         }
     )
+
+
+def _replay_clients(dry_run: bool):
+    if dry_run:
+        return StubEntityRegistryClient(), _NoopReasonerRuntimeClient()
+
+    base_url = (
+        os.environ.get("SUBSYSTEM_NEWS_ENTITY_REGISTRY_URL")
+        or os.environ.get("ENTITY_REGISTRY_URL")
+        or ""
+    ).strip()
+    parsed = urlparse(base_url)
+    if parsed.scheme not in {"http", "https"} or not parsed.netloc:
+        raise ContractViolationError(
+            "replay requires --dry-run or an entity-registry URL in "
+            "SUBSYSTEM_NEWS_ENTITY_REGISTRY_URL or ENTITY_REGISTRY_URL"
+        )
+    return HttpEntityRegistryClient(base_url), DefaultReasonerRuntimeClient()
+
+
+class _NoopReasonerRuntimeClient:
+    def generate_structured(self, request: object) -> Mapping[str, object]:
+        del request
+        return {"facts": []}
 
 
 if __name__ == "__main__":  # pragma: no cover
