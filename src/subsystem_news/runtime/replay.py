@@ -25,6 +25,7 @@ from subsystem_news.errors import ContractViolationError
 from subsystem_news.extract.fact_extractor import extract_facts
 from subsystem_news.extract.runtime_client import ReasonerRuntimeClient
 from subsystem_news.extract.schema_pin import FACT_SCHEMA_PIN, SchemaPin
+from subsystem_news.graph import GRAPH_SCHEMA_PIN, extract_graph_deltas
 from subsystem_news.normalize.pipeline import normalize_article
 from subsystem_news.runtime.models import (
     CandidatePayload,
@@ -144,7 +145,10 @@ def replay_artifact_snapshot(
 
     stage_order = ["load_artifact"]
     artifact = _load_artifact_snapshot(artifact_path)
-    pins = dict(schema_pins or {"Ex-1": FACT_SCHEMA_PIN, "Ex-2": SIGNAL_SCHEMA_PIN})
+    pins = dict(
+        schema_pins
+        or {"Ex-1": FACT_SCHEMA_PIN, "Ex-2": SIGNAL_SCHEMA_PIN, "Ex-3": GRAPH_SCHEMA_PIN}
+    )
     baseline = PipelineArticleContext(
         article_id=artifact.article_id,
         cluster_id="artifact-snapshot-baseline",
@@ -294,6 +298,16 @@ def _replay_article_context(
         schema_pin=schema_pins["Ex-2"],
     )
 
+    stage_order.append("graph")
+    graph_deltas = extract_graph_deltas(
+        representative,
+        cluster,
+        entity_resolution,
+        facts,
+        reasoner_client,
+        schema_pin=schema_pins["Ex-3"],
+    )
+
     return PipelineArticleContext(
         article_id=clustered_artifact.article_id,
         cluster_id=cluster.cluster_id,
@@ -304,6 +318,7 @@ def _replay_article_context(
         entity_resolution=entity_resolution,
         facts=facts,
         signals=signals,
+        graph_deltas=graph_deltas,
         schema_pins=schema_pins,
         dedupe_metadata={
             "threshold": dedupe_threshold,
@@ -330,6 +345,7 @@ def _replay_article_context(
             "representative_article_id": representative.article_id,
         },
         signal_metadata={"signal_count": len(signals)},
+        graph_metadata={"graph_delta_count": len(graph_deltas)},
     )
 
 
@@ -437,12 +453,14 @@ def _schema_pins_for_replay(pins: Mapping[str, SchemaPin]) -> dict[str, SchemaPi
     replay_pins = dict(pins)
     replay_pins.setdefault("Ex-1", FACT_SCHEMA_PIN)
     replay_pins.setdefault("Ex-2", SIGNAL_SCHEMA_PIN)
+    replay_pins.setdefault("Ex-3", GRAPH_SCHEMA_PIN)
     _require_schema_pin("Ex-1", replay_pins["Ex-1"])
     _require_schema_pin("Ex-2", replay_pins["Ex-2"])
+    _require_schema_pin("Ex-3", replay_pins["Ex-3"])
     return replay_pins
 
 
-def _require_schema_pin(contract: Literal["Ex-1", "Ex-2"], pin: SchemaPin) -> None:
+def _require_schema_pin(contract: Literal["Ex-1", "Ex-2", "Ex-3"], pin: SchemaPin) -> None:
     if pin.contract != contract:
         raise ContractViolationError(f"{contract} replay schema pin has contract {pin.contract}")
 
@@ -511,7 +529,7 @@ def _version_map(context: PipelineArticleContext) -> dict[str, dict[str, Any]]:
 
 
 def _context_candidates(context: PipelineArticleContext) -> list[CandidatePayload]:
-    return [*context.facts, *context.signals]
+    return [*context.facts, *context.signals, *context.graph_deltas]
 
 
 def _candidate_key(candidate: CandidatePayload) -> str:

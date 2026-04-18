@@ -11,6 +11,7 @@ from subsystem_news.dedupe.store import DedupeStore
 from subsystem_news.entities.resolver_client import RegistryLookup, StubEntityRegistryClient
 from subsystem_news.extract.runtime_client import StructuredGenerationRequest
 from subsystem_news.extract.schema_pin import FACT_SCHEMA_PIN
+from subsystem_news.graph import GRAPH_SCHEMA_PIN
 from subsystem_news.runtime.artifact_store import ArtifactStore
 from subsystem_news.runtime.cli import main
 from subsystem_news.runtime.models import CandidatePayload, PipelineRunResult
@@ -51,6 +52,8 @@ class ReplayReasonerRuntimeClient:
         self.requests.append(request)
         if request.contract == "Ex-1":
             return {"facts": [self._fact_payload(request)]}
+        if request.contract == "Ex-3":
+            return {"graph_deltas": []}
         return {"judgement": self._judgement_payload(request)}
 
     def _fact_payload(self, request: StructuredGenerationRequest) -> dict[str, object]:
@@ -147,6 +150,12 @@ def test_replay_trace_unchanged_has_no_diffs_and_preserves_schema_pins(
             SIGNAL_SCHEMA_PIN.schema_name,
             SIGNAL_SCHEMA_PIN.schema_version,
             SIGNAL_SCHEMA_PIN.model_output_version,
+        ),
+        (
+            "Ex-3",
+            GRAPH_SCHEMA_PIN.schema_name,
+            GRAPH_SCHEMA_PIN.schema_version,
+            GRAPH_SCHEMA_PIN.model_output_version,
         ),
     }
 

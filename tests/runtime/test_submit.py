@@ -10,6 +10,7 @@ import pytest
 from subsystem_news.contracts.candidates import (
     InvolvedEntity,
     NewsFactCandidate,
+    NewsGraphDeltaCandidate,
     NewsSignalCandidate,
 )
 from subsystem_news.contracts.evidence import EvidenceSpan
@@ -89,6 +90,27 @@ def signal_candidate() -> NewsSignalCandidate:
     )
 
 
+def graph_candidate() -> NewsGraphDeltaCandidate:
+    return NewsGraphDeltaCandidate(
+        candidate_id="graph-1",
+        article_id="article-1",
+        source_reference=source_reference(),
+        subject_entity=entity(),
+        relation_type="acquired",
+        object_entity=InvolvedEntity(
+            mention_text="Globex Inc",
+            canonical_id="entity:globex",
+            resolution_status="resolved",
+            type_hint="company",
+        ),
+        delta_action="add",
+        valid_from=datetime(2026, 2, 1, tzinfo=timezone.utc),
+        evidence_spans=[evidence()],
+        confidence=0.88,
+        requires_manual_review=True,
+    )
+
+
 class RetrySdkClient:
     def __init__(self, failures: int) -> None:
         self.failures = failures
@@ -105,9 +127,11 @@ class RetrySdkClient:
 
 
 def test_validate_candidate_batch_accepts_fact_and_signal_candidates() -> None:
-    batch = validate_candidate_batch([fact_candidate(), signal_candidate()])
+    batch = validate_candidate_batch(
+        [fact_candidate(), signal_candidate(), graph_candidate()]
+    )
 
-    assert [candidate.export_contract for candidate in batch] == ["Ex-1", "Ex-2"]
+    assert [candidate.export_contract for candidate in batch] == ["Ex-1", "Ex-2", "Ex-3"]
 
 
 def test_validate_candidate_batch_rejects_missing_source_reference_and_evidence() -> None:
@@ -149,6 +173,26 @@ def test_validate_candidate_batch_rejects_incomplete_ex2_fields() -> None:
         validate_candidate_batch([missing_direction])
 
 
+def test_validate_candidate_batch_rejects_unresolved_ex3_endpoint() -> None:
+    unresolved = InvolvedEntity(
+        mention_text="Globex Inc",
+        canonical_id=None,
+        resolution_status="unresolved",
+        type_hint="company",
+    )
+    candidate = graph_candidate().model_copy(update={"object_entity": unresolved})
+
+    with pytest.raises(ContractViolationError, match="object_entity"):
+        validate_candidate_batch([candidate])
+
+
+def test_validate_candidate_batch_rejects_ex3_without_manual_review() -> None:
+    candidate = graph_candidate().model_copy(update={"requires_manual_review": False})
+
+    with pytest.raises(ContractViolationError, match="requires_manual_review"):
+        validate_candidate_batch([candidate])
+
+
 def test_submit_candidates_retries_transient_failures() -> None:
     client = RetrySdkClient(failures=1)
 
@@ -188,3 +232,13 @@ def test_default_sdk_client_requires_receipt_candidate_id_partition(
 
     with pytest.raises(ContractViolationError, match="submitted_candidate_ids"):
         DefaultSubsystemSdkClient().submit([fact_candidate()])
+
+
+def test_submit_candidates_requires_direct_client_receipt_partition() -> None:
+    class BadReceiptClient:
+        def submit(self, batch: Sequence[CandidatePayload]) -> SubmitReceipt:
+            del batch
+            return SubmitReceipt(accepted_count=0, rejected_count=0)
+
+    with pytest.raises(ContractViolationError, match="counts must equal submitted batch"):
+        submit_candidates([fact_candidate()], BadReceiptClient())

@@ -38,12 +38,19 @@ def candidate_idempotency_key(candidate: CandidatePayload) -> str:
         "export_contract": candidate.export_contract,
         "candidate_id": candidate.candidate_id,
         "article_id": candidate.article_id,
-        "cluster_id": candidate.cluster_id,
+        "cluster_id": getattr(candidate, "cluster_id", None),
         "source_reference": candidate.source_reference.model_dump(mode="json"),
         "evidence_spans": [
             span.model_dump(mode="json") for span in candidate.evidence_spans
         ],
     }
+    if candidate.export_contract == "Ex-3":
+        payload["graph_delta"] = {
+            "subject_entity": candidate.subject_entity.model_dump(mode="json"),
+            "relation_type": candidate.relation_type,
+            "object_entity": candidate.object_entity.model_dump(mode="json"),
+            "delta_action": candidate.delta_action,
+        }
     encoded = json.dumps(payload, sort_keys=True, separators=(",", ":")).encode("utf-8")
     digest = hashlib.sha256(encoded).hexdigest()
     return f"candidate-key:{digest[:32]}"

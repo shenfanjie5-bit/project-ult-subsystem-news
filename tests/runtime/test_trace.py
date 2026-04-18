@@ -9,7 +9,7 @@ from subsystem_news.runtime.trace import (
     write_pipeline_trace,
 )
 
-from .test_submit import fact_candidate, signal_candidate
+from .test_submit import fact_candidate, graph_candidate, signal_candidate
 
 
 def test_candidate_idempotency_key_is_stable_and_contract_sensitive() -> None:
@@ -17,6 +17,14 @@ def test_candidate_idempotency_key_is_stable_and_contract_sensitive() -> None:
 
     assert candidate_idempotency_key(fact) == candidate_idempotency_key(fact)
     assert candidate_idempotency_key(fact) != candidate_idempotency_key(signal_candidate())
+
+
+def test_candidate_idempotency_key_handles_graph_without_cluster_id() -> None:
+    graph = graph_candidate()
+
+    assert not hasattr(graph, "cluster_id")
+    assert candidate_idempotency_key(graph) == candidate_idempotency_key(graph)
+    assert candidate_idempotency_key(graph) != candidate_idempotency_key(fact_candidate())
 
 
 def test_pipeline_trace_roundtrip_returns_model(tmp_path) -> None:

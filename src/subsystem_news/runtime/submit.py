@@ -7,7 +7,11 @@ from typing import Protocol
 
 from pydantic import BaseModel, ConfigDict, Field, ValidationError
 
-from subsystem_news.contracts.candidates import NewsFactCandidate, NewsSignalCandidate
+from subsystem_news.contracts.candidates import (
+    NewsFactCandidate,
+    NewsGraphDeltaCandidate,
+    NewsSignalCandidate,
+)
 from subsystem_news.errors import ContractViolationError
 from subsystem_news.runtime.models import CandidatePayload
 
@@ -89,14 +93,17 @@ def submit_candidates(
         try:
             receipt = client.submit(validated)
             if isinstance(receipt, SubmitReceipt):
+                _require_receipt_partitions_batch(receipt, validated)
                 return receipt
             if isinstance(receipt, Mapping):
                 try:
-                    return SubmitReceipt.model_validate(receipt)
+                    parsed_receipt = SubmitReceipt.model_validate(receipt)
                 except (ValidationError, ValueError, TypeError) as exc:
                     raise ContractViolationError(
                         "submit client returned invalid receipt"
                     ) from exc
+                _require_receipt_partitions_batch(parsed_receipt, validated)
+                return parsed_receipt
             raise ContractViolationError("submit client returned unsupported receipt")
         except ContractViolationError:
             raise
@@ -116,7 +123,13 @@ def _validate_candidate(candidate: CandidatePayload) -> CandidatePayload:
         _require_candidate_common_fields(candidate, expected_contract="Ex-2")
         _require_signal_fields(candidate)
         return _revalidate_signal(candidate)
-    raise ContractViolationError("candidate must be NewsFactCandidate or NewsSignalCandidate")
+    if isinstance(candidate, NewsGraphDeltaCandidate):
+        _require_candidate_common_fields(candidate, expected_contract="Ex-3")
+        _require_graph_fields(candidate)
+        return _revalidate_graph(candidate)
+    raise ContractViolationError(
+        "candidate must be NewsFactCandidate, NewsSignalCandidate, or NewsGraphDeltaCandidate"
+    )
 
 
 def _require_candidate_common_fields(
@@ -143,6 +156,21 @@ def _require_signal_fields(candidate: NewsSignalCandidate) -> None:
         raise ContractViolationError("Ex-2 candidate requires affected_entities")
 
 
+def _require_graph_fields(candidate: NewsGraphDeltaCandidate) -> None:
+    if candidate.requires_manual_review is not True:
+        raise ContractViolationError(
+            "Ex-3 candidate requires requires_manual_review=true"
+        )
+    for role, entity in (
+        ("subject", candidate.subject_entity),
+        ("object", candidate.object_entity),
+    ):
+        if entity.resolution_status != "resolved" or entity.canonical_id is None:
+            raise ContractViolationError(
+                f"Ex-3 candidate requires resolved {role}_entity with canonical_id"
+            )
+
+
 def _revalidate_fact(candidate: NewsFactCandidate) -> NewsFactCandidate:
     try:
         return NewsFactCandidate.model_validate(candidate.model_dump(mode="json"))
@@ -155,6 +183,13 @@ def _revalidate_signal(candidate: NewsSignalCandidate) -> NewsSignalCandidate:
         return NewsSignalCandidate.model_validate(candidate.model_dump(mode="json"))
     except (ValidationError, ValueError, TypeError) as exc:
         raise ContractViolationError("candidate violates Ex-2 contract") from exc
+
+
+def _revalidate_graph(candidate: NewsGraphDeltaCandidate) -> NewsGraphDeltaCandidate:
+    try:
+        return NewsGraphDeltaCandidate.model_validate(candidate.model_dump(mode="json"))
+    except (ValidationError, ValueError, TypeError) as exc:
+        raise ContractViolationError("candidate violates Ex-3 contract") from exc
 
 
 def _require_receipt_partitions_batch(

@@ -9,14 +9,18 @@ from typing import Any, Literal
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 from subsystem_news.contracts.article import NewsArticleArtifact
-from subsystem_news.contracts.candidates import NewsFactCandidate, NewsSignalCandidate
+from subsystem_news.contracts.candidates import (
+    NewsFactCandidate,
+    NewsGraphDeltaCandidate,
+    NewsSignalCandidate,
+)
 from subsystem_news.contracts.cluster import NewsDedupeCluster
 from subsystem_news.contracts.source_reference import SourceReference
 from subsystem_news.entities.resolution import EntityResolutionResult
 from subsystem_news.extract.schema_pin import SchemaPin
 
 
-CandidatePayload = NewsFactCandidate | NewsSignalCandidate
+CandidatePayload = NewsFactCandidate | NewsSignalCandidate | NewsGraphDeltaCandidate
 
 
 class PipelineConfig(BaseModel):
@@ -47,11 +51,13 @@ class PipelineArticleContext(BaseModel):
     entity_resolution: EntityResolutionResult
     facts: list[NewsFactCandidate] = Field(default_factory=list)
     signals: list[NewsSignalCandidate] = Field(default_factory=list)
+    graph_deltas: list[NewsGraphDeltaCandidate] = Field(default_factory=list)
     schema_pins: dict[str, SchemaPin] = Field(default_factory=dict)
     dedupe_metadata: dict[str, Any] = Field(default_factory=dict)
     entity_metadata: dict[str, Any] = Field(default_factory=dict)
     extract_metadata: dict[str, Any] = Field(default_factory=dict)
     signal_metadata: dict[str, Any] = Field(default_factory=dict)
+    graph_metadata: dict[str, Any] = Field(default_factory=dict)
 
     @model_validator(mode="after")
     def validate_handoff_identity(self) -> "PipelineArticleContext":
@@ -77,6 +83,11 @@ class PipelineArticleContext(BaseModel):
                 raise ValueError("signals must be generated from representative facts")
             if signal.cluster_id != self.cluster_id:
                 raise ValueError("signals must carry the runtime cluster_id")
+        for graph_delta in self.graph_deltas:
+            if graph_delta.article_id != self.representative_artifact.article_id:
+                raise ValueError("graph_deltas must be generated from representative article")
+            if graph_delta.source_reference != self.representative_artifact.source_reference:
+                raise ValueError("graph_deltas must carry representative source_reference")
         return self
 
 
