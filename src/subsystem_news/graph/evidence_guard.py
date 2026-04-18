@@ -113,33 +113,66 @@ def _quote_supports_relation(
     candidate: NewsGraphDeltaCandidate,
 ) -> bool:
     normalized_quote = _normalize_text(quote)
-    return (
-        _contains_entity_text(normalized_quote, candidate.subject_entity.mention_text)
-        and _contains_entity_text(normalized_quote, candidate.object_entity.mention_text)
-        and _contains_relation_trigger(normalized_quote, candidate.relation_type)
-    )
+    relation_type = candidate.relation_type
+    subject_spans = _phrase_spans(candidate.subject_entity.mention_text, normalized_quote)
+    object_spans = _phrase_spans(candidate.object_entity.mention_text, normalized_quote)
+    if not subject_spans or not object_spans:
+        return False
 
+    if relation_type == "partner_of":
+        return _contains_relation_trigger(normalized_quote, relation_type)
 
-def _contains_entity_text(normalized_quote: str, mention_text: str) -> bool:
-    normalized_mention = _normalize_text(mention_text)
-    return bool(normalized_mention) and normalized_mention in normalized_quote
+    trigger_spans = _relation_trigger_spans(normalized_quote, relation_type)
+    return _has_ordered_spans(subject_spans, trigger_spans, object_spans)
 
 
 def _contains_relation_trigger(normalized_quote: str, relation_type: str) -> bool:
+    return bool(_relation_trigger_spans(normalized_quote, relation_type))
+
+
+def _relation_trigger_spans(
+    normalized_quote: str,
+    relation_type: str,
+) -> list[tuple[int, int]]:
     triggers = _RELATION_TRIGGERS.get(relation_type)
     if triggers is None:
         raise ContractViolationError(f"unsupported graph relation_type: {relation_type}")
-    return any(_phrase_in_text(trigger, normalized_quote) for trigger in triggers)
+    spans: list[tuple[int, int]] = []
+    for trigger in triggers:
+        spans.extend(_phrase_spans(trigger, normalized_quote))
+    return spans
 
 
-def _phrase_in_text(phrase: str, normalized_text: str) -> bool:
+def _phrase_spans(phrase: str, normalized_text: str) -> list[tuple[int, int]]:
     normalized_phrase = _normalize_text(phrase)
     if not normalized_phrase:
-        return False
+        return []
     if re.search(r"[A-Za-z0-9]", normalized_phrase):
         pattern = r"(?<![A-Za-z0-9])" + re.escape(normalized_phrase) + r"(?![A-Za-z0-9])"
-        return re.search(pattern, normalized_text) is not None
-    return normalized_phrase in normalized_text
+        return [
+            (match.start(), match.end())
+            for match in re.finditer(pattern, normalized_text)
+        ]
+
+    spans: list[tuple[int, int]] = []
+    start = normalized_text.find(normalized_phrase)
+    while start >= 0:
+        spans.append((start, start + len(normalized_phrase)))
+        start = normalized_text.find(normalized_phrase, start + len(normalized_phrase))
+    return spans
+
+
+def _has_ordered_spans(
+    subject_spans: Sequence[tuple[int, int]],
+    trigger_spans: Sequence[tuple[int, int]],
+    object_spans: Sequence[tuple[int, int]],
+) -> bool:
+    return any(
+        subject_end <= trigger_start and trigger_end <= object_start
+        for _, subject_end in subject_spans
+        for trigger_start, trigger_end in trigger_spans
+        for object_start, _ in object_spans
+    )
 
 
 def _normalize_text(value: str) -> str:

@@ -186,6 +186,13 @@ def test_validate_candidate_batch_rejects_unresolved_ex3_endpoint() -> None:
         validate_candidate_batch([candidate])
 
 
+def test_validate_candidate_batch_rejects_ex3_without_manual_review() -> None:
+    candidate = graph_candidate().model_copy(update={"requires_manual_review": False})
+
+    with pytest.raises(ContractViolationError, match="requires_manual_review"):
+        validate_candidate_batch([candidate])
+
+
 def test_submit_candidates_retries_transient_failures() -> None:
     client = RetrySdkClient(failures=1)
 

@@ -157,6 +157,10 @@ def _require_signal_fields(candidate: NewsSignalCandidate) -> None:
 
 
 def _require_graph_fields(candidate: NewsGraphDeltaCandidate) -> None:
+    if candidate.requires_manual_review is not True:
+        raise ContractViolationError(
+            "Ex-3 candidate requires requires_manual_review=true"
+        )
     for role, entity in (
         ("subject", candidate.subject_entity),
         ("object", candidate.object_entity),
