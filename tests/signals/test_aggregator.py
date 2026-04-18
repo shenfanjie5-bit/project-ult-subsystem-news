@@ -133,6 +133,96 @@ def test_generate_signals_promotes_judges_builds_and_deamplifies_reposts() -> No
     assert len(client.requests) == 2
 
 
+def test_generate_signals_keeps_distinct_cluster_facts_and_deamplifies_repost() -> None:
+    contract_wire, contract_repost = load_facts("repost_cluster.json")
+    product_quote = "Acme Corp launched a new battery module product for fleet customers."
+    product_fact = clone_fact(
+        contract_wire,
+        candidate_id="fact-acme-product-launch",
+        article_id="article-acme-product",
+        fact_type="product",
+        summary="Acme Corp launched a new battery module product for fleet customers.",
+        evidence_spans=[
+            {
+                "article_id": "article-acme-product",
+                "start_char": 0,
+                "end_char": len(product_quote),
+                "quote": product_quote,
+                "locator": "body",
+            }
+        ],
+        confidence=0.84,
+    )
+    contract_judgement = load_fixture("repost_cluster.json")["judgement"]
+    product_judgement = {
+        "signal_type": "event_impact",
+        "direction": "positive",
+        "impact_scope": "company",
+        "time_horizon": "short",
+        "rationale": "The product launch supports near-term demand for Acme Corp.",
+        "confidence": 0.82,
+    }
+    client = FakeReasonerRuntimeClient(
+        {
+            "fact-acme-contract-wire": {
+                "judgement": {**contract_judgement, "confidence": 0.74}
+            },
+            "fact-acme-contract-repost": {
+                "judgement": {**contract_judgement, "confidence": 0.9}
+            },
+            "fact-acme-product-launch": {"judgement": product_judgement},
+        }
+    )
+
+    signals = generate_signals([contract_wire, contract_repost, product_fact], client)
+
+    assert len(signals) == 2
+    assert {signal.candidate_id for signal in signals} == {
+        "signal:fact-acme-contract-repost:event_impact",
+        "signal:fact-acme-product-launch:event_impact",
+    }
+    assert {signal.signal_type for signal in signals} == {"event_impact"}
+    assert {signal.cluster_id for signal in signals} == {"cluster-acme-contract"}
+    assert len(client.requests) == 3
+
+
+def test_generate_signals_keeps_distinct_fact_types_with_shared_evidence() -> None:
+    contract_wire, contract_repost = load_facts("repost_cluster.json")
+    litigation_fact = clone_fact(
+        contract_wire,
+        candidate_id="fact-acme-litigation-shared-evidence",
+        fact_type="litigation",
+    )
+    assert litigation_fact.evidence_spans == contract_wire.evidence_spans
+
+    judgement = load_fixture("repost_cluster.json")["judgement"]
+    client = FakeReasonerRuntimeClient(
+        {
+            "fact-acme-contract-wire": {
+                "judgement": {**judgement, "confidence": 0.74}
+            },
+            "fact-acme-contract-repost": {
+                "judgement": {**judgement, "confidence": 0.9}
+            },
+            "fact-acme-litigation-shared-evidence": {
+                "judgement": {**judgement, "confidence": 0.82}
+            },
+        }
+    )
+
+    signals = generate_signals([contract_wire, contract_repost, litigation_fact], client)
+
+    assert len(signals) == 2
+    assert {signal.candidate_id for signal in signals} == {
+        "signal:fact-acme-contract-repost:event_impact",
+        "signal:fact-acme-litigation-shared-evidence:event_impact",
+    }
+    assert {signal.signal_type for signal in signals} == {"event_impact"}
+    assert {signal.direction for signal in signals} == {"positive"}
+    assert {signal.cluster_id for signal in signals} == {"cluster-acme-contract"}
+    assert len(client.requests) == 3
+
+
 def test_generate_signals_rejects_low_confidence_and_ex1_only_without_runtime_call() -> None:
     low_confidence = clone_fact(load_fact("positive_operating_event.json"), confidence=0.2)
     ex1_only = load_fact("ex1_only_boundary.json")
