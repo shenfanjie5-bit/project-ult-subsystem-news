@@ -200,6 +200,83 @@ def test_rss_html_content_is_normalized_from_raw_html() -> None:
     assert artifact.source_reference == fetch.source_reference
 
 
+def test_rss_nested_content_encoded_markup_is_normalized_from_raw_html() -> None:
+    configs = [config_by_id(load_configs(), "global-wire-rss")]
+    rss_with_nested_html = """<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>Global Wire</title>
+    <item>
+      <guid>wire-nested-html-content</guid>
+      <link>https://news.example.com/articles/nested-html-content</link>
+      <title>Acme expands capacity</title>
+      <pubDate>Thu, 15 Jan 2026 10:30:00 GMT</pubDate>
+      <description>Fallback summary should not be used.</description>
+      <content:encoded>
+        <article>
+          <header>Subscribe now</header>
+          <p>Acme Corp expanded capacity.</p>
+          <p>Globex Inc signed a supply option.</p>
+          <script>window.noise = true;</script>
+        </article>
+      </content:encoded>
+    </item>
+  </channel>
+</rss>"""
+    html_transport = StaticTransport({"https://news.example.com/rss": rss_with_nested_html})
+    ref = discover_articles(configs, transport=html_transport)[0]
+
+    fetch = fetch_article_body(ref, configs, transport=html_transport)
+    artifact = normalize_article(fetch)
+
+    assert fetch.raw_body is None
+    assert fetch.raw_html is not None
+    assert "<article>" in fetch.raw_html
+    assert artifact.body_text == (
+        "Acme Corp expanded capacity. Globex Inc signed a supply option."
+    )
+    assert artifact.body_text != "Fallback summary should not be used."
+    assert "<" not in artifact.body_text
+    assert "Subscribe now" not in artifact.body_text
+
+
+def test_atom_xhtml_content_is_normalized_from_raw_html() -> None:
+    configs = [config_by_id(load_configs(), "global-wire-rss")]
+    atom_with_xhtml = """<?xml version="1.0" encoding="UTF-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <title>Global Wire</title>
+  <entry>
+    <id>atom-xhtml-content</id>
+    <link href="https://news.example.com/articles/atom-xhtml-content"/>
+    <title>Acme signs Atom contract</title>
+    <updated>2026-01-15T10:30:00Z</updated>
+    <summary>Fallback atom summary should not be used.</summary>
+    <content type="xhtml">
+      <div xmlns="http://www.w3.org/1999/xhtml">
+        <header>Subscribe now</header>
+        <p>Acme Corp signed an Atom contract.</p>
+        <p>Globex Inc remains the supplier.</p>
+      </div>
+    </content>
+  </entry>
+</feed>"""
+    html_transport = StaticTransport({"https://news.example.com/rss": atom_with_xhtml})
+    ref = discover_articles(configs, transport=html_transport)[0]
+
+    fetch = fetch_article_body(ref, configs, transport=html_transport)
+    artifact = normalize_article(fetch)
+
+    assert fetch.raw_body is None
+    assert fetch.raw_html is not None
+    assert "<p>Acme Corp signed an Atom contract.</p>" in fetch.raw_html
+    assert artifact.body_text == (
+        "Acme Corp signed an Atom contract. Globex Inc remains the supplier."
+    )
+    assert artifact.body_text != "Fallback atom summary should not be used."
+    assert "<" not in artifact.body_text
+    assert "Subscribe now" not in artifact.body_text
+
+
 def test_api_adapter_discovers_and_fetches_provider_key_article() -> None:
     configs = [config_by_id(load_configs(), "market-filings-api")]
     refs = discover_articles(configs, transport=transport())
