@@ -1,0 +1,212 @@
+{
+  "replay_id": "baseline-ambiguous_entity",
+  "input_kind": "trace",
+  "input_path": "src/subsystem_news/fixtures/regression/ambiguous_entity/cases.json",
+  "source_run_id": "baseline-run-ambiguous_entity",
+  "started_at": "2026-03-01T00:00:00Z",
+  "completed_at": "2026-03-01T00:05:00Z",
+  "article_results": [
+    {
+      "article_id": "article-reg-ambiguous-entity",
+      "source_reference": {
+        "source_id": "regression-topic",
+        "url": "https://fixtures.example.com/regression-topic/ambiguous-mercury",
+        "provider_key": "ambiguous-mercury",
+        "original_locator": {
+          "locator_type": "fixture",
+          "locator_value": "ambiguous-mercury"
+        }
+      },
+      "status": "processed",
+      "baseline_available": true,
+      "has_changes": false,
+      "baseline": {
+        "article_id": "article-reg-ambiguous-entity",
+        "cluster_id": "cluster-reg-ambiguous",
+        "representative_article_id": "article-reg-ambiguous-entity",
+        "source_reference": {
+          "source_id": "regression-topic",
+          "url": "https://fixtures.example.com/regression-topic/ambiguous-mercury",
+          "provider_key": "ambiguous-mercury",
+          "original_locator": {
+            "locator_type": "fixture",
+            "locator_value": "ambiguous-mercury"
+          }
+        },
+        "candidate_ids": [
+          "Ex-1:fact-reg-ambiguous-entity"
+        ],
+        "schema_pins": {
+          "Ex-1": {
+            "schema_name": "news_fact_candidate",
+            "schema_version": "news_fact_candidate.v1",
+            "contract": "Ex-1",
+            "model_output_version": "news_fact_candidate.output.v1"
+          },
+          "Ex-2": {
+            "schema_name": "news_signal_candidate",
+            "schema_version": "news_signal_candidate.v1",
+            "contract": "Ex-2",
+            "model_output_version": "news_signal_candidate.output.v1"
+          },
+          "Ex-3": {
+            "schema_name": "news_graph_delta_candidate",
+            "schema_version": "news_graph_delta_candidate.v1",
+            "contract": "Ex-3",
+            "model_output_version": "news_graph_delta_candidate.output.v1"
+          }
+        }
+      },
+      "replayed": {
+        "article_id": "article-reg-ambiguous-entity",
+        "cluster_id": "cluster-reg-ambiguous",
+        "representative_article_id": "article-reg-ambiguous-entity",
+        "source_reference": {
+          "source_id": "regression-topic",
+          "url": "https://fixtures.example.com/regression-topic/ambiguous-mercury",
+          "provider_key": "ambiguous-mercury",
+          "original_locator": {
+            "locator_type": "fixture",
+            "locator_value": "ambiguous-mercury"
+          }
+        },
+        "candidate_ids": [
+          "Ex-1:fact-reg-ambiguous-entity"
+        ],
+        "schema_pins": {
+          "Ex-1": {
+            "schema_name": "news_fact_candidate",
+            "schema_version": "news_fact_candidate.v1",
+            "contract": "Ex-1",
+            "model_output_version": "news_fact_candidate.output.v1"
+          },
+          "Ex-2": {
+            "schema_name": "news_signal_candidate",
+            "schema_version": "news_signal_candidate.v1",
+            "contract": "Ex-2",
+            "model_output_version": "news_signal_candidate.output.v1"
+          },
+          "Ex-3": {
+            "schema_name": "news_graph_delta_candidate",
+            "schema_version": "news_graph_delta_candidate.v1",
+            "contract": "Ex-3",
+            "model_output_version": "news_graph_delta_candidate.output.v1"
+          }
+        }
+      },
+      "candidate_diffs": [],
+      "evidence_span_diffs": [],
+      "entity_resolution_diffs": [],
+      "version_metadata_diffs": [],
+      "error_stage": null,
+      "error_message": null
+    }
+  ],
+  "changed_count": 0,
+  "error_count": 0,
+  "has_changes": false,
+  "stage_order": [
+    "fixture_baseline"
+  ],
+  "metadata": {
+    "category": "ambiguous_entity",
+    "case_count": 1,
+    "article_count": 1,
+    "candidate_payloads": [
+      {
+        "candidate_id": "fact-reg-ambiguous-entity",
+        "article_id": "article-reg-ambiguous-entity",
+        "cluster_id": "cluster-reg-ambiguous",
+        "source_reference": {
+          "source_id": "regression-topic",
+          "url": "https://fixtures.example.com/regression-topic/ambiguous-mercury",
+          "provider_key": "ambiguous-mercury",
+          "original_locator": {
+            "locator_type": "fixture",
+            "locator_value": "ambiguous-mercury"
+          }
+        },
+        "fact_type": "product",
+        "summary": "Mercury Energy announced a storage update.",
+        "involved_entities": [
+          {
+            "mention_text": "Mercury Energy",
+            "canonical_id": null,
+            "resolution_status": "ambiguous",
+            "type_hint": "company"
+          },
+          {
+            "mention_text": "energy storage systems",
+            "canonical_id": null,
+            "resolution_status": "unresolved",
+            "type_hint": "market_theme"
+          }
+        ],
+        "event_time": null,
+        "confidence": 0.81,
+        "source_reliability_tier": "C",
+        "export_contract": "Ex-1",
+        "evidence_spans": [
+          {
+            "article_id": "article-reg-ambiguous-entity",
+            "start_char": 0,
+            "end_char": 90,
+            "quote": "Mercury Energy announced an update about energy storage systems without naming a customer.",
+            "locator": "body"
+          }
+        ]
+      }
+    ],
+    "schema_pins": {
+      "Ex-1": {
+        "schema_name": "news_fact_candidate",
+        "schema_version": "news_fact_candidate.v1",
+        "contract": "Ex-1",
+        "model_output_version": "news_fact_candidate.output.v1"
+      },
+      "Ex-2": {
+        "schema_name": "news_signal_candidate",
+        "schema_version": "news_signal_candidate.v1",
+        "contract": "Ex-2",
+        "model_output_version": "news_signal_candidate.output.v1"
+      },
+      "Ex-3": {
+        "schema_name": "news_graph_delta_candidate",
+        "schema_version": "news_graph_delta_candidate.v1",
+        "contract": "Ex-3",
+        "model_output_version": "news_graph_delta_candidate.output.v1"
+      }
+    },
+    "evidence_spans": {
+      "Ex-1:fact-reg-ambiguous-entity:evidence:0": {
+        "article_id": "article-reg-ambiguous-entity",
+        "start_char": 0,
+        "end_char": 90,
+        "quote": "Mercury Energy announced an update about energy storage systems without naming a customer.",
+        "locator": "body"
+      }
+    },
+    "entity_resolutions": {
+      "fact-reg-ambiguous-entity:Mercury Energy": {
+        "mention_text": "Mercury Energy",
+        "canonical_id": null,
+        "resolution_status": "ambiguous",
+        "type_hint": "company"
+      },
+      "fact-reg-ambiguous-entity:energy storage systems": {
+        "mention_text": "energy storage systems",
+        "canonical_id": null,
+        "resolution_status": "unresolved",
+        "type_hint": "market_theme"
+      }
+    },
+    "replay_version": "fixture-baseline.v1",
+    "metrics_summary": {
+      "evidence_coverage": 1.0,
+      "dedupe_precision": 1.0,
+      "unresolved_explicitness": 1.0,
+      "ex2_contract_completeness": 1.0,
+      "ex3_false_positive_rate": 0.0
+    }
+  }
+}

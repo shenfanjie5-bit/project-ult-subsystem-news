@@ -1,0 +1,136 @@
+{
+  "cases": [
+    {
+      "case_id": "ex1-only-unresolved-boundary",
+      "category": "ex1_only",
+      "article_ids": [
+        "article-reg-ex1-only"
+      ],
+      "expected_outputs": [
+        {
+          "candidate_id": "fact-reg-ex1-only-unresolved",
+          "export_contract": "Ex-1",
+          "article_id": "article-reg-ex1-only",
+          "cluster_id": "cluster-reg-ex1-only",
+          "source_reference": {
+            "source_id": "regression-topic",
+            "url": "https://fixtures.example.com/regression-topic/ex1-only-unresolved",
+            "provider_key": "ex1-only-unresolved",
+            "original_locator": {
+              "locator_type": "fixture",
+              "locator_value": "ex1-only-unresolved"
+            }
+          },
+          "evidence_spans": [
+            {
+              "article_id": "article-reg-ex1-only",
+              "start_char": 0,
+              "end_char": 91,
+              "quote": "Unlisted Battery Venture announced a storage roadmap without naming any customer or ticker.",
+              "locator": "body"
+            }
+          ],
+          "schema_pin": {
+            "schema_name": "news_fact_candidate",
+            "schema_version": "news_fact_candidate.v1",
+            "contract": "Ex-1",
+            "model_output_version": "news_fact_candidate.output.v1"
+          },
+          "involved_entities": [
+            {
+              "mention_text": "Unlisted Battery Venture",
+              "canonical_id": null,
+              "resolution_status": "unresolved",
+              "type_hint": "company"
+            },
+            {
+              "mention_text": "customer",
+              "canonical_id": null,
+              "resolution_status": "unresolved",
+              "type_hint": "company"
+            }
+          ]
+        }
+      ],
+      "source_reference": {
+        "source_id": "regression-topic",
+        "url": "https://fixtures.example.com/regression-topic/ex1-only-unresolved",
+        "provider_key": "ex1-only-unresolved",
+        "original_locator": {
+          "locator_type": "fixture",
+          "locator_value": "ex1-only-unresolved"
+        }
+      },
+      "version_pins": {
+        "Ex-1": {
+          "schema_name": "news_fact_candidate",
+          "schema_version": "news_fact_candidate.v1",
+          "contract": "Ex-1",
+          "model_output_version": "news_fact_candidate.output.v1"
+        },
+        "Ex-2": {
+          "schema_name": "news_signal_candidate",
+          "schema_version": "news_signal_candidate.v1",
+          "contract": "Ex-2",
+          "model_output_version": "news_signal_candidate.output.v1"
+        },
+        "Ex-3": {
+          "schema_name": "news_graph_delta_candidate",
+          "schema_version": "news_graph_delta_candidate.v1",
+          "contract": "Ex-3",
+          "model_output_version": "news_graph_delta_candidate.output.v1"
+        }
+      },
+      "baseline_path": "baseline/ex1_only.json",
+      "raw_inputs": [
+        {
+          "article_id": "article-reg-ex1-only",
+          "source_reference": {
+            "source_id": "regression-topic",
+            "url": "https://fixtures.example.com/regression-topic/ex1-only-unresolved",
+            "provider_key": "ex1-only-unresolved",
+            "original_locator": {
+              "locator_type": "fixture",
+              "locator_value": "ex1-only-unresolved"
+            }
+          },
+          "title": "Unlisted storage roadmap",
+          "body_text": "Unlisted Battery Venture announced a storage roadmap without naming any customer or ticker.",
+          "published_at": "2026-03-01T00:00:00+00:00",
+          "fetched_at": "2026-03-01T00:05:00+00:00"
+        }
+      ],
+      "normalized_artifacts": [
+        {
+          "article_id": "article-reg-ex1-only",
+          "source_id": "regression-topic",
+          "source_reference": {
+            "source_id": "regression-topic",
+            "url": "https://fixtures.example.com/regression-topic/ex1-only-unresolved",
+            "provider_key": "ex1-only-unresolved",
+            "original_locator": {
+              "locator_type": "fixture",
+              "locator_value": "ex1-only-unresolved"
+            }
+          },
+          "title": "Unlisted storage roadmap",
+          "body_text": "Unlisted Battery Venture announced a storage roadmap without naming any customer or ticker.",
+          "published_at": "2026-03-01T00:00:00+00:00",
+          "fetched_at": "2026-03-01T00:05:00+00:00",
+          "language": "en",
+          "author_or_channel": "Regression Fixture",
+          "content_hash": "sha256:article-reg-ex1-only:content",
+          "article_fingerprint": "sha256:cluster-reg-ex1-only:fingerprint",
+          "license_tag": "fixture",
+          "reliability_tier": "A",
+          "cluster_id": "cluster-reg-ex1-only"
+        }
+      ],
+      "expected_cluster_id": "cluster-reg-ex1-only",
+      "metadata": {
+        "expected_ex2_count": 0,
+        "expected_unresolved_only_ex1": true
+      }
+    }
+  ]
+}

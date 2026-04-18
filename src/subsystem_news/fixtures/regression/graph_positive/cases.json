@@ -1,0 +1,178 @@
+{
+  "cases": [
+    {
+      "case_id": "graph-positive-explicit-relation",
+      "category": "graph_positive",
+      "article_ids": [
+        "article-reg-graph-positive"
+      ],
+      "expected_outputs": [
+        {
+          "candidate_id": "fact-reg-graph-positive",
+          "export_contract": "Ex-1",
+          "article_id": "article-reg-graph-positive",
+          "cluster_id": "cluster-reg-graph-positive",
+          "source_reference": {
+            "source_id": "regression-graph",
+            "url": "https://fixtures.example.com/regression-graph/graph-positive-sanction",
+            "provider_key": "graph-positive-sanction",
+            "original_locator": {
+              "locator_type": "fixture",
+              "locator_value": "graph-positive-sanction"
+            }
+          },
+          "evidence_spans": [
+            {
+              "article_id": "article-reg-graph-positive",
+              "start_char": 0,
+              "end_char": 72,
+              "quote": "Atlas Shipping was sanctioned by State Treasury over restricted exports.",
+              "locator": "body"
+            }
+          ],
+          "schema_pin": {
+            "schema_name": "news_fact_candidate",
+            "schema_version": "news_fact_candidate.v1",
+            "contract": "Ex-1",
+            "model_output_version": "news_fact_candidate.output.v1"
+          },
+          "involved_entities": [
+            {
+              "mention_text": "Atlas Shipping",
+              "canonical_id": "entity:atlas-shipping",
+              "resolution_status": "resolved",
+              "type_hint": "company"
+            },
+            {
+              "mention_text": "State Treasury",
+              "canonical_id": "entity:state-treasury",
+              "resolution_status": "resolved",
+              "type_hint": "regulator"
+            }
+          ]
+        },
+        {
+          "candidate_id": "graph-reg-positive-sanction",
+          "export_contract": "Ex-3",
+          "article_id": "article-reg-graph-positive",
+          "cluster_id": null,
+          "source_reference": {
+            "source_id": "regression-graph",
+            "url": "https://fixtures.example.com/regression-graph/graph-positive-sanction",
+            "provider_key": "graph-positive-sanction",
+            "original_locator": {
+              "locator_type": "fixture",
+              "locator_value": "graph-positive-sanction"
+            }
+          },
+          "evidence_spans": [
+            {
+              "article_id": "article-reg-graph-positive",
+              "start_char": 0,
+              "end_char": 72,
+              "quote": "Atlas Shipping was sanctioned by State Treasury over restricted exports.",
+              "locator": "body"
+            }
+          ],
+          "schema_pin": {
+            "schema_name": "news_graph_delta_candidate",
+            "schema_version": "news_graph_delta_candidate.v1",
+            "contract": "Ex-3",
+            "model_output_version": "news_graph_delta_candidate.output.v1"
+          },
+          "subject_entity": {
+            "mention_text": "Atlas Shipping",
+            "canonical_id": "entity:atlas-shipping",
+            "resolution_status": "resolved",
+            "type_hint": "company"
+          },
+          "object_entity": {
+            "mention_text": "State Treasury",
+            "canonical_id": "entity:state-treasury",
+            "resolution_status": "resolved",
+            "type_hint": "regulator"
+          },
+          "requires_manual_review": true
+        }
+      ],
+      "source_reference": {
+        "source_id": "regression-graph",
+        "url": "https://fixtures.example.com/regression-graph/graph-positive-sanction",
+        "provider_key": "graph-positive-sanction",
+        "original_locator": {
+          "locator_type": "fixture",
+          "locator_value": "graph-positive-sanction"
+        }
+      },
+      "version_pins": {
+        "Ex-1": {
+          "schema_name": "news_fact_candidate",
+          "schema_version": "news_fact_candidate.v1",
+          "contract": "Ex-1",
+          "model_output_version": "news_fact_candidate.output.v1"
+        },
+        "Ex-2": {
+          "schema_name": "news_signal_candidate",
+          "schema_version": "news_signal_candidate.v1",
+          "contract": "Ex-2",
+          "model_output_version": "news_signal_candidate.output.v1"
+        },
+        "Ex-3": {
+          "schema_name": "news_graph_delta_candidate",
+          "schema_version": "news_graph_delta_candidate.v1",
+          "contract": "Ex-3",
+          "model_output_version": "news_graph_delta_candidate.output.v1"
+        }
+      },
+      "baseline_path": "baseline/graph_positive.json",
+      "raw_inputs": [
+        {
+          "article_id": "article-reg-graph-positive",
+          "source_reference": {
+            "source_id": "regression-graph",
+            "url": "https://fixtures.example.com/regression-graph/graph-positive-sanction",
+            "provider_key": "graph-positive-sanction",
+            "original_locator": {
+              "locator_type": "fixture",
+              "locator_value": "graph-positive-sanction"
+            }
+          },
+          "title": "Atlas sanctioned by State Treasury",
+          "body_text": "Atlas Shipping was sanctioned by State Treasury over restricted exports.",
+          "published_at": "2026-03-01T00:00:00+00:00",
+          "fetched_at": "2026-03-01T00:05:00+00:00"
+        }
+      ],
+      "normalized_artifacts": [
+        {
+          "article_id": "article-reg-graph-positive",
+          "source_id": "regression-graph",
+          "source_reference": {
+            "source_id": "regression-graph",
+            "url": "https://fixtures.example.com/regression-graph/graph-positive-sanction",
+            "provider_key": "graph-positive-sanction",
+            "original_locator": {
+              "locator_type": "fixture",
+              "locator_value": "graph-positive-sanction"
+            }
+          },
+          "title": "Atlas sanctioned by State Treasury",
+          "body_text": "Atlas Shipping was sanctioned by State Treasury over restricted exports.",
+          "published_at": "2026-03-01T00:00:00+00:00",
+          "fetched_at": "2026-03-01T00:05:00+00:00",
+          "language": "en",
+          "author_or_channel": "Regression Fixture",
+          "content_hash": "sha256:article-reg-graph-positive:content",
+          "article_fingerprint": "sha256:cluster-reg-graph-positive:fingerprint",
+          "license_tag": "fixture",
+          "reliability_tier": "A",
+          "cluster_id": "cluster-reg-graph-positive"
+        }
+      ],
+      "expected_cluster_id": "cluster-reg-graph-positive",
+      "metadata": {
+        "requires_ex3_review": true
+      }
+    }
+  ]
+}

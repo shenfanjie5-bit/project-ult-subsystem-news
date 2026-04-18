@@ -1,0 +1,273 @@
+{
+  "replay_id": "baseline-graph_positive",
+  "input_kind": "trace",
+  "input_path": "src/subsystem_news/fixtures/regression/graph_positive/cases.json",
+  "source_run_id": "baseline-run-graph_positive",
+  "started_at": "2026-03-01T00:00:00Z",
+  "completed_at": "2026-03-01T00:05:00Z",
+  "article_results": [
+    {
+      "article_id": "article-reg-graph-positive",
+      "source_reference": {
+        "source_id": "regression-graph",
+        "url": "https://fixtures.example.com/regression-graph/graph-positive-sanction",
+        "provider_key": "graph-positive-sanction",
+        "original_locator": {
+          "locator_type": "fixture",
+          "locator_value": "graph-positive-sanction"
+        }
+      },
+      "status": "processed",
+      "baseline_available": true,
+      "has_changes": false,
+      "baseline": {
+        "article_id": "article-reg-graph-positive",
+        "cluster_id": "cluster-reg-graph-positive",
+        "representative_article_id": "article-reg-graph-positive",
+        "source_reference": {
+          "source_id": "regression-graph",
+          "url": "https://fixtures.example.com/regression-graph/graph-positive-sanction",
+          "provider_key": "graph-positive-sanction",
+          "original_locator": {
+            "locator_type": "fixture",
+            "locator_value": "graph-positive-sanction"
+          }
+        },
+        "candidate_ids": [
+          "Ex-1:fact-reg-graph-positive",
+          "Ex-3:graph-reg-positive-sanction"
+        ],
+        "schema_pins": {
+          "Ex-1": {
+            "schema_name": "news_fact_candidate",
+            "schema_version": "news_fact_candidate.v1",
+            "contract": "Ex-1",
+            "model_output_version": "news_fact_candidate.output.v1"
+          },
+          "Ex-2": {
+            "schema_name": "news_signal_candidate",
+            "schema_version": "news_signal_candidate.v1",
+            "contract": "Ex-2",
+            "model_output_version": "news_signal_candidate.output.v1"
+          },
+          "Ex-3": {
+            "schema_name": "news_graph_delta_candidate",
+            "schema_version": "news_graph_delta_candidate.v1",
+            "contract": "Ex-3",
+            "model_output_version": "news_graph_delta_candidate.output.v1"
+          }
+        }
+      },
+      "replayed": {
+        "article_id": "article-reg-graph-positive",
+        "cluster_id": "cluster-reg-graph-positive",
+        "representative_article_id": "article-reg-graph-positive",
+        "source_reference": {
+          "source_id": "regression-graph",
+          "url": "https://fixtures.example.com/regression-graph/graph-positive-sanction",
+          "provider_key": "graph-positive-sanction",
+          "original_locator": {
+            "locator_type": "fixture",
+            "locator_value": "graph-positive-sanction"
+          }
+        },
+        "candidate_ids": [
+          "Ex-1:fact-reg-graph-positive",
+          "Ex-3:graph-reg-positive-sanction"
+        ],
+        "schema_pins": {
+          "Ex-1": {
+            "schema_name": "news_fact_candidate",
+            "schema_version": "news_fact_candidate.v1",
+            "contract": "Ex-1",
+            "model_output_version": "news_fact_candidate.output.v1"
+          },
+          "Ex-2": {
+            "schema_name": "news_signal_candidate",
+            "schema_version": "news_signal_candidate.v1",
+            "contract": "Ex-2",
+            "model_output_version": "news_signal_candidate.output.v1"
+          },
+          "Ex-3": {
+            "schema_name": "news_graph_delta_candidate",
+            "schema_version": "news_graph_delta_candidate.v1",
+            "contract": "Ex-3",
+            "model_output_version": "news_graph_delta_candidate.output.v1"
+          }
+        }
+      },
+      "candidate_diffs": [],
+      "evidence_span_diffs": [],
+      "entity_resolution_diffs": [],
+      "version_metadata_diffs": [],
+      "error_stage": null,
+      "error_message": null
+    }
+  ],
+  "changed_count": 0,
+  "error_count": 0,
+  "has_changes": false,
+  "stage_order": [
+    "fixture_baseline"
+  ],
+  "metadata": {
+    "category": "graph_positive",
+    "case_count": 1,
+    "article_count": 1,
+    "candidate_payloads": [
+      {
+        "candidate_id": "fact-reg-graph-positive",
+        "article_id": "article-reg-graph-positive",
+        "cluster_id": "cluster-reg-graph-positive",
+        "source_reference": {
+          "source_id": "regression-graph",
+          "url": "https://fixtures.example.com/regression-graph/graph-positive-sanction",
+          "provider_key": "graph-positive-sanction",
+          "original_locator": {
+            "locator_type": "fixture",
+            "locator_value": "graph-positive-sanction"
+          }
+        },
+        "fact_type": "regulation_impact",
+        "summary": "Atlas Shipping was sanctioned by State Treasury over restricted exports.",
+        "involved_entities": [
+          {
+            "mention_text": "Atlas Shipping",
+            "canonical_id": "entity:atlas-shipping",
+            "resolution_status": "resolved",
+            "type_hint": "company"
+          },
+          {
+            "mention_text": "State Treasury",
+            "canonical_id": "entity:state-treasury",
+            "resolution_status": "resolved",
+            "type_hint": "regulator"
+          }
+        ],
+        "event_time": null,
+        "confidence": 0.9,
+        "source_reliability_tier": "A",
+        "export_contract": "Ex-1",
+        "evidence_spans": [
+          {
+            "article_id": "article-reg-graph-positive",
+            "start_char": 0,
+            "end_char": 72,
+            "quote": "Atlas Shipping was sanctioned by State Treasury over restricted exports.",
+            "locator": "body"
+          }
+        ]
+      },
+      {
+        "candidate_id": "graph-reg-positive-sanction",
+        "article_id": "article-reg-graph-positive",
+        "source_reference": {
+          "source_id": "regression-graph",
+          "url": "https://fixtures.example.com/regression-graph/graph-positive-sanction",
+          "provider_key": "graph-positive-sanction",
+          "original_locator": {
+            "locator_type": "fixture",
+            "locator_value": "graph-positive-sanction"
+          }
+        },
+        "subject_entity": {
+          "mention_text": "Atlas Shipping",
+          "canonical_id": "entity:atlas-shipping",
+          "resolution_status": "resolved",
+          "type_hint": "company"
+        },
+        "relation_type": "sanctioned_by",
+        "object_entity": {
+          "mention_text": "State Treasury",
+          "canonical_id": "entity:state-treasury",
+          "resolution_status": "resolved",
+          "type_hint": "regulator"
+        },
+        "delta_action": "add",
+        "valid_from": null,
+        "confidence": 0.91,
+        "requires_manual_review": true,
+        "export_contract": "Ex-3",
+        "evidence_spans": [
+          {
+            "article_id": "article-reg-graph-positive",
+            "start_char": 0,
+            "end_char": 72,
+            "quote": "Atlas Shipping was sanctioned by State Treasury over restricted exports.",
+            "locator": "body"
+          }
+        ]
+      }
+    ],
+    "schema_pins": {
+      "Ex-1": {
+        "schema_name": "news_fact_candidate",
+        "schema_version": "news_fact_candidate.v1",
+        "contract": "Ex-1",
+        "model_output_version": "news_fact_candidate.output.v1"
+      },
+      "Ex-2": {
+        "schema_name": "news_signal_candidate",
+        "schema_version": "news_signal_candidate.v1",
+        "contract": "Ex-2",
+        "model_output_version": "news_signal_candidate.output.v1"
+      },
+      "Ex-3": {
+        "schema_name": "news_graph_delta_candidate",
+        "schema_version": "news_graph_delta_candidate.v1",
+        "contract": "Ex-3",
+        "model_output_version": "news_graph_delta_candidate.output.v1"
+      }
+    },
+    "evidence_spans": {
+      "Ex-1:fact-reg-graph-positive:evidence:0": {
+        "article_id": "article-reg-graph-positive",
+        "start_char": 0,
+        "end_char": 72,
+        "quote": "Atlas Shipping was sanctioned by State Treasury over restricted exports.",
+        "locator": "body"
+      },
+      "Ex-3:graph-reg-positive-sanction:evidence:0": {
+        "article_id": "article-reg-graph-positive",
+        "start_char": 0,
+        "end_char": 72,
+        "quote": "Atlas Shipping was sanctioned by State Treasury over restricted exports.",
+        "locator": "body"
+      }
+    },
+    "entity_resolutions": {
+      "fact-reg-graph-positive:Atlas Shipping": {
+        "mention_text": "Atlas Shipping",
+        "canonical_id": "entity:atlas-shipping",
+        "resolution_status": "resolved",
+        "type_hint": "company"
+      },
+      "fact-reg-graph-positive:State Treasury": {
+        "mention_text": "State Treasury",
+        "canonical_id": "entity:state-treasury",
+        "resolution_status": "resolved",
+        "type_hint": "regulator"
+      },
+      "graph-reg-positive-sanction:subject_entity:Atlas Shipping": {
+        "mention_text": "Atlas Shipping",
+        "canonical_id": "entity:atlas-shipping",
+        "resolution_status": "resolved",
+        "type_hint": "company"
+      },
+      "graph-reg-positive-sanction:object_entity:State Treasury": {
+        "mention_text": "State Treasury",
+        "canonical_id": "entity:state-treasury",
+        "resolution_status": "resolved",
+        "type_hint": "regulator"
+      }
+    },
+    "replay_version": "fixture-baseline.v1",
+    "metrics_summary": {
+      "evidence_coverage": 1.0,
+      "dedupe_precision": 1.0,
+      "unresolved_explicitness": 1.0,
+      "ex2_contract_completeness": 1.0,
+      "ex3_false_positive_rate": 0.0
+    }
+  }
+}

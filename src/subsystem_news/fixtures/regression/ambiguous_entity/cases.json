@@ -1,0 +1,135 @@
+{
+  "cases": [
+    {
+      "case_id": "ambiguous-entity-explicit",
+      "category": "ambiguous_entity",
+      "article_ids": [
+        "article-reg-ambiguous-entity"
+      ],
+      "expected_outputs": [
+        {
+          "candidate_id": "fact-reg-ambiguous-entity",
+          "export_contract": "Ex-1",
+          "article_id": "article-reg-ambiguous-entity",
+          "cluster_id": "cluster-reg-ambiguous",
+          "source_reference": {
+            "source_id": "regression-topic",
+            "url": "https://fixtures.example.com/regression-topic/ambiguous-mercury",
+            "provider_key": "ambiguous-mercury",
+            "original_locator": {
+              "locator_type": "fixture",
+              "locator_value": "ambiguous-mercury"
+            }
+          },
+          "evidence_spans": [
+            {
+              "article_id": "article-reg-ambiguous-entity",
+              "start_char": 0,
+              "end_char": 90,
+              "quote": "Mercury Energy announced an update about energy storage systems without naming a customer.",
+              "locator": "body"
+            }
+          ],
+          "schema_pin": {
+            "schema_name": "news_fact_candidate",
+            "schema_version": "news_fact_candidate.v1",
+            "contract": "Ex-1",
+            "model_output_version": "news_fact_candidate.output.v1"
+          },
+          "involved_entities": [
+            {
+              "mention_text": "Mercury Energy",
+              "canonical_id": null,
+              "resolution_status": "ambiguous",
+              "type_hint": "company"
+            },
+            {
+              "mention_text": "energy storage systems",
+              "canonical_id": null,
+              "resolution_status": "unresolved",
+              "type_hint": "market_theme"
+            }
+          ]
+        }
+      ],
+      "source_reference": {
+        "source_id": "regression-topic",
+        "url": "https://fixtures.example.com/regression-topic/ambiguous-mercury",
+        "provider_key": "ambiguous-mercury",
+        "original_locator": {
+          "locator_type": "fixture",
+          "locator_value": "ambiguous-mercury"
+        }
+      },
+      "version_pins": {
+        "Ex-1": {
+          "schema_name": "news_fact_candidate",
+          "schema_version": "news_fact_candidate.v1",
+          "contract": "Ex-1",
+          "model_output_version": "news_fact_candidate.output.v1"
+        },
+        "Ex-2": {
+          "schema_name": "news_signal_candidate",
+          "schema_version": "news_signal_candidate.v1",
+          "contract": "Ex-2",
+          "model_output_version": "news_signal_candidate.output.v1"
+        },
+        "Ex-3": {
+          "schema_name": "news_graph_delta_candidate",
+          "schema_version": "news_graph_delta_candidate.v1",
+          "contract": "Ex-3",
+          "model_output_version": "news_graph_delta_candidate.output.v1"
+        }
+      },
+      "baseline_path": "baseline/ambiguous_entity.json",
+      "raw_inputs": [
+        {
+          "article_id": "article-reg-ambiguous-entity",
+          "source_reference": {
+            "source_id": "regression-topic",
+            "url": "https://fixtures.example.com/regression-topic/ambiguous-mercury",
+            "provider_key": "ambiguous-mercury",
+            "original_locator": {
+              "locator_type": "fixture",
+              "locator_value": "ambiguous-mercury"
+            }
+          },
+          "title": "Mercury Energy storage update",
+          "body_text": "Mercury Energy announced an update about energy storage systems without naming a customer.",
+          "published_at": "2026-03-01T00:00:00+00:00",
+          "fetched_at": "2026-03-01T00:05:00+00:00"
+        }
+      ],
+      "normalized_artifacts": [
+        {
+          "article_id": "article-reg-ambiguous-entity",
+          "source_id": "regression-topic",
+          "source_reference": {
+            "source_id": "regression-topic",
+            "url": "https://fixtures.example.com/regression-topic/ambiguous-mercury",
+            "provider_key": "ambiguous-mercury",
+            "original_locator": {
+              "locator_type": "fixture",
+              "locator_value": "ambiguous-mercury"
+            }
+          },
+          "title": "Mercury Energy storage update",
+          "body_text": "Mercury Energy announced an update about energy storage systems without naming a customer.",
+          "published_at": "2026-03-01T00:00:00+00:00",
+          "fetched_at": "2026-03-01T00:05:00+00:00",
+          "language": "en",
+          "author_or_channel": "Regression Fixture",
+          "content_hash": "sha256:article-reg-ambiguous-entity:content",
+          "article_fingerprint": "sha256:cluster-reg-ambiguous:fingerprint",
+          "license_tag": "fixture",
+          "reliability_tier": "A",
+          "cluster_id": "cluster-reg-ambiguous"
+        }
+      ],
+      "expected_cluster_id": "cluster-reg-ambiguous",
+      "metadata": {
+        "expected_unresolved_only_ex1": true
+      }
+    }
+  ]
+}

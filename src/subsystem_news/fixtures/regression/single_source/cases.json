@@ -1,0 +1,257 @@
+{
+  "cases": [
+    {
+      "case_id": "single-source-standard",
+      "category": "single_source",
+      "article_ids": [
+        "article-reg-single-source"
+      ],
+      "expected_outputs": [
+        {
+          "candidate_id": "fact-reg-single-contract",
+          "export_contract": "Ex-1",
+          "article_id": "article-reg-single-source",
+          "cluster_id": "cluster-reg-single-source",
+          "source_reference": {
+            "source_id": "regression-wire",
+            "url": "https://fixtures.example.com/regression-wire/single-source-acme",
+            "provider_key": "single-source-acme",
+            "original_locator": {
+              "locator_type": "fixture",
+              "locator_value": "single-source-acme"
+            }
+          },
+          "evidence_spans": [
+            {
+              "article_id": "article-reg-single-source",
+              "start_char": 0,
+              "end_char": 62,
+              "quote": "Acme Corp signed a three-year supply contract with Globex Inc.",
+              "locator": "body"
+            }
+          ],
+          "schema_pin": {
+            "schema_name": "news_fact_candidate",
+            "schema_version": "news_fact_candidate.v1",
+            "contract": "Ex-1",
+            "model_output_version": "news_fact_candidate.output.v1"
+          },
+          "involved_entities": [
+            {
+              "mention_text": "Acme Corp",
+              "canonical_id": "entity:acme-corp",
+              "resolution_status": "resolved",
+              "type_hint": "company"
+            },
+            {
+              "mention_text": "Globex Inc",
+              "canonical_id": "entity:globex-inc",
+              "resolution_status": "resolved",
+              "type_hint": "company"
+            }
+          ]
+        },
+        {
+          "candidate_id": "fact-reg-single-litigation",
+          "export_contract": "Ex-1",
+          "article_id": "article-reg-single-source",
+          "cluster_id": "cluster-reg-single-source",
+          "source_reference": {
+            "source_id": "regression-wire",
+            "url": "https://fixtures.example.com/regression-wire/single-source-acme",
+            "provider_key": "single-source-acme",
+            "original_locator": {
+              "locator_type": "fixture",
+              "locator_value": "single-source-acme"
+            }
+          },
+          "evidence_spans": [
+            {
+              "article_id": "article-reg-single-source",
+              "start_char": 63,
+              "end_char": 120,
+              "quote": "Globex Inc faces a supplier lawsuit over delayed modules.",
+              "locator": "body"
+            }
+          ],
+          "schema_pin": {
+            "schema_name": "news_fact_candidate",
+            "schema_version": "news_fact_candidate.v1",
+            "contract": "Ex-1",
+            "model_output_version": "news_fact_candidate.output.v1"
+          },
+          "involved_entities": [
+            {
+              "mention_text": "Globex Inc",
+              "canonical_id": "entity:globex-inc",
+              "resolution_status": "resolved",
+              "type_hint": "company"
+            }
+          ]
+        },
+        {
+          "candidate_id": "signal-reg-single-contract",
+          "export_contract": "Ex-2",
+          "article_id": "article-reg-single-source",
+          "cluster_id": "cluster-reg-single-source",
+          "source_reference": {
+            "source_id": "regression-wire",
+            "url": "https://fixtures.example.com/regression-wire/single-source-acme",
+            "provider_key": "single-source-acme",
+            "original_locator": {
+              "locator_type": "fixture",
+              "locator_value": "single-source-acme"
+            }
+          },
+          "evidence_spans": [
+            {
+              "article_id": "article-reg-single-source",
+              "start_char": 0,
+              "end_char": 62,
+              "quote": "Acme Corp signed a three-year supply contract with Globex Inc.",
+              "locator": "body"
+            }
+          ],
+          "schema_pin": {
+            "schema_name": "news_signal_candidate",
+            "schema_version": "news_signal_candidate.v1",
+            "contract": "Ex-2",
+            "model_output_version": "news_signal_candidate.output.v1"
+          },
+          "affected_entities": [
+            {
+              "mention_text": "Acme Corp",
+              "canonical_id": "entity:acme-corp",
+              "resolution_status": "resolved",
+              "type_hint": "company"
+            }
+          ],
+          "direction": "positive",
+          "magnitude": "medium"
+        },
+        {
+          "candidate_id": "signal-reg-single-litigation",
+          "export_contract": "Ex-2",
+          "article_id": "article-reg-single-source",
+          "cluster_id": "cluster-reg-single-source",
+          "source_reference": {
+            "source_id": "regression-wire",
+            "url": "https://fixtures.example.com/regression-wire/single-source-acme",
+            "provider_key": "single-source-acme",
+            "original_locator": {
+              "locator_type": "fixture",
+              "locator_value": "single-source-acme"
+            }
+          },
+          "evidence_spans": [
+            {
+              "article_id": "article-reg-single-source",
+              "start_char": 63,
+              "end_char": 120,
+              "quote": "Globex Inc faces a supplier lawsuit over delayed modules.",
+              "locator": "body"
+            }
+          ],
+          "schema_pin": {
+            "schema_name": "news_signal_candidate",
+            "schema_version": "news_signal_candidate.v1",
+            "contract": "Ex-2",
+            "model_output_version": "news_signal_candidate.output.v1"
+          },
+          "affected_entities": [
+            {
+              "mention_text": "Globex Inc",
+              "canonical_id": "entity:globex-inc",
+              "resolution_status": "resolved",
+              "type_hint": "company"
+            }
+          ],
+          "direction": "negative",
+          "magnitude": "medium"
+        }
+      ],
+      "source_reference": {
+        "source_id": "regression-wire",
+        "url": "https://fixtures.example.com/regression-wire/single-source-acme",
+        "provider_key": "single-source-acme",
+        "original_locator": {
+          "locator_type": "fixture",
+          "locator_value": "single-source-acme"
+        }
+      },
+      "version_pins": {
+        "Ex-1": {
+          "schema_name": "news_fact_candidate",
+          "schema_version": "news_fact_candidate.v1",
+          "contract": "Ex-1",
+          "model_output_version": "news_fact_candidate.output.v1"
+        },
+        "Ex-2": {
+          "schema_name": "news_signal_candidate",
+          "schema_version": "news_signal_candidate.v1",
+          "contract": "Ex-2",
+          "model_output_version": "news_signal_candidate.output.v1"
+        },
+        "Ex-3": {
+          "schema_name": "news_graph_delta_candidate",
+          "schema_version": "news_graph_delta_candidate.v1",
+          "contract": "Ex-3",
+          "model_output_version": "news_graph_delta_candidate.output.v1"
+        }
+      },
+      "baseline_path": "baseline/single_source.json",
+      "raw_inputs": [
+        {
+          "article_id": "article-reg-single-source",
+          "source_reference": {
+            "source_id": "regression-wire",
+            "url": "https://fixtures.example.com/regression-wire/single-source-acme",
+            "provider_key": "single-source-acme",
+            "original_locator": {
+              "locator_type": "fixture",
+              "locator_value": "single-source-acme"
+            }
+          },
+          "title": "Acme contract and lawsuit update",
+          "body_text": "Acme Corp signed a three-year supply contract with Globex Inc. Globex Inc faces a supplier lawsuit over delayed modules.",
+          "published_at": "2026-03-01T00:00:00+00:00",
+          "fetched_at": "2026-03-01T00:05:00+00:00"
+        }
+      ],
+      "normalized_artifacts": [
+        {
+          "article_id": "article-reg-single-source",
+          "source_id": "regression-wire",
+          "source_reference": {
+            "source_id": "regression-wire",
+            "url": "https://fixtures.example.com/regression-wire/single-source-acme",
+            "provider_key": "single-source-acme",
+            "original_locator": {
+              "locator_type": "fixture",
+              "locator_value": "single-source-acme"
+            }
+          },
+          "title": "Acme contract and lawsuit update",
+          "body_text": "Acme Corp signed a three-year supply contract with Globex Inc. Globex Inc faces a supplier lawsuit over delayed modules.",
+          "published_at": "2026-03-01T00:00:00+00:00",
+          "fetched_at": "2026-03-01T00:05:00+00:00",
+          "language": "en",
+          "author_or_channel": "Regression Fixture",
+          "content_hash": "sha256:article-reg-single-source:content",
+          "article_fingerprint": "sha256:cluster-reg-single-source:fingerprint",
+          "license_tag": "fixture",
+          "reliability_tier": "A",
+          "cluster_id": "cluster-reg-single-source"
+        }
+      ],
+      "expected_cluster_id": "cluster-reg-single-source",
+      "metadata": {
+        "focus_areas": [
+          "same_cluster_distinct_entities",
+          "opposite_directions",
+          "multiple_fact_types"
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,2574 @@
+{
+  "cases": [
+    {
+      "case_id": "repost-cluster-00",
+      "category": "repost_cluster",
+      "article_ids": [
+        "article-reg-repost-00-wire",
+        "article-reg-repost-00-copy"
+      ],
+      "expected_outputs": [
+        {
+          "candidate_id": "fact-reg-repost-00-wire",
+          "export_contract": "Ex-1",
+          "article_id": "article-reg-repost-00-wire",
+          "cluster_id": "cluster-reg-repost-00",
+          "source_reference": {
+            "source_id": "regression-wire",
+            "url": "https://fixtures.example.com/regression-wire/repost-00-wire",
+            "provider_key": "repost-00-wire",
+            "original_locator": {
+              "locator_type": "fixture",
+              "locator_value": "repost-00-wire"
+            }
+          },
+          "evidence_spans": [
+            {
+              "article_id": "article-reg-repost-00-wire",
+              "start_char": 0,
+              "end_char": 53,
+              "quote": "RepostCo 00 signed a supply contract with BuyerCo 00.",
+              "locator": "body"
+            }
+          ],
+          "schema_pin": {
+            "schema_name": "news_fact_candidate",
+            "schema_version": "news_fact_candidate.v1",
+            "contract": "Ex-1",
+            "model_output_version": "news_fact_candidate.output.v1"
+          },
+          "involved_entities": [
+            {
+              "mention_text": "RepostCo 00",
+              "canonical_id": "entity:repostco-00",
+              "resolution_status": "resolved",
+              "type_hint": "company"
+            },
+            {
+              "mention_text": "BuyerCo 00",
+              "canonical_id": "entity:buyerco-00",
+              "resolution_status": "resolved",
+              "type_hint": "company"
+            }
+          ]
+        },
+        {
+          "candidate_id": "fact-reg-repost-00-copy",
+          "export_contract": "Ex-1",
+          "article_id": "article-reg-repost-00-copy",
+          "cluster_id": "cluster-reg-repost-00",
+          "source_reference": {
+            "source_id": "regression-partner",
+            "url": "https://fixtures.example.com/regression-partner/repost-00-copy",
+            "provider_key": "repost-00-copy",
+            "original_locator": {
+              "locator_type": "fixture",
+              "locator_value": "repost-00-copy"
+            }
+          },
+          "evidence_spans": [
+            {
+              "article_id": "article-reg-repost-00-copy",
+              "start_char": 0,
+              "end_char": 53,
+              "quote": "RepostCo 00 signed a supply contract with BuyerCo 00.",
+              "locator": "body"
+            }
+          ],
+          "schema_pin": {
+            "schema_name": "news_fact_candidate",
+            "schema_version": "news_fact_candidate.v1",
+            "contract": "Ex-1",
+            "model_output_version": "news_fact_candidate.output.v1"
+          },
+          "involved_entities": [
+            {
+              "mention_text": "RepostCo 00",
+              "canonical_id": "entity:repostco-00",
+              "resolution_status": "resolved",
+              "type_hint": "company"
+            },
+            {
+              "mention_text": "BuyerCo 00",
+              "canonical_id": "entity:buyerco-00",
+              "resolution_status": "resolved",
+              "type_hint": "company"
+            }
+          ]
+        },
+        {
+          "candidate_id": "signal-reg-repost-00-folded",
+          "export_contract": "Ex-2",
+          "article_id": "article-reg-repost-00-copy",
+          "cluster_id": "cluster-reg-repost-00",
+          "source_reference": {
+            "source_id": "regression-partner",
+            "url": "https://fixtures.example.com/regression-partner/repost-00-copy",
+            "provider_key": "repost-00-copy",
+            "original_locator": {
+              "locator_type": "fixture",
+              "locator_value": "repost-00-copy"
+            }
+          },
+          "evidence_spans": [
+            {
+              "article_id": "article-reg-repost-00-copy",
+              "start_char": 0,
+              "end_char": 53,
+              "quote": "RepostCo 00 signed a supply contract with BuyerCo 00.",
+              "locator": "body"
+            }
+          ],
+          "schema_pin": {
+            "schema_name": "news_signal_candidate",
+            "schema_version": "news_signal_candidate.v1",
+            "contract": "Ex-2",
+            "model_output_version": "news_signal_candidate.output.v1"
+          },
+          "affected_entities": [
+            {
+              "mention_text": "RepostCo 00",
+              "canonical_id": "entity:repostco-00",
+              "resolution_status": "resolved",
+              "type_hint": "company"
+            }
+          ],
+          "direction": "positive",
+          "magnitude": "medium"
+        }
+      ],
+      "source_reference": {
+        "source_id": "regression-wire",
+        "url": "https://fixtures.example.com/regression-wire/repost-00-wire",
+        "provider_key": "repost-00-wire",
+        "original_locator": {
+          "locator_type": "fixture",
+          "locator_value": "repost-00-wire"
+        }
+      },
+      "version_pins": {
+        "Ex-1": {
+          "schema_name": "news_fact_candidate",
+          "schema_version": "news_fact_candidate.v1",
+          "contract": "Ex-1",
+          "model_output_version": "news_fact_candidate.output.v1"
+        },
+        "Ex-2": {
+          "schema_name": "news_signal_candidate",
+          "schema_version": "news_signal_candidate.v1",
+          "contract": "Ex-2",
+          "model_output_version": "news_signal_candidate.output.v1"
+        },
+        "Ex-3": {
+          "schema_name": "news_graph_delta_candidate",
+          "schema_version": "news_graph_delta_candidate.v1",
+          "contract": "Ex-3",
+          "model_output_version": "news_graph_delta_candidate.output.v1"
+        }
+      },
+      "baseline_path": "baseline/repost_cluster.json",
+      "raw_inputs": [
+        {
+          "article_id": "article-reg-repost-00-wire",
+          "source_reference": {
+            "source_id": "regression-wire",
+            "url": "https://fixtures.example.com/regression-wire/repost-00-wire",
+            "provider_key": "repost-00-wire",
+            "original_locator": {
+              "locator_type": "fixture",
+              "locator_value": "repost-00-wire"
+            }
+          },
+          "title": "RepostCo 00 contract",
+          "body_text": "RepostCo 00 signed a supply contract with BuyerCo 00.",
+          "published_at": "2026-03-01T00:00:00+00:00",
+          "fetched_at": "2026-03-01T00:05:00+00:00"
+        },
+        {
+          "article_id": "article-reg-repost-00-copy",
+          "source_reference": {
+            "source_id": "regression-partner",
+            "url": "https://fixtures.example.com/regression-partner/repost-00-copy",
+            "provider_key": "repost-00-copy",
+            "original_locator": {
+              "locator_type": "fixture",
+              "locator_value": "repost-00-copy"
+            }
+          },
+          "title": "RepostCo 00 contract copy",
+          "body_text": "RepostCo 00 signed a supply contract with BuyerCo 00.",
+          "published_at": "2026-03-01T00:00:00+00:00",
+          "fetched_at": "2026-03-01T00:05:00+00:00"
+        }
+      ],
+      "normalized_artifacts": [
+        {
+          "article_id": "article-reg-repost-00-wire",
+          "source_id": "regression-wire",
+          "source_reference": {
+            "source_id": "regression-wire",
+            "url": "https://fixtures.example.com/regression-wire/repost-00-wire",
+            "provider_key": "repost-00-wire",
+            "original_locator": {
+              "locator_type": "fixture",
+              "locator_value": "repost-00-wire"
+            }
+          },
+          "title": "RepostCo 00 contract",
+          "body_text": "RepostCo 00 signed a supply contract with BuyerCo 00.",
+          "published_at": "2026-03-01T00:00:00+00:00",
+          "fetched_at": "2026-03-01T00:05:00+00:00",
+          "language": "en",
+          "author_or_channel": "Regression Fixture",
+          "content_hash": "sha256:article-reg-repost-00-wire:content",
+          "article_fingerprint": "sha256:cluster-reg-repost-00:fingerprint",
+          "license_tag": "fixture",
+          "reliability_tier": "A",
+          "cluster_id": "cluster-reg-repost-00"
+        },
+        {
+          "article_id": "article-reg-repost-00-copy",
+          "source_id": "regression-partner",
+          "source_reference": {
+            "source_id": "regression-partner",
+            "url": "https://fixtures.example.com/regression-partner/repost-00-copy",
+            "provider_key": "repost-00-copy",
+            "original_locator": {
+              "locator_type": "fixture",
+              "locator_value": "repost-00-copy"
+            }
+          },
+          "title": "RepostCo 00 contract copy",
+          "body_text": "RepostCo 00 signed a supply contract with BuyerCo 00.",
+          "published_at": "2026-03-01T00:00:00+00:00",
+          "fetched_at": "2026-03-01T00:05:00+00:00",
+          "language": "en",
+          "author_or_channel": "Regression Fixture",
+          "content_hash": "sha256:article-reg-repost-00-copy:content",
+          "article_fingerprint": "sha256:cluster-reg-repost-00:fingerprint",
+          "license_tag": "fixture",
+          "reliability_tier": "A",
+          "cluster_id": "cluster-reg-repost-00"
+        }
+      ],
+      "expected_cluster_id": "cluster-reg-repost-00",
+      "metadata": {
+        "expected_folded_duplicates": 1,
+        "repost_duplicate_folded": true
+      }
+    },
+    {
+      "case_id": "repost-cluster-01",
+      "category": "repost_cluster",
+      "article_ids": [
+        "article-reg-repost-01-wire",
+        "article-reg-repost-01-copy"
+      ],
+      "expected_outputs": [
+        {
+          "candidate_id": "fact-reg-repost-01-wire",
+          "export_contract": "Ex-1",
+          "article_id": "article-reg-repost-01-wire",
+          "cluster_id": "cluster-reg-repost-01",
+          "source_reference": {
+            "source_id": "regression-wire",
+            "url": "https://fixtures.example.com/regression-wire/repost-01-wire",
+            "provider_key": "repost-01-wire",
+            "original_locator": {
+              "locator_type": "fixture",
+              "locator_value": "repost-01-wire"
+            }
+          },
+          "evidence_spans": [
+            {
+              "article_id": "article-reg-repost-01-wire",
+              "start_char": 0,
+              "end_char": 53,
+              "quote": "RepostCo 01 signed a supply contract with BuyerCo 01.",
+              "locator": "body"
+            }
+          ],
+          "schema_pin": {
+            "schema_name": "news_fact_candidate",
+            "schema_version": "news_fact_candidate.v1",
+            "contract": "Ex-1",
+            "model_output_version": "news_fact_candidate.output.v1"
+          },
+          "involved_entities": [
+            {
+              "mention_text": "RepostCo 01",
+              "canonical_id": "entity:repostco-01",
+              "resolution_status": "resolved",
+              "type_hint": "company"
+            },
+            {
+              "mention_text": "BuyerCo 01",
+              "canonical_id": "entity:buyerco-01",
+              "resolution_status": "resolved",
+              "type_hint": "company"
+            }
+          ]
+        },
+        {
+          "candidate_id": "fact-reg-repost-01-copy",
+          "export_contract": "Ex-1",
+          "article_id": "article-reg-repost-01-copy",
+          "cluster_id": "cluster-reg-repost-01",
+          "source_reference": {
+            "source_id": "regression-partner",
+            "url": "https://fixtures.example.com/regression-partner/repost-01-copy",
+            "provider_key": "repost-01-copy",
+            "original_locator": {
+              "locator_type": "fixture",
+              "locator_value": "repost-01-copy"
+            }
+          },
+          "evidence_spans": [
+            {
+              "article_id": "article-reg-repost-01-copy",
+              "start_char": 0,
+              "end_char": 53,
+              "quote": "RepostCo 01 signed a supply contract with BuyerCo 01.",
+              "locator": "body"
+            }
+          ],
+          "schema_pin": {
+            "schema_name": "news_fact_candidate",
+            "schema_version": "news_fact_candidate.v1",
+            "contract": "Ex-1",
+            "model_output_version": "news_fact_candidate.output.v1"
+          },
+          "involved_entities": [
+            {
+              "mention_text": "RepostCo 01",
+              "canonical_id": "entity:repostco-01",
+              "resolution_status": "resolved",
+              "type_hint": "company"
+            },
+            {
+              "mention_text": "BuyerCo 01",
+              "canonical_id": "entity:buyerco-01",
+              "resolution_status": "resolved",
+              "type_hint": "company"
+            }
+          ]
+        },
+        {
+          "candidate_id": "signal-reg-repost-01-folded",
+          "export_contract": "Ex-2",
+          "article_id": "article-reg-repost-01-copy",
+          "cluster_id": "cluster-reg-repost-01",
+          "source_reference": {
+            "source_id": "regression-partner",
+            "url": "https://fixtures.example.com/regression-partner/repost-01-copy",
+            "provider_key": "repost-01-copy",
+            "original_locator": {
+              "locator_type": "fixture",
+              "locator_value": "repost-01-copy"
+            }
+          },
+          "evidence_spans": [
+            {
+              "article_id": "article-reg-repost-01-copy",
+              "start_char": 0,
+              "end_char": 53,
+              "quote": "RepostCo 01 signed a supply contract with BuyerCo 01.",
+              "locator": "body"
+            }
+          ],
+          "schema_pin": {
+            "schema_name": "news_signal_candidate",
+            "schema_version": "news_signal_candidate.v1",
+            "contract": "Ex-2",
+            "model_output_version": "news_signal_candidate.output.v1"
+          },
+          "affected_entities": [
+            {
+              "mention_text": "RepostCo 01",
+              "canonical_id": "entity:repostco-01",
+              "resolution_status": "resolved",
+              "type_hint": "company"
+            }
+          ],
+          "direction": "positive",
+          "magnitude": "medium"
+        }
+      ],
+      "source_reference": {
+        "source_id": "regression-wire",
+        "url": "https://fixtures.example.com/regression-wire/repost-01-wire",
+        "provider_key": "repost-01-wire",
+        "original_locator": {
+          "locator_type": "fixture",
+          "locator_value": "repost-01-wire"
+        }
+      },
+      "version_pins": {
+        "Ex-1": {
+          "schema_name": "news_fact_candidate",
+          "schema_version": "news_fact_candidate.v1",
+          "contract": "Ex-1",
+          "model_output_version": "news_fact_candidate.output.v1"
+        },
+        "Ex-2": {
+          "schema_name": "news_signal_candidate",
+          "schema_version": "news_signal_candidate.v1",
+          "contract": "Ex-2",
+          "model_output_version": "news_signal_candidate.output.v1"
+        },
+        "Ex-3": {
+          "schema_name": "news_graph_delta_candidate",
+          "schema_version": "news_graph_delta_candidate.v1",
+          "contract": "Ex-3",
+          "model_output_version": "news_graph_delta_candidate.output.v1"
+        }
+      },
+      "baseline_path": "baseline/repost_cluster.json",
+      "raw_inputs": [
+        {
+          "article_id": "article-reg-repost-01-wire",
+          "source_reference": {
+            "source_id": "regression-wire",
+            "url": "https://fixtures.example.com/regression-wire/repost-01-wire",
+            "provider_key": "repost-01-wire",
+            "original_locator": {
+              "locator_type": "fixture",
+              "locator_value": "repost-01-wire"
+            }
+          },
+          "title": "RepostCo 01 contract",
+          "body_text": "RepostCo 01 signed a supply contract with BuyerCo 01.",
+          "published_at": "2026-03-01T00:00:00+00:00",
+          "fetched_at": "2026-03-01T00:05:00+00:00"
+        },
+        {
+          "article_id": "article-reg-repost-01-copy",
+          "source_reference": {
+            "source_id": "regression-partner",
+            "url": "https://fixtures.example.com/regression-partner/repost-01-copy",
+            "provider_key": "repost-01-copy",
+            "original_locator": {
+              "locator_type": "fixture",
+              "locator_value": "repost-01-copy"
+            }
+          },
+          "title": "RepostCo 01 contract copy",
+          "body_text": "RepostCo 01 signed a supply contract with BuyerCo 01.",
+          "published_at": "2026-03-01T00:00:00+00:00",
+          "fetched_at": "2026-03-01T00:05:00+00:00"
+        }
+      ],
+      "normalized_artifacts": [
+        {
+          "article_id": "article-reg-repost-01-wire",
+          "source_id": "regression-wire",
+          "source_reference": {
+            "source_id": "regression-wire",
+            "url": "https://fixtures.example.com/regression-wire/repost-01-wire",
+            "provider_key": "repost-01-wire",
+            "original_locator": {
+              "locator_type": "fixture",
+              "locator_value": "repost-01-wire"
+            }
+          },
+          "title": "RepostCo 01 contract",
+          "body_text": "RepostCo 01 signed a supply contract with BuyerCo 01.",
+          "published_at": "2026-03-01T00:00:00+00:00",
+          "fetched_at": "2026-03-01T00:05:00+00:00",
+          "language": "en",
+          "author_or_channel": "Regression Fixture",
+          "content_hash": "sha256:article-reg-repost-01-wire:content",
+          "article_fingerprint": "sha256:cluster-reg-repost-01:fingerprint",
+          "license_tag": "fixture",
+          "reliability_tier": "A",
+          "cluster_id": "cluster-reg-repost-01"
+        },
+        {
+          "article_id": "article-reg-repost-01-copy",
+          "source_id": "regression-partner",
+          "source_reference": {
+            "source_id": "regression-partner",
+            "url": "https://fixtures.example.com/regression-partner/repost-01-copy",
+            "provider_key": "repost-01-copy",
+            "original_locator": {
+              "locator_type": "fixture",
+              "locator_value": "repost-01-copy"
+            }
+          },
+          "title": "RepostCo 01 contract copy",
+          "body_text": "RepostCo 01 signed a supply contract with BuyerCo 01.",
+          "published_at": "2026-03-01T00:00:00+00:00",
+          "fetched_at": "2026-03-01T00:05:00+00:00",
+          "language": "en",
+          "author_or_channel": "Regression Fixture",
+          "content_hash": "sha256:article-reg-repost-01-copy:content",
+          "article_fingerprint": "sha256:cluster-reg-repost-01:fingerprint",
+          "license_tag": "fixture",
+          "reliability_tier": "A",
+          "cluster_id": "cluster-reg-repost-01"
+        }
+      ],
+      "expected_cluster_id": "cluster-reg-repost-01",
+      "metadata": {
+        "expected_folded_duplicates": 1,
+        "repost_duplicate_folded": true
+      }
+    },
+    {
+      "case_id": "repost-cluster-02",
+      "category": "repost_cluster",
+      "article_ids": [
+        "article-reg-repost-02-wire",
+        "article-reg-repost-02-copy"
+      ],
+      "expected_outputs": [
+        {
+          "candidate_id": "fact-reg-repost-02-wire",
+          "export_contract": "Ex-1",
+          "article_id": "article-reg-repost-02-wire",
+          "cluster_id": "cluster-reg-repost-02",
+          "source_reference": {
+            "source_id": "regression-wire",
+            "url": "https://fixtures.example.com/regression-wire/repost-02-wire",
+            "provider_key": "repost-02-wire",
+            "original_locator": {
+              "locator_type": "fixture",
+              "locator_value": "repost-02-wire"
+            }
+          },
+          "evidence_spans": [
+            {
+              "article_id": "article-reg-repost-02-wire",
+              "start_char": 0,
+              "end_char": 53,
+              "quote": "RepostCo 02 signed a supply contract with BuyerCo 02.",
+              "locator": "body"
+            }
+          ],
+          "schema_pin": {
+            "schema_name": "news_fact_candidate",
+            "schema_version": "news_fact_candidate.v1",
+            "contract": "Ex-1",
+            "model_output_version": "news_fact_candidate.output.v1"
+          },
+          "involved_entities": [
+            {
+              "mention_text": "RepostCo 02",
+              "canonical_id": "entity:repostco-02",
+              "resolution_status": "resolved",
+              "type_hint": "company"
+            },
+            {
+              "mention_text": "BuyerCo 02",
+              "canonical_id": "entity:buyerco-02",
+              "resolution_status": "resolved",
+              "type_hint": "company"
+            }
+          ]
+        },
+        {
+          "candidate_id": "fact-reg-repost-02-copy",
+          "export_contract": "Ex-1",
+          "article_id": "article-reg-repost-02-copy",
+          "cluster_id": "cluster-reg-repost-02",
+          "source_reference": {
+            "source_id": "regression-partner",
+            "url": "https://fixtures.example.com/regression-partner/repost-02-copy",
+            "provider_key": "repost-02-copy",
+            "original_locator": {
+              "locator_type": "fixture",
+              "locator_value": "repost-02-copy"
+            }
+          },
+          "evidence_spans": [
+            {
+              "article_id": "article-reg-repost-02-copy",
+              "start_char": 0,
+              "end_char": 53,
+              "quote": "RepostCo 02 signed a supply contract with BuyerCo 02.",
+              "locator": "body"
+            }
+          ],
+          "schema_pin": {
+            "schema_name": "news_fact_candidate",
+            "schema_version": "news_fact_candidate.v1",
+            "contract": "Ex-1",
+            "model_output_version": "news_fact_candidate.output.v1"
+          },
+          "involved_entities": [
+            {
+              "mention_text": "RepostCo 02",
+              "canonical_id": "entity:repostco-02",
+              "resolution_status": "resolved",
+              "type_hint": "company"
+            },
+            {
+              "mention_text": "BuyerCo 02",
+              "canonical_id": "entity:buyerco-02",
+              "resolution_status": "resolved",
+              "type_hint": "company"
+            }
+          ]
+        },
+        {
+          "candidate_id": "signal-reg-repost-02-folded",
+          "export_contract": "Ex-2",
+          "article_id": "article-reg-repost-02-copy",
+          "cluster_id": "cluster-reg-repost-02",
+          "source_reference": {
+            "source_id": "regression-partner",
+            "url": "https://fixtures.example.com/regression-partner/repost-02-copy",
+            "provider_key": "repost-02-copy",
+            "original_locator": {
+              "locator_type": "fixture",
+              "locator_value": "repost-02-copy"
+            }
+          },
+          "evidence_spans": [
+            {
+              "article_id": "article-reg-repost-02-copy",
+              "start_char": 0,
+              "end_char": 53,
+              "quote": "RepostCo 02 signed a supply contract with BuyerCo 02.",
+              "locator": "body"
+            }
+          ],
+          "schema_pin": {
+            "schema_name": "news_signal_candidate",
+            "schema_version": "news_signal_candidate.v1",
+            "contract": "Ex-2",
+            "model_output_version": "news_signal_candidate.output.v1"
+          },
+          "affected_entities": [
+            {
+              "mention_text": "RepostCo 02",
+              "canonical_id": "entity:repostco-02",
+              "resolution_status": "resolved",
+              "type_hint": "company"
+            }
+          ],
+          "direction": "positive",
+          "magnitude": "medium"
+        }
+      ],
+      "source_reference": {
+        "source_id": "regression-wire",
+        "url": "https://fixtures.example.com/regression-wire/repost-02-wire",
+        "provider_key": "repost-02-wire",
+        "original_locator": {
+          "locator_type": "fixture",
+          "locator_value": "repost-02-wire"
+        }
+      },
+      "version_pins": {
+        "Ex-1": {
+          "schema_name": "news_fact_candidate",
+          "schema_version": "news_fact_candidate.v1",
+          "contract": "Ex-1",
+          "model_output_version": "news_fact_candidate.output.v1"
+        },
+        "Ex-2": {
+          "schema_name": "news_signal_candidate",
+          "schema_version": "news_signal_candidate.v1",
+          "contract": "Ex-2",
+          "model_output_version": "news_signal_candidate.output.v1"
+        },
+        "Ex-3": {
+          "schema_name": "news_graph_delta_candidate",
+          "schema_version": "news_graph_delta_candidate.v1",
+          "contract": "Ex-3",
+          "model_output_version": "news_graph_delta_candidate.output.v1"
+        }
+      },
+      "baseline_path": "baseline/repost_cluster.json",
+      "raw_inputs": [
+        {
+          "article_id": "article-reg-repost-02-wire",
+          "source_reference": {
+            "source_id": "regression-wire",
+            "url": "https://fixtures.example.com/regression-wire/repost-02-wire",
+            "provider_key": "repost-02-wire",
+            "original_locator": {
+              "locator_type": "fixture",
+              "locator_value": "repost-02-wire"
+            }
+          },
+          "title": "RepostCo 02 contract",
+          "body_text": "RepostCo 02 signed a supply contract with BuyerCo 02.",
+          "published_at": "2026-03-01T00:00:00+00:00",
+          "fetched_at": "2026-03-01T00:05:00+00:00"
+        },
+        {
+          "article_id": "article-reg-repost-02-copy",
+          "source_reference": {
+            "source_id": "regression-partner",
+            "url": "https://fixtures.example.com/regression-partner/repost-02-copy",
+            "provider_key": "repost-02-copy",
+            "original_locator": {
+              "locator_type": "fixture",
+              "locator_value": "repost-02-copy"
+            }
+          },
+          "title": "RepostCo 02 contract copy",
+          "body_text": "RepostCo 02 signed a supply contract with BuyerCo 02.",
+          "published_at": "2026-03-01T00:00:00+00:00",
+          "fetched_at": "2026-03-01T00:05:00+00:00"
+        }
+      ],
+      "normalized_artifacts": [
+        {
+          "article_id": "article-reg-repost-02-wire",
+          "source_id": "regression-wire",
+          "source_reference": {
+            "source_id": "regression-wire",
+            "url": "https://fixtures.example.com/regression-wire/repost-02-wire",
+            "provider_key": "repost-02-wire",
+            "original_locator": {
+              "locator_type": "fixture",
+              "locator_value": "repost-02-wire"
+            }
+          },
+          "title": "RepostCo 02 contract",
+          "body_text": "RepostCo 02 signed a supply contract with BuyerCo 02.",
+          "published_at": "2026-03-01T00:00:00+00:00",
+          "fetched_at": "2026-03-01T00:05:00+00:00",
+          "language": "en",
+          "author_or_channel": "Regression Fixture",
+          "content_hash": "sha256:article-reg-repost-02-wire:content",
+          "article_fingerprint": "sha256:cluster-reg-repost-02:fingerprint",
+          "license_tag": "fixture",
+          "reliability_tier": "A",
+          "cluster_id": "cluster-reg-repost-02"
+        },
+        {
+          "article_id": "article-reg-repost-02-copy",
+          "source_id": "regression-partner",
+          "source_reference": {
+            "source_id": "regression-partner",
+            "url": "https://fixtures.example.com/regression-partner/repost-02-copy",
+            "provider_key": "repost-02-copy",
+            "original_locator": {
+              "locator_type": "fixture",
+              "locator_value": "repost-02-copy"
+            }
+          },
+          "title": "RepostCo 02 contract copy",
+          "body_text": "RepostCo 02 signed a supply contract with BuyerCo 02.",
+          "published_at": "2026-03-01T00:00:00+00:00",
+          "fetched_at": "2026-03-01T00:05:00+00:00",
+          "language": "en",
+          "author_or_channel": "Regression Fixture",
+          "content_hash": "sha256:article-reg-repost-02-copy:content",
+          "article_fingerprint": "sha256:cluster-reg-repost-02:fingerprint",
+          "license_tag": "fixture",
+          "reliability_tier": "A",
+          "cluster_id": "cluster-reg-repost-02"
+        }
+      ],
+      "expected_cluster_id": "cluster-reg-repost-02",
+      "metadata": {
+        "expected_folded_duplicates": 1,
+        "repost_duplicate_folded": true
+      }
+    },
+    {
+      "case_id": "repost-cluster-03",
+      "category": "repost_cluster",
+      "article_ids": [
+        "article-reg-repost-03-wire",
+        "article-reg-repost-03-copy"
+      ],
+      "expected_outputs": [
+        {
+          "candidate_id": "fact-reg-repost-03-wire",
+          "export_contract": "Ex-1",
+          "article_id": "article-reg-repost-03-wire",
+          "cluster_id": "cluster-reg-repost-03",
+          "source_reference": {
+            "source_id": "regression-wire",
+            "url": "https://fixtures.example.com/regression-wire/repost-03-wire",
+            "provider_key": "repost-03-wire",
+            "original_locator": {
+              "locator_type": "fixture",
+              "locator_value": "repost-03-wire"
+            }
+          },
+          "evidence_spans": [
+            {
+              "article_id": "article-reg-repost-03-wire",
+              "start_char": 0,
+              "end_char": 53,
+              "quote": "RepostCo 03 signed a supply contract with BuyerCo 03.",
+              "locator": "body"
+            }
+          ],
+          "schema_pin": {
+            "schema_name": "news_fact_candidate",
+            "schema_version": "news_fact_candidate.v1",
+            "contract": "Ex-1",
+            "model_output_version": "news_fact_candidate.output.v1"
+          },
+          "involved_entities": [
+            {
+              "mention_text": "RepostCo 03",
+              "canonical_id": "entity:repostco-03",
+              "resolution_status": "resolved",
+              "type_hint": "company"
+            },
+            {
+              "mention_text": "BuyerCo 03",
+              "canonical_id": "entity:buyerco-03",
+              "resolution_status": "resolved",
+              "type_hint": "company"
+            }
+          ]
+        },
+        {
+          "candidate_id": "fact-reg-repost-03-copy",
+          "export_contract": "Ex-1",
+          "article_id": "article-reg-repost-03-copy",
+          "cluster_id": "cluster-reg-repost-03",
+          "source_reference": {
+            "source_id": "regression-partner",
+            "url": "https://fixtures.example.com/regression-partner/repost-03-copy",
+            "provider_key": "repost-03-copy",
+            "original_locator": {
+              "locator_type": "fixture",
+              "locator_value": "repost-03-copy"
+            }
+          },
+          "evidence_spans": [
+            {
+              "article_id": "article-reg-repost-03-copy",
+              "start_char": 0,
+              "end_char": 53,
+              "quote": "RepostCo 03 signed a supply contract with BuyerCo 03.",
+              "locator": "body"
+            }
+          ],
+          "schema_pin": {
+            "schema_name": "news_fact_candidate",
+            "schema_version": "news_fact_candidate.v1",
+            "contract": "Ex-1",
+            "model_output_version": "news_fact_candidate.output.v1"
+          },
+          "involved_entities": [
+            {
+              "mention_text": "RepostCo 03",
+              "canonical_id": "entity:repostco-03",
+              "resolution_status": "resolved",
+              "type_hint": "company"
+            },
+            {
+              "mention_text": "BuyerCo 03",
+              "canonical_id": "entity:buyerco-03",
+              "resolution_status": "resolved",
+              "type_hint": "company"
+            }
+          ]
+        },
+        {
+          "candidate_id": "signal-reg-repost-03-folded",
+          "export_contract": "Ex-2",
+          "article_id": "article-reg-repost-03-copy",
+          "cluster_id": "cluster-reg-repost-03",
+          "source_reference": {
+            "source_id": "regression-partner",
+            "url": "https://fixtures.example.com/regression-partner/repost-03-copy",
+            "provider_key": "repost-03-copy",
+            "original_locator": {
+              "locator_type": "fixture",
+              "locator_value": "repost-03-copy"
+            }
+          },
+          "evidence_spans": [
+            {
+              "article_id": "article-reg-repost-03-copy",
+              "start_char": 0,
+              "end_char": 53,
+              "quote": "RepostCo 03 signed a supply contract with BuyerCo 03.",
+              "locator": "body"
+            }
+          ],
+          "schema_pin": {
+            "schema_name": "news_signal_candidate",
+            "schema_version": "news_signal_candidate.v1",
+            "contract": "Ex-2",
+            "model_output_version": "news_signal_candidate.output.v1"
+          },
+          "affected_entities": [
+            {
+              "mention_text": "RepostCo 03",
+              "canonical_id": "entity:repostco-03",
+              "resolution_status": "resolved",
+              "type_hint": "company"
+            }
+          ],
+          "direction": "positive",
+          "magnitude": "medium"
+        }
+      ],
+      "source_reference": {
+        "source_id": "regression-wire",
+        "url": "https://fixtures.example.com/regression-wire/repost-03-wire",
+        "provider_key": "repost-03-wire",
+        "original_locator": {
+          "locator_type": "fixture",
+          "locator_value": "repost-03-wire"
+        }
+      },
+      "version_pins": {
+        "Ex-1": {
+          "schema_name": "news_fact_candidate",
+          "schema_version": "news_fact_candidate.v1",
+          "contract": "Ex-1",
+          "model_output_version": "news_fact_candidate.output.v1"
+        },
+        "Ex-2": {
+          "schema_name": "news_signal_candidate",
+          "schema_version": "news_signal_candidate.v1",
+          "contract": "Ex-2",
+          "model_output_version": "news_signal_candidate.output.v1"
+        },
+        "Ex-3": {
+          "schema_name": "news_graph_delta_candidate",
+          "schema_version": "news_graph_delta_candidate.v1",
+          "contract": "Ex-3",
+          "model_output_version": "news_graph_delta_candidate.output.v1"
+        }
+      },
+      "baseline_path": "baseline/repost_cluster.json",
+      "raw_inputs": [
+        {
+          "article_id": "article-reg-repost-03-wire",
+          "source_reference": {
+            "source_id": "regression-wire",
+            "url": "https://fixtures.example.com/regression-wire/repost-03-wire",
+            "provider_key": "repost-03-wire",
+            "original_locator": {
+              "locator_type": "fixture",
+              "locator_value": "repost-03-wire"
+            }
+          },
+          "title": "RepostCo 03 contract",
+          "body_text": "RepostCo 03 signed a supply contract with BuyerCo 03.",
+          "published_at": "2026-03-01T00:00:00+00:00",
+          "fetched_at": "2026-03-01T00:05:00+00:00"
+        },
+        {
+          "article_id": "article-reg-repost-03-copy",
+          "source_reference": {
+            "source_id": "regression-partner",
+            "url": "https://fixtures.example.com/regression-partner/repost-03-copy",
+            "provider_key": "repost-03-copy",
+            "original_locator": {
+              "locator_type": "fixture",
+              "locator_value": "repost-03-copy"
+            }
+          },
+          "title": "RepostCo 03 contract copy",
+          "body_text": "RepostCo 03 signed a supply contract with BuyerCo 03.",
+          "published_at": "2026-03-01T00:00:00+00:00",
+          "fetched_at": "2026-03-01T00:05:00+00:00"
+        }
+      ],
+      "normalized_artifacts": [
+        {
+          "article_id": "article-reg-repost-03-wire",
+          "source_id": "regression-wire",
+          "source_reference": {
+            "source_id": "regression-wire",
+            "url": "https://fixtures.example.com/regression-wire/repost-03-wire",
+            "provider_key": "repost-03-wire",
+            "original_locator": {
+              "locator_type": "fixture",
+              "locator_value": "repost-03-wire"
+            }
+          },
+          "title": "RepostCo 03 contract",
+          "body_text": "RepostCo 03 signed a supply contract with BuyerCo 03.",
+          "published_at": "2026-03-01T00:00:00+00:00",
+          "fetched_at": "2026-03-01T00:05:00+00:00",
+          "language": "en",
+          "author_or_channel": "Regression Fixture",
+          "content_hash": "sha256:article-reg-repost-03-wire:content",
+          "article_fingerprint": "sha256:cluster-reg-repost-03:fingerprint",
+          "license_tag": "fixture",
+          "reliability_tier": "A",
+          "cluster_id": "cluster-reg-repost-03"
+        },
+        {
+          "article_id": "article-reg-repost-03-copy",
+          "source_id": "regression-partner",
+          "source_reference": {
+            "source_id": "regression-partner",
+            "url": "https://fixtures.example.com/regression-partner/repost-03-copy",
+            "provider_key": "repost-03-copy",
+            "original_locator": {
+              "locator_type": "fixture",
+              "locator_value": "repost-03-copy"
+            }
+          },
+          "title": "RepostCo 03 contract copy",
+          "body_text": "RepostCo 03 signed a supply contract with BuyerCo 03.",
+          "published_at": "2026-03-01T00:00:00+00:00",
+          "fetched_at": "2026-03-01T00:05:00+00:00",
+          "language": "en",
+          "author_or_channel": "Regression Fixture",
+          "content_hash": "sha256:article-reg-repost-03-copy:content",
+          "article_fingerprint": "sha256:cluster-reg-repost-03:fingerprint",
+          "license_tag": "fixture",
+          "reliability_tier": "A",
+          "cluster_id": "cluster-reg-repost-03"
+        }
+      ],
+      "expected_cluster_id": "cluster-reg-repost-03",
+      "metadata": {
+        "expected_folded_duplicates": 1,
+        "repost_duplicate_folded": true
+      }
+    },
+    {
+      "case_id": "repost-cluster-04",
+      "category": "repost_cluster",
+      "article_ids": [
+        "article-reg-repost-04-wire",
+        "article-reg-repost-04-copy"
+      ],
+      "expected_outputs": [
+        {
+          "candidate_id": "fact-reg-repost-04-wire",
+          "export_contract": "Ex-1",
+          "article_id": "article-reg-repost-04-wire",
+          "cluster_id": "cluster-reg-repost-04",
+          "source_reference": {
+            "source_id": "regression-wire",
+            "url": "https://fixtures.example.com/regression-wire/repost-04-wire",
+            "provider_key": "repost-04-wire",
+            "original_locator": {
+              "locator_type": "fixture",
+              "locator_value": "repost-04-wire"
+            }
+          },
+          "evidence_spans": [
+            {
+              "article_id": "article-reg-repost-04-wire",
+              "start_char": 0,
+              "end_char": 53,
+              "quote": "RepostCo 04 signed a supply contract with BuyerCo 04.",
+              "locator": "body"
+            }
+          ],
+          "schema_pin": {
+            "schema_name": "news_fact_candidate",
+            "schema_version": "news_fact_candidate.v1",
+            "contract": "Ex-1",
+            "model_output_version": "news_fact_candidate.output.v1"
+          },
+          "involved_entities": [
+            {
+              "mention_text": "RepostCo 04",
+              "canonical_id": "entity:repostco-04",
+              "resolution_status": "resolved",
+              "type_hint": "company"
+            },
+            {
+              "mention_text": "BuyerCo 04",
+              "canonical_id": "entity:buyerco-04",
+              "resolution_status": "resolved",
+              "type_hint": "company"
+            }
+          ]
+        },
+        {
+          "candidate_id": "fact-reg-repost-04-copy",
+          "export_contract": "Ex-1",
+          "article_id": "article-reg-repost-04-copy",
+          "cluster_id": "cluster-reg-repost-04",
+          "source_reference": {
+            "source_id": "regression-partner",
+            "url": "https://fixtures.example.com/regression-partner/repost-04-copy",
+            "provider_key": "repost-04-copy",
+            "original_locator": {
+              "locator_type": "fixture",
+              "locator_value": "repost-04-copy"
+            }
+          },
+          "evidence_spans": [
+            {
+              "article_id": "article-reg-repost-04-copy",
+              "start_char": 0,
+              "end_char": 53,
+              "quote": "RepostCo 04 signed a supply contract with BuyerCo 04.",
+              "locator": "body"
+            }
+          ],
+          "schema_pin": {
+            "schema_name": "news_fact_candidate",
+            "schema_version": "news_fact_candidate.v1",
+            "contract": "Ex-1",
+            "model_output_version": "news_fact_candidate.output.v1"
+          },
+          "involved_entities": [
+            {
+              "mention_text": "RepostCo 04",
+              "canonical_id": "entity:repostco-04",
+              "resolution_status": "resolved",
+              "type_hint": "company"
+            },
+            {
+              "mention_text": "BuyerCo 04",
+              "canonical_id": "entity:buyerco-04",
+              "resolution_status": "resolved",
+              "type_hint": "company"
+            }
+          ]
+        },
+        {
+          "candidate_id": "signal-reg-repost-04-folded",
+          "export_contract": "Ex-2",
+          "article_id": "article-reg-repost-04-copy",
+          "cluster_id": "cluster-reg-repost-04",
+          "source_reference": {
+            "source_id": "regression-partner",
+            "url": "https://fixtures.example.com/regression-partner/repost-04-copy",
+            "provider_key": "repost-04-copy",
+            "original_locator": {
+              "locator_type": "fixture",
+              "locator_value": "repost-04-copy"
+            }
+          },
+          "evidence_spans": [
+            {
+              "article_id": "article-reg-repost-04-copy",
+              "start_char": 0,
+              "end_char": 53,
+              "quote": "RepostCo 04 signed a supply contract with BuyerCo 04.",
+              "locator": "body"
+            }
+          ],
+          "schema_pin": {
+            "schema_name": "news_signal_candidate",
+            "schema_version": "news_signal_candidate.v1",
+            "contract": "Ex-2",
+            "model_output_version": "news_signal_candidate.output.v1"
+          },
+          "affected_entities": [
+            {
+              "mention_text": "RepostCo 04",
+              "canonical_id": "entity:repostco-04",
+              "resolution_status": "resolved",
+              "type_hint": "company"
+            }
+          ],
+          "direction": "positive",
+          "magnitude": "medium"
+        }
+      ],
+      "source_reference": {
+        "source_id": "regression-wire",
+        "url": "https://fixtures.example.com/regression-wire/repost-04-wire",
+        "provider_key": "repost-04-wire",
+        "original_locator": {
+          "locator_type": "fixture",
+          "locator_value": "repost-04-wire"
+        }
+      },
+      "version_pins": {
+        "Ex-1": {
+          "schema_name": "news_fact_candidate",
+          "schema_version": "news_fact_candidate.v1",
+          "contract": "Ex-1",
+          "model_output_version": "news_fact_candidate.output.v1"
+        },
+        "Ex-2": {
+          "schema_name": "news_signal_candidate",
+          "schema_version": "news_signal_candidate.v1",
+          "contract": "Ex-2",
+          "model_output_version": "news_signal_candidate.output.v1"
+        },
+        "Ex-3": {
+          "schema_name": "news_graph_delta_candidate",
+          "schema_version": "news_graph_delta_candidate.v1",
+          "contract": "Ex-3",
+          "model_output_version": "news_graph_delta_candidate.output.v1"
+        }
+      },
+      "baseline_path": "baseline/repost_cluster.json",
+      "raw_inputs": [
+        {
+          "article_id": "article-reg-repost-04-wire",
+          "source_reference": {
+            "source_id": "regression-wire",
+            "url": "https://fixtures.example.com/regression-wire/repost-04-wire",
+            "provider_key": "repost-04-wire",
+            "original_locator": {
+              "locator_type": "fixture",
+              "locator_value": "repost-04-wire"
+            }
+          },
+          "title": "RepostCo 04 contract",
+          "body_text": "RepostCo 04 signed a supply contract with BuyerCo 04.",
+          "published_at": "2026-03-01T00:00:00+00:00",
+          "fetched_at": "2026-03-01T00:05:00+00:00"
+        },
+        {
+          "article_id": "article-reg-repost-04-copy",
+          "source_reference": {
+            "source_id": "regression-partner",
+            "url": "https://fixtures.example.com/regression-partner/repost-04-copy",
+            "provider_key": "repost-04-copy",
+            "original_locator": {
+              "locator_type": "fixture",
+              "locator_value": "repost-04-copy"
+            }
+          },
+          "title": "RepostCo 04 contract copy",
+          "body_text": "RepostCo 04 signed a supply contract with BuyerCo 04.",
+          "published_at": "2026-03-01T00:00:00+00:00",
+          "fetched_at": "2026-03-01T00:05:00+00:00"
+        }
+      ],
+      "normalized_artifacts": [
+        {
+          "article_id": "article-reg-repost-04-wire",
+          "source_id": "regression-wire",
+          "source_reference": {
+            "source_id": "regression-wire",
+            "url": "https://fixtures.example.com/regression-wire/repost-04-wire",
+            "provider_key": "repost-04-wire",
+            "original_locator": {
+              "locator_type": "fixture",
+              "locator_value": "repost-04-wire"
+            }
+          },
+          "title": "RepostCo 04 contract",
+          "body_text": "RepostCo 04 signed a supply contract with BuyerCo 04.",
+          "published_at": "2026-03-01T00:00:00+00:00",
+          "fetched_at": "2026-03-01T00:05:00+00:00",
+          "language": "en",
+          "author_or_channel": "Regression Fixture",
+          "content_hash": "sha256:article-reg-repost-04-wire:content",
+          "article_fingerprint": "sha256:cluster-reg-repost-04:fingerprint",
+          "license_tag": "fixture",
+          "reliability_tier": "A",
+          "cluster_id": "cluster-reg-repost-04"
+        },
+        {
+          "article_id": "article-reg-repost-04-copy",
+          "source_id": "regression-partner",
+          "source_reference": {
+            "source_id": "regression-partner",
+            "url": "https://fixtures.example.com/regression-partner/repost-04-copy",
+            "provider_key": "repost-04-copy",
+            "original_locator": {
+              "locator_type": "fixture",
+              "locator_value": "repost-04-copy"
+            }
+          },
+          "title": "RepostCo 04 contract copy",
+          "body_text": "RepostCo 04 signed a supply contract with BuyerCo 04.",
+          "published_at": "2026-03-01T00:00:00+00:00",
+          "fetched_at": "2026-03-01T00:05:00+00:00",
+          "language": "en",
+          "author_or_channel": "Regression Fixture",
+          "content_hash": "sha256:article-reg-repost-04-copy:content",
+          "article_fingerprint": "sha256:cluster-reg-repost-04:fingerprint",
+          "license_tag": "fixture",
+          "reliability_tier": "A",
+          "cluster_id": "cluster-reg-repost-04"
+        }
+      ],
+      "expected_cluster_id": "cluster-reg-repost-04",
+      "metadata": {
+        "expected_folded_duplicates": 1,
+        "repost_duplicate_folded": true
+      }
+    },
+    {
+      "case_id": "repost-cluster-05",
+      "category": "repost_cluster",
+      "article_ids": [
+        "article-reg-repost-05-wire",
+        "article-reg-repost-05-copy"
+      ],
+      "expected_outputs": [
+        {
+          "candidate_id": "fact-reg-repost-05-wire",
+          "export_contract": "Ex-1",
+          "article_id": "article-reg-repost-05-wire",
+          "cluster_id": "cluster-reg-repost-05",
+          "source_reference": {
+            "source_id": "regression-wire",
+            "url": "https://fixtures.example.com/regression-wire/repost-05-wire",
+            "provider_key": "repost-05-wire",
+            "original_locator": {
+              "locator_type": "fixture",
+              "locator_value": "repost-05-wire"
+            }
+          },
+          "evidence_spans": [
+            {
+              "article_id": "article-reg-repost-05-wire",
+              "start_char": 0,
+              "end_char": 53,
+              "quote": "RepostCo 05 signed a supply contract with BuyerCo 05.",
+              "locator": "body"
+            }
+          ],
+          "schema_pin": {
+            "schema_name": "news_fact_candidate",
+            "schema_version": "news_fact_candidate.v1",
+            "contract": "Ex-1",
+            "model_output_version": "news_fact_candidate.output.v1"
+          },
+          "involved_entities": [
+            {
+              "mention_text": "RepostCo 05",
+              "canonical_id": "entity:repostco-05",
+              "resolution_status": "resolved",
+              "type_hint": "company"
+            },
+            {
+              "mention_text": "BuyerCo 05",
+              "canonical_id": "entity:buyerco-05",
+              "resolution_status": "resolved",
+              "type_hint": "company"
+            }
+          ]
+        },
+        {
+          "candidate_id": "fact-reg-repost-05-copy",
+          "export_contract": "Ex-1",
+          "article_id": "article-reg-repost-05-copy",
+          "cluster_id": "cluster-reg-repost-05",
+          "source_reference": {
+            "source_id": "regression-partner",
+            "url": "https://fixtures.example.com/regression-partner/repost-05-copy",
+            "provider_key": "repost-05-copy",
+            "original_locator": {
+              "locator_type": "fixture",
+              "locator_value": "repost-05-copy"
+            }
+          },
+          "evidence_spans": [
+            {
+              "article_id": "article-reg-repost-05-copy",
+              "start_char": 0,
+              "end_char": 53,
+              "quote": "RepostCo 05 signed a supply contract with BuyerCo 05.",
+              "locator": "body"
+            }
+          ],
+          "schema_pin": {
+            "schema_name": "news_fact_candidate",
+            "schema_version": "news_fact_candidate.v1",
+            "contract": "Ex-1",
+            "model_output_version": "news_fact_candidate.output.v1"
+          },
+          "involved_entities": [
+            {
+              "mention_text": "RepostCo 05",
+              "canonical_id": "entity:repostco-05",
+              "resolution_status": "resolved",
+              "type_hint": "company"
+            },
+            {
+              "mention_text": "BuyerCo 05",
+              "canonical_id": "entity:buyerco-05",
+              "resolution_status": "resolved",
+              "type_hint": "company"
+            }
+          ]
+        },
+        {
+          "candidate_id": "signal-reg-repost-05-folded",
+          "export_contract": "Ex-2",
+          "article_id": "article-reg-repost-05-copy",
+          "cluster_id": "cluster-reg-repost-05",
+          "source_reference": {
+            "source_id": "regression-partner",
+            "url": "https://fixtures.example.com/regression-partner/repost-05-copy",
+            "provider_key": "repost-05-copy",
+            "original_locator": {
+              "locator_type": "fixture",
+              "locator_value": "repost-05-copy"
+            }
+          },
+          "evidence_spans": [
+            {
+              "article_id": "article-reg-repost-05-copy",
+              "start_char": 0,
+              "end_char": 53,
+              "quote": "RepostCo 05 signed a supply contract with BuyerCo 05.",
+              "locator": "body"
+            }
+          ],
+          "schema_pin": {
+            "schema_name": "news_signal_candidate",
+            "schema_version": "news_signal_candidate.v1",
+            "contract": "Ex-2",
+            "model_output_version": "news_signal_candidate.output.v1"
+          },
+          "affected_entities": [
+            {
+              "mention_text": "RepostCo 05",
+              "canonical_id": "entity:repostco-05",
+              "resolution_status": "resolved",
+              "type_hint": "company"
+            }
+          ],
+          "direction": "positive",
+          "magnitude": "medium"
+        }
+      ],
+      "source_reference": {
+        "source_id": "regression-wire",
+        "url": "https://fixtures.example.com/regression-wire/repost-05-wire",
+        "provider_key": "repost-05-wire",
+        "original_locator": {
+          "locator_type": "fixture",
+          "locator_value": "repost-05-wire"
+        }
+      },
+      "version_pins": {
+        "Ex-1": {
+          "schema_name": "news_fact_candidate",
+          "schema_version": "news_fact_candidate.v1",
+          "contract": "Ex-1",
+          "model_output_version": "news_fact_candidate.output.v1"
+        },
+        "Ex-2": {
+          "schema_name": "news_signal_candidate",
+          "schema_version": "news_signal_candidate.v1",
+          "contract": "Ex-2",
+          "model_output_version": "news_signal_candidate.output.v1"
+        },
+        "Ex-3": {
+          "schema_name": "news_graph_delta_candidate",
+          "schema_version": "news_graph_delta_candidate.v1",
+          "contract": "Ex-3",
+          "model_output_version": "news_graph_delta_candidate.output.v1"
+        }
+      },
+      "baseline_path": "baseline/repost_cluster.json",
+      "raw_inputs": [
+        {
+          "article_id": "article-reg-repost-05-wire",
+          "source_reference": {
+            "source_id": "regression-wire",
+            "url": "https://fixtures.example.com/regression-wire/repost-05-wire",
+            "provider_key": "repost-05-wire",
+            "original_locator": {
+              "locator_type": "fixture",
+              "locator_value": "repost-05-wire"
+            }
+          },
+          "title": "RepostCo 05 contract",
+          "body_text": "RepostCo 05 signed a supply contract with BuyerCo 05.",
+          "published_at": "2026-03-01T00:00:00+00:00",
+          "fetched_at": "2026-03-01T00:05:00+00:00"
+        },
+        {
+          "article_id": "article-reg-repost-05-copy",
+          "source_reference": {
+            "source_id": "regression-partner",
+            "url": "https://fixtures.example.com/regression-partner/repost-05-copy",
+            "provider_key": "repost-05-copy",
+            "original_locator": {
+              "locator_type": "fixture",
+              "locator_value": "repost-05-copy"
+            }
+          },
+          "title": "RepostCo 05 contract copy",
+          "body_text": "RepostCo 05 signed a supply contract with BuyerCo 05.",
+          "published_at": "2026-03-01T00:00:00+00:00",
+          "fetched_at": "2026-03-01T00:05:00+00:00"
+        }
+      ],
+      "normalized_artifacts": [
+        {
+          "article_id": "article-reg-repost-05-wire",
+          "source_id": "regression-wire",
+          "source_reference": {
+            "source_id": "regression-wire",
+            "url": "https://fixtures.example.com/regression-wire/repost-05-wire",
+            "provider_key": "repost-05-wire",
+            "original_locator": {
+              "locator_type": "fixture",
+              "locator_value": "repost-05-wire"
+            }
+          },
+          "title": "RepostCo 05 contract",
+          "body_text": "RepostCo 05 signed a supply contract with BuyerCo 05.",
+          "published_at": "2026-03-01T00:00:00+00:00",
+          "fetched_at": "2026-03-01T00:05:00+00:00",
+          "language": "en",
+          "author_or_channel": "Regression Fixture",
+          "content_hash": "sha256:article-reg-repost-05-wire:content",
+          "article_fingerprint": "sha256:cluster-reg-repost-05:fingerprint",
+          "license_tag": "fixture",
+          "reliability_tier": "A",
+          "cluster_id": "cluster-reg-repost-05"
+        },
+        {
+          "article_id": "article-reg-repost-05-copy",
+          "source_id": "regression-partner",
+          "source_reference": {
+            "source_id": "regression-partner",
+            "url": "https://fixtures.example.com/regression-partner/repost-05-copy",
+            "provider_key": "repost-05-copy",
+            "original_locator": {
+              "locator_type": "fixture",
+              "locator_value": "repost-05-copy"
+            }
+          },
+          "title": "RepostCo 05 contract copy",
+          "body_text": "RepostCo 05 signed a supply contract with BuyerCo 05.",
+          "published_at": "2026-03-01T00:00:00+00:00",
+          "fetched_at": "2026-03-01T00:05:00+00:00",
+          "language": "en",
+          "author_or_channel": "Regression Fixture",
+          "content_hash": "sha256:article-reg-repost-05-copy:content",
+          "article_fingerprint": "sha256:cluster-reg-repost-05:fingerprint",
+          "license_tag": "fixture",
+          "reliability_tier": "A",
+          "cluster_id": "cluster-reg-repost-05"
+        }
+      ],
+      "expected_cluster_id": "cluster-reg-repost-05",
+      "metadata": {
+        "expected_folded_duplicates": 1,
+        "repost_duplicate_folded": true
+      }
+    },
+    {
+      "case_id": "repost-cluster-06",
+      "category": "repost_cluster",
+      "article_ids": [
+        "article-reg-repost-06-wire",
+        "article-reg-repost-06-copy"
+      ],
+      "expected_outputs": [
+        {
+          "candidate_id": "fact-reg-repost-06-wire",
+          "export_contract": "Ex-1",
+          "article_id": "article-reg-repost-06-wire",
+          "cluster_id": "cluster-reg-repost-06",
+          "source_reference": {
+            "source_id": "regression-wire",
+            "url": "https://fixtures.example.com/regression-wire/repost-06-wire",
+            "provider_key": "repost-06-wire",
+            "original_locator": {
+              "locator_type": "fixture",
+              "locator_value": "repost-06-wire"
+            }
+          },
+          "evidence_spans": [
+            {
+              "article_id": "article-reg-repost-06-wire",
+              "start_char": 0,
+              "end_char": 53,
+              "quote": "RepostCo 06 signed a supply contract with BuyerCo 06.",
+              "locator": "body"
+            }
+          ],
+          "schema_pin": {
+            "schema_name": "news_fact_candidate",
+            "schema_version": "news_fact_candidate.v1",
+            "contract": "Ex-1",
+            "model_output_version": "news_fact_candidate.output.v1"
+          },
+          "involved_entities": [
+            {
+              "mention_text": "RepostCo 06",
+              "canonical_id": "entity:repostco-06",
+              "resolution_status": "resolved",
+              "type_hint": "company"
+            },
+            {
+              "mention_text": "BuyerCo 06",
+              "canonical_id": "entity:buyerco-06",
+              "resolution_status": "resolved",
+              "type_hint": "company"
+            }
+          ]
+        },
+        {
+          "candidate_id": "fact-reg-repost-06-copy",
+          "export_contract": "Ex-1",
+          "article_id": "article-reg-repost-06-copy",
+          "cluster_id": "cluster-reg-repost-06",
+          "source_reference": {
+            "source_id": "regression-partner",
+            "url": "https://fixtures.example.com/regression-partner/repost-06-copy",
+            "provider_key": "repost-06-copy",
+            "original_locator": {
+              "locator_type": "fixture",
+              "locator_value": "repost-06-copy"
+            }
+          },
+          "evidence_spans": [
+            {
+              "article_id": "article-reg-repost-06-copy",
+              "start_char": 0,
+              "end_char": 53,
+              "quote": "RepostCo 06 signed a supply contract with BuyerCo 06.",
+              "locator": "body"
+            }
+          ],
+          "schema_pin": {
+            "schema_name": "news_fact_candidate",
+            "schema_version": "news_fact_candidate.v1",
+            "contract": "Ex-1",
+            "model_output_version": "news_fact_candidate.output.v1"
+          },
+          "involved_entities": [
+            {
+              "mention_text": "RepostCo 06",
+              "canonical_id": "entity:repostco-06",
+              "resolution_status": "resolved",
+              "type_hint": "company"
+            },
+            {
+              "mention_text": "BuyerCo 06",
+              "canonical_id": "entity:buyerco-06",
+              "resolution_status": "resolved",
+              "type_hint": "company"
+            }
+          ]
+        },
+        {
+          "candidate_id": "signal-reg-repost-06-folded",
+          "export_contract": "Ex-2",
+          "article_id": "article-reg-repost-06-copy",
+          "cluster_id": "cluster-reg-repost-06",
+          "source_reference": {
+            "source_id": "regression-partner",
+            "url": "https://fixtures.example.com/regression-partner/repost-06-copy",
+            "provider_key": "repost-06-copy",
+            "original_locator": {
+              "locator_type": "fixture",
+              "locator_value": "repost-06-copy"
+            }
+          },
+          "evidence_spans": [
+            {
+              "article_id": "article-reg-repost-06-copy",
+              "start_char": 0,
+              "end_char": 53,
+              "quote": "RepostCo 06 signed a supply contract with BuyerCo 06.",
+              "locator": "body"
+            }
+          ],
+          "schema_pin": {
+            "schema_name": "news_signal_candidate",
+            "schema_version": "news_signal_candidate.v1",
+            "contract": "Ex-2",
+            "model_output_version": "news_signal_candidate.output.v1"
+          },
+          "affected_entities": [
+            {
+              "mention_text": "RepostCo 06",
+              "canonical_id": "entity:repostco-06",
+              "resolution_status": "resolved",
+              "type_hint": "company"
+            }
+          ],
+          "direction": "positive",
+          "magnitude": "medium"
+        }
+      ],
+      "source_reference": {
+        "source_id": "regression-wire",
+        "url": "https://fixtures.example.com/regression-wire/repost-06-wire",
+        "provider_key": "repost-06-wire",
+        "original_locator": {
+          "locator_type": "fixture",
+          "locator_value": "repost-06-wire"
+        }
+      },
+      "version_pins": {
+        "Ex-1": {
+          "schema_name": "news_fact_candidate",
+          "schema_version": "news_fact_candidate.v1",
+          "contract": "Ex-1",
+          "model_output_version": "news_fact_candidate.output.v1"
+        },
+        "Ex-2": {
+          "schema_name": "news_signal_candidate",
+          "schema_version": "news_signal_candidate.v1",
+          "contract": "Ex-2",
+          "model_output_version": "news_signal_candidate.output.v1"
+        },
+        "Ex-3": {
+          "schema_name": "news_graph_delta_candidate",
+          "schema_version": "news_graph_delta_candidate.v1",
+          "contract": "Ex-3",
+          "model_output_version": "news_graph_delta_candidate.output.v1"
+        }
+      },
+      "baseline_path": "baseline/repost_cluster.json",
+      "raw_inputs": [
+        {
+          "article_id": "article-reg-repost-06-wire",
+          "source_reference": {
+            "source_id": "regression-wire",
+            "url": "https://fixtures.example.com/regression-wire/repost-06-wire",
+            "provider_key": "repost-06-wire",
+            "original_locator": {
+              "locator_type": "fixture",
+              "locator_value": "repost-06-wire"
+            }
+          },
+          "title": "RepostCo 06 contract",
+          "body_text": "RepostCo 06 signed a supply contract with BuyerCo 06.",
+          "published_at": "2026-03-01T00:00:00+00:00",
+          "fetched_at": "2026-03-01T00:05:00+00:00"
+        },
+        {
+          "article_id": "article-reg-repost-06-copy",
+          "source_reference": {
+            "source_id": "regression-partner",
+            "url": "https://fixtures.example.com/regression-partner/repost-06-copy",
+            "provider_key": "repost-06-copy",
+            "original_locator": {
+              "locator_type": "fixture",
+              "locator_value": "repost-06-copy"
+            }
+          },
+          "title": "RepostCo 06 contract copy",
+          "body_text": "RepostCo 06 signed a supply contract with BuyerCo 06.",
+          "published_at": "2026-03-01T00:00:00+00:00",
+          "fetched_at": "2026-03-01T00:05:00+00:00"
+        }
+      ],
+      "normalized_artifacts": [
+        {
+          "article_id": "article-reg-repost-06-wire",
+          "source_id": "regression-wire",
+          "source_reference": {
+            "source_id": "regression-wire",
+            "url": "https://fixtures.example.com/regression-wire/repost-06-wire",
+            "provider_key": "repost-06-wire",
+            "original_locator": {
+              "locator_type": "fixture",
+              "locator_value": "repost-06-wire"
+            }
+          },
+          "title": "RepostCo 06 contract",
+          "body_text": "RepostCo 06 signed a supply contract with BuyerCo 06.",
+          "published_at": "2026-03-01T00:00:00+00:00",
+          "fetched_at": "2026-03-01T00:05:00+00:00",
+          "language": "en",
+          "author_or_channel": "Regression Fixture",
+          "content_hash": "sha256:article-reg-repost-06-wire:content",
+          "article_fingerprint": "sha256:cluster-reg-repost-06:fingerprint",
+          "license_tag": "fixture",
+          "reliability_tier": "A",
+          "cluster_id": "cluster-reg-repost-06"
+        },
+        {
+          "article_id": "article-reg-repost-06-copy",
+          "source_id": "regression-partner",
+          "source_reference": {
+            "source_id": "regression-partner",
+            "url": "https://fixtures.example.com/regression-partner/repost-06-copy",
+            "provider_key": "repost-06-copy",
+            "original_locator": {
+              "locator_type": "fixture",
+              "locator_value": "repost-06-copy"
+            }
+          },
+          "title": "RepostCo 06 contract copy",
+          "body_text": "RepostCo 06 signed a supply contract with BuyerCo 06.",
+          "published_at": "2026-03-01T00:00:00+00:00",
+          "fetched_at": "2026-03-01T00:05:00+00:00",
+          "language": "en",
+          "author_or_channel": "Regression Fixture",
+          "content_hash": "sha256:article-reg-repost-06-copy:content",
+          "article_fingerprint": "sha256:cluster-reg-repost-06:fingerprint",
+          "license_tag": "fixture",
+          "reliability_tier": "A",
+          "cluster_id": "cluster-reg-repost-06"
+        }
+      ],
+      "expected_cluster_id": "cluster-reg-repost-06",
+      "metadata": {
+        "expected_folded_duplicates": 1,
+        "repost_duplicate_folded": true
+      }
+    },
+    {
+      "case_id": "repost-cluster-07",
+      "category": "repost_cluster",
+      "article_ids": [
+        "article-reg-repost-07-wire",
+        "article-reg-repost-07-copy"
+      ],
+      "expected_outputs": [
+        {
+          "candidate_id": "fact-reg-repost-07-wire",
+          "export_contract": "Ex-1",
+          "article_id": "article-reg-repost-07-wire",
+          "cluster_id": "cluster-reg-repost-07",
+          "source_reference": {
+            "source_id": "regression-wire",
+            "url": "https://fixtures.example.com/regression-wire/repost-07-wire",
+            "provider_key": "repost-07-wire",
+            "original_locator": {
+              "locator_type": "fixture",
+              "locator_value": "repost-07-wire"
+            }
+          },
+          "evidence_spans": [
+            {
+              "article_id": "article-reg-repost-07-wire",
+              "start_char": 0,
+              "end_char": 53,
+              "quote": "RepostCo 07 signed a supply contract with BuyerCo 07.",
+              "locator": "body"
+            }
+          ],
+          "schema_pin": {
+            "schema_name": "news_fact_candidate",
+            "schema_version": "news_fact_candidate.v1",
+            "contract": "Ex-1",
+            "model_output_version": "news_fact_candidate.output.v1"
+          },
+          "involved_entities": [
+            {
+              "mention_text": "RepostCo 07",
+              "canonical_id": "entity:repostco-07",
+              "resolution_status": "resolved",
+              "type_hint": "company"
+            },
+            {
+              "mention_text": "BuyerCo 07",
+              "canonical_id": "entity:buyerco-07",
+              "resolution_status": "resolved",
+              "type_hint": "company"
+            }
+          ]
+        },
+        {
+          "candidate_id": "fact-reg-repost-07-copy",
+          "export_contract": "Ex-1",
+          "article_id": "article-reg-repost-07-copy",
+          "cluster_id": "cluster-reg-repost-07",
+          "source_reference": {
+            "source_id": "regression-partner",
+            "url": "https://fixtures.example.com/regression-partner/repost-07-copy",
+            "provider_key": "repost-07-copy",
+            "original_locator": {
+              "locator_type": "fixture",
+              "locator_value": "repost-07-copy"
+            }
+          },
+          "evidence_spans": [
+            {
+              "article_id": "article-reg-repost-07-copy",
+              "start_char": 0,
+              "end_char": 53,
+              "quote": "RepostCo 07 signed a supply contract with BuyerCo 07.",
+              "locator": "body"
+            }
+          ],
+          "schema_pin": {
+            "schema_name": "news_fact_candidate",
+            "schema_version": "news_fact_candidate.v1",
+            "contract": "Ex-1",
+            "model_output_version": "news_fact_candidate.output.v1"
+          },
+          "involved_entities": [
+            {
+              "mention_text": "RepostCo 07",
+              "canonical_id": "entity:repostco-07",
+              "resolution_status": "resolved",
+              "type_hint": "company"
+            },
+            {
+              "mention_text": "BuyerCo 07",
+              "canonical_id": "entity:buyerco-07",
+              "resolution_status": "resolved",
+              "type_hint": "company"
+            }
+          ]
+        },
+        {
+          "candidate_id": "signal-reg-repost-07-folded",
+          "export_contract": "Ex-2",
+          "article_id": "article-reg-repost-07-copy",
+          "cluster_id": "cluster-reg-repost-07",
+          "source_reference": {
+            "source_id": "regression-partner",
+            "url": "https://fixtures.example.com/regression-partner/repost-07-copy",
+            "provider_key": "repost-07-copy",
+            "original_locator": {
+              "locator_type": "fixture",
+              "locator_value": "repost-07-copy"
+            }
+          },
+          "evidence_spans": [
+            {
+              "article_id": "article-reg-repost-07-copy",
+              "start_char": 0,
+              "end_char": 53,
+              "quote": "RepostCo 07 signed a supply contract with BuyerCo 07.",
+              "locator": "body"
+            }
+          ],
+          "schema_pin": {
+            "schema_name": "news_signal_candidate",
+            "schema_version": "news_signal_candidate.v1",
+            "contract": "Ex-2",
+            "model_output_version": "news_signal_candidate.output.v1"
+          },
+          "affected_entities": [
+            {
+              "mention_text": "RepostCo 07",
+              "canonical_id": "entity:repostco-07",
+              "resolution_status": "resolved",
+              "type_hint": "company"
+            }
+          ],
+          "direction": "positive",
+          "magnitude": "medium"
+        }
+      ],
+      "source_reference": {
+        "source_id": "regression-wire",
+        "url": "https://fixtures.example.com/regression-wire/repost-07-wire",
+        "provider_key": "repost-07-wire",
+        "original_locator": {
+          "locator_type": "fixture",
+          "locator_value": "repost-07-wire"
+        }
+      },
+      "version_pins": {
+        "Ex-1": {
+          "schema_name": "news_fact_candidate",
+          "schema_version": "news_fact_candidate.v1",
+          "contract": "Ex-1",
+          "model_output_version": "news_fact_candidate.output.v1"
+        },
+        "Ex-2": {
+          "schema_name": "news_signal_candidate",
+          "schema_version": "news_signal_candidate.v1",
+          "contract": "Ex-2",
+          "model_output_version": "news_signal_candidate.output.v1"
+        },
+        "Ex-3": {
+          "schema_name": "news_graph_delta_candidate",
+          "schema_version": "news_graph_delta_candidate.v1",
+          "contract": "Ex-3",
+          "model_output_version": "news_graph_delta_candidate.output.v1"
+        }
+      },
+      "baseline_path": "baseline/repost_cluster.json",
+      "raw_inputs": [
+        {
+          "article_id": "article-reg-repost-07-wire",
+          "source_reference": {
+            "source_id": "regression-wire",
+            "url": "https://fixtures.example.com/regression-wire/repost-07-wire",
+            "provider_key": "repost-07-wire",
+            "original_locator": {
+              "locator_type": "fixture",
+              "locator_value": "repost-07-wire"
+            }
+          },
+          "title": "RepostCo 07 contract",
+          "body_text": "RepostCo 07 signed a supply contract with BuyerCo 07.",
+          "published_at": "2026-03-01T00:00:00+00:00",
+          "fetched_at": "2026-03-01T00:05:00+00:00"
+        },
+        {
+          "article_id": "article-reg-repost-07-copy",
+          "source_reference": {
+            "source_id": "regression-partner",
+            "url": "https://fixtures.example.com/regression-partner/repost-07-copy",
+            "provider_key": "repost-07-copy",
+            "original_locator": {
+              "locator_type": "fixture",
+              "locator_value": "repost-07-copy"
+            }
+          },
+          "title": "RepostCo 07 contract copy",
+          "body_text": "RepostCo 07 signed a supply contract with BuyerCo 07.",
+          "published_at": "2026-03-01T00:00:00+00:00",
+          "fetched_at": "2026-03-01T00:05:00+00:00"
+        }
+      ],
+      "normalized_artifacts": [
+        {
+          "article_id": "article-reg-repost-07-wire",
+          "source_id": "regression-wire",
+          "source_reference": {
+            "source_id": "regression-wire",
+            "url": "https://fixtures.example.com/regression-wire/repost-07-wire",
+            "provider_key": "repost-07-wire",
+            "original_locator": {
+              "locator_type": "fixture",
+              "locator_value": "repost-07-wire"
+            }
+          },
+          "title": "RepostCo 07 contract",
+          "body_text": "RepostCo 07 signed a supply contract with BuyerCo 07.",
+          "published_at": "2026-03-01T00:00:00+00:00",
+          "fetched_at": "2026-03-01T00:05:00+00:00",
+          "language": "en",
+          "author_or_channel": "Regression Fixture",
+          "content_hash": "sha256:article-reg-repost-07-wire:content",
+          "article_fingerprint": "sha256:cluster-reg-repost-07:fingerprint",
+          "license_tag": "fixture",
+          "reliability_tier": "A",
+          "cluster_id": "cluster-reg-repost-07"
+        },
+        {
+          "article_id": "article-reg-repost-07-copy",
+          "source_id": "regression-partner",
+          "source_reference": {
+            "source_id": "regression-partner",
+            "url": "https://fixtures.example.com/regression-partner/repost-07-copy",
+            "provider_key": "repost-07-copy",
+            "original_locator": {
+              "locator_type": "fixture",
+              "locator_value": "repost-07-copy"
+            }
+          },
+          "title": "RepostCo 07 contract copy",
+          "body_text": "RepostCo 07 signed a supply contract with BuyerCo 07.",
+          "published_at": "2026-03-01T00:00:00+00:00",
+          "fetched_at": "2026-03-01T00:05:00+00:00",
+          "language": "en",
+          "author_or_channel": "Regression Fixture",
+          "content_hash": "sha256:article-reg-repost-07-copy:content",
+          "article_fingerprint": "sha256:cluster-reg-repost-07:fingerprint",
+          "license_tag": "fixture",
+          "reliability_tier": "A",
+          "cluster_id": "cluster-reg-repost-07"
+        }
+      ],
+      "expected_cluster_id": "cluster-reg-repost-07",
+      "metadata": {
+        "expected_folded_duplicates": 1,
+        "repost_duplicate_folded": true
+      }
+    },
+    {
+      "case_id": "repost-cluster-08",
+      "category": "repost_cluster",
+      "article_ids": [
+        "article-reg-repost-08-wire",
+        "article-reg-repost-08-copy"
+      ],
+      "expected_outputs": [
+        {
+          "candidate_id": "fact-reg-repost-08-wire",
+          "export_contract": "Ex-1",
+          "article_id": "article-reg-repost-08-wire",
+          "cluster_id": "cluster-reg-repost-08",
+          "source_reference": {
+            "source_id": "regression-wire",
+            "url": "https://fixtures.example.com/regression-wire/repost-08-wire",
+            "provider_key": "repost-08-wire",
+            "original_locator": {
+              "locator_type": "fixture",
+              "locator_value": "repost-08-wire"
+            }
+          },
+          "evidence_spans": [
+            {
+              "article_id": "article-reg-repost-08-wire",
+              "start_char": 0,
+              "end_char": 53,
+              "quote": "RepostCo 08 signed a supply contract with BuyerCo 08.",
+              "locator": "body"
+            }
+          ],
+          "schema_pin": {
+            "schema_name": "news_fact_candidate",
+            "schema_version": "news_fact_candidate.v1",
+            "contract": "Ex-1",
+            "model_output_version": "news_fact_candidate.output.v1"
+          },
+          "involved_entities": [
+            {
+              "mention_text": "RepostCo 08",
+              "canonical_id": "entity:repostco-08",
+              "resolution_status": "resolved",
+              "type_hint": "company"
+            },
+            {
+              "mention_text": "BuyerCo 08",
+              "canonical_id": "entity:buyerco-08",
+              "resolution_status": "resolved",
+              "type_hint": "company"
+            }
+          ]
+        },
+        {
+          "candidate_id": "fact-reg-repost-08-copy",
+          "export_contract": "Ex-1",
+          "article_id": "article-reg-repost-08-copy",
+          "cluster_id": "cluster-reg-repost-08",
+          "source_reference": {
+            "source_id": "regression-partner",
+            "url": "https://fixtures.example.com/regression-partner/repost-08-copy",
+            "provider_key": "repost-08-copy",
+            "original_locator": {
+              "locator_type": "fixture",
+              "locator_value": "repost-08-copy"
+            }
+          },
+          "evidence_spans": [
+            {
+              "article_id": "article-reg-repost-08-copy",
+              "start_char": 0,
+              "end_char": 53,
+              "quote": "RepostCo 08 signed a supply contract with BuyerCo 08.",
+              "locator": "body"
+            }
+          ],
+          "schema_pin": {
+            "schema_name": "news_fact_candidate",
+            "schema_version": "news_fact_candidate.v1",
+            "contract": "Ex-1",
+            "model_output_version": "news_fact_candidate.output.v1"
+          },
+          "involved_entities": [
+            {
+              "mention_text": "RepostCo 08",
+              "canonical_id": "entity:repostco-08",
+              "resolution_status": "resolved",
+              "type_hint": "company"
+            },
+            {
+              "mention_text": "BuyerCo 08",
+              "canonical_id": "entity:buyerco-08",
+              "resolution_status": "resolved",
+              "type_hint": "company"
+            }
+          ]
+        },
+        {
+          "candidate_id": "signal-reg-repost-08-folded",
+          "export_contract": "Ex-2",
+          "article_id": "article-reg-repost-08-copy",
+          "cluster_id": "cluster-reg-repost-08",
+          "source_reference": {
+            "source_id": "regression-partner",
+            "url": "https://fixtures.example.com/regression-partner/repost-08-copy",
+            "provider_key": "repost-08-copy",
+            "original_locator": {
+              "locator_type": "fixture",
+              "locator_value": "repost-08-copy"
+            }
+          },
+          "evidence_spans": [
+            {
+              "article_id": "article-reg-repost-08-copy",
+              "start_char": 0,
+              "end_char": 53,
+              "quote": "RepostCo 08 signed a supply contract with BuyerCo 08.",
+              "locator": "body"
+            }
+          ],
+          "schema_pin": {
+            "schema_name": "news_signal_candidate",
+            "schema_version": "news_signal_candidate.v1",
+            "contract": "Ex-2",
+            "model_output_version": "news_signal_candidate.output.v1"
+          },
+          "affected_entities": [
+            {
+              "mention_text": "RepostCo 08",
+              "canonical_id": "entity:repostco-08",
+              "resolution_status": "resolved",
+              "type_hint": "company"
+            }
+          ],
+          "direction": "positive",
+          "magnitude": "medium"
+        }
+      ],
+      "source_reference": {
+        "source_id": "regression-wire",
+        "url": "https://fixtures.example.com/regression-wire/repost-08-wire",
+        "provider_key": "repost-08-wire",
+        "original_locator": {
+          "locator_type": "fixture",
+          "locator_value": "repost-08-wire"
+        }
+      },
+      "version_pins": {
+        "Ex-1": {
+          "schema_name": "news_fact_candidate",
+          "schema_version": "news_fact_candidate.v1",
+          "contract": "Ex-1",
+          "model_output_version": "news_fact_candidate.output.v1"
+        },
+        "Ex-2": {
+          "schema_name": "news_signal_candidate",
+          "schema_version": "news_signal_candidate.v1",
+          "contract": "Ex-2",
+          "model_output_version": "news_signal_candidate.output.v1"
+        },
+        "Ex-3": {
+          "schema_name": "news_graph_delta_candidate",
+          "schema_version": "news_graph_delta_candidate.v1",
+          "contract": "Ex-3",
+          "model_output_version": "news_graph_delta_candidate.output.v1"
+        }
+      },
+      "baseline_path": "baseline/repost_cluster.json",
+      "raw_inputs": [
+        {
+          "article_id": "article-reg-repost-08-wire",
+          "source_reference": {
+            "source_id": "regression-wire",
+            "url": "https://fixtures.example.com/regression-wire/repost-08-wire",
+            "provider_key": "repost-08-wire",
+            "original_locator": {
+              "locator_type": "fixture",
+              "locator_value": "repost-08-wire"
+            }
+          },
+          "title": "RepostCo 08 contract",
+          "body_text": "RepostCo 08 signed a supply contract with BuyerCo 08.",
+          "published_at": "2026-03-01T00:00:00+00:00",
+          "fetched_at": "2026-03-01T00:05:00+00:00"
+        },
+        {
+          "article_id": "article-reg-repost-08-copy",
+          "source_reference": {
+            "source_id": "regression-partner",
+            "url": "https://fixtures.example.com/regression-partner/repost-08-copy",
+            "provider_key": "repost-08-copy",
+            "original_locator": {
+              "locator_type": "fixture",
+              "locator_value": "repost-08-copy"
+            }
+          },
+          "title": "RepostCo 08 contract copy",
+          "body_text": "RepostCo 08 signed a supply contract with BuyerCo 08.",
+          "published_at": "2026-03-01T00:00:00+00:00",
+          "fetched_at": "2026-03-01T00:05:00+00:00"
+        }
+      ],
+      "normalized_artifacts": [
+        {
+          "article_id": "article-reg-repost-08-wire",
+          "source_id": "regression-wire",
+          "source_reference": {
+            "source_id": "regression-wire",
+            "url": "https://fixtures.example.com/regression-wire/repost-08-wire",
+            "provider_key": "repost-08-wire",
+            "original_locator": {
+              "locator_type": "fixture",
+              "locator_value": "repost-08-wire"
+            }
+          },
+          "title": "RepostCo 08 contract",
+          "body_text": "RepostCo 08 signed a supply contract with BuyerCo 08.",
+          "published_at": "2026-03-01T00:00:00+00:00",
+          "fetched_at": "2026-03-01T00:05:00+00:00",
+          "language": "en",
+          "author_or_channel": "Regression Fixture",
+          "content_hash": "sha256:article-reg-repost-08-wire:content",
+          "article_fingerprint": "sha256:cluster-reg-repost-08:fingerprint",
+          "license_tag": "fixture",
+          "reliability_tier": "A",
+          "cluster_id": "cluster-reg-repost-08"
+        },
+        {
+          "article_id": "article-reg-repost-08-copy",
+          "source_id": "regression-partner",
+          "source_reference": {
+            "source_id": "regression-partner",
+            "url": "https://fixtures.example.com/regression-partner/repost-08-copy",
+            "provider_key": "repost-08-copy",
+            "original_locator": {
+              "locator_type": "fixture",
+              "locator_value": "repost-08-copy"
+            }
+          },
+          "title": "RepostCo 08 contract copy",
+          "body_text": "RepostCo 08 signed a supply contract with BuyerCo 08.",
+          "published_at": "2026-03-01T00:00:00+00:00",
+          "fetched_at": "2026-03-01T00:05:00+00:00",
+          "language": "en",
+          "author_or_channel": "Regression Fixture",
+          "content_hash": "sha256:article-reg-repost-08-copy:content",
+          "article_fingerprint": "sha256:cluster-reg-repost-08:fingerprint",
+          "license_tag": "fixture",
+          "reliability_tier": "A",
+          "cluster_id": "cluster-reg-repost-08"
+        }
+      ],
+      "expected_cluster_id": "cluster-reg-repost-08",
+      "metadata": {
+        "expected_folded_duplicates": 1,
+        "repost_duplicate_folded": true
+      }
+    },
+    {
+      "case_id": "repost-cluster-09",
+      "category": "repost_cluster",
+      "article_ids": [
+        "article-reg-repost-09-wire",
+        "article-reg-repost-09-copy"
+      ],
+      "expected_outputs": [
+        {
+          "candidate_id": "fact-reg-repost-09-wire",
+          "export_contract": "Ex-1",
+          "article_id": "article-reg-repost-09-wire",
+          "cluster_id": "cluster-reg-repost-09",
+          "source_reference": {
+            "source_id": "regression-wire",
+            "url": "https://fixtures.example.com/regression-wire/repost-09-wire",
+            "provider_key": "repost-09-wire",
+            "original_locator": {
+              "locator_type": "fixture",
+              "locator_value": "repost-09-wire"
+            }
+          },
+          "evidence_spans": [
+            {
+              "article_id": "article-reg-repost-09-wire",
+              "start_char": 0,
+              "end_char": 53,
+              "quote": "RepostCo 09 signed a supply contract with BuyerCo 09.",
+              "locator": "body"
+            }
+          ],
+          "schema_pin": {
+            "schema_name": "news_fact_candidate",
+            "schema_version": "news_fact_candidate.v1",
+            "contract": "Ex-1",
+            "model_output_version": "news_fact_candidate.output.v1"
+          },
+          "involved_entities": [
+            {
+              "mention_text": "RepostCo 09",
+              "canonical_id": "entity:repostco-09",
+              "resolution_status": "resolved",
+              "type_hint": "company"
+            },
+            {
+              "mention_text": "BuyerCo 09",
+              "canonical_id": "entity:buyerco-09",
+              "resolution_status": "resolved",
+              "type_hint": "company"
+            }
+          ]
+        },
+        {
+          "candidate_id": "fact-reg-repost-09-copy",
+          "export_contract": "Ex-1",
+          "article_id": "article-reg-repost-09-copy",
+          "cluster_id": "cluster-reg-repost-09",
+          "source_reference": {
+            "source_id": "regression-partner",
+            "url": "https://fixtures.example.com/regression-partner/repost-09-copy",
+            "provider_key": "repost-09-copy",
+            "original_locator": {
+              "locator_type": "fixture",
+              "locator_value": "repost-09-copy"
+            }
+          },
+          "evidence_spans": [
+            {
+              "article_id": "article-reg-repost-09-copy",
+              "start_char": 0,
+              "end_char": 53,
+              "quote": "RepostCo 09 signed a supply contract with BuyerCo 09.",
+              "locator": "body"
+            }
+          ],
+          "schema_pin": {
+            "schema_name": "news_fact_candidate",
+            "schema_version": "news_fact_candidate.v1",
+            "contract": "Ex-1",
+            "model_output_version": "news_fact_candidate.output.v1"
+          },
+          "involved_entities": [
+            {
+              "mention_text": "RepostCo 09",
+              "canonical_id": "entity:repostco-09",
+              "resolution_status": "resolved",
+              "type_hint": "company"
+            },
+            {
+              "mention_text": "BuyerCo 09",
+              "canonical_id": "entity:buyerco-09",
+              "resolution_status": "resolved",
+              "type_hint": "company"
+            }
+          ]
+        },
+        {
+          "candidate_id": "signal-reg-repost-09-folded",
+          "export_contract": "Ex-2",
+          "article_id": "article-reg-repost-09-copy",
+          "cluster_id": "cluster-reg-repost-09",
+          "source_reference": {
+            "source_id": "regression-partner",
+            "url": "https://fixtures.example.com/regression-partner/repost-09-copy",
+            "provider_key": "repost-09-copy",
+            "original_locator": {
+              "locator_type": "fixture",
+              "locator_value": "repost-09-copy"
+            }
+          },
+          "evidence_spans": [
+            {
+              "article_id": "article-reg-repost-09-copy",
+              "start_char": 0,
+              "end_char": 53,
+              "quote": "RepostCo 09 signed a supply contract with BuyerCo 09.",
+              "locator": "body"
+            }
+          ],
+          "schema_pin": {
+            "schema_name": "news_signal_candidate",
+            "schema_version": "news_signal_candidate.v1",
+            "contract": "Ex-2",
+            "model_output_version": "news_signal_candidate.output.v1"
+          },
+          "affected_entities": [
+            {
+              "mention_text": "RepostCo 09",
+              "canonical_id": "entity:repostco-09",
+              "resolution_status": "resolved",
+              "type_hint": "company"
+            }
+          ],
+          "direction": "positive",
+          "magnitude": "medium"
+        }
+      ],
+      "source_reference": {
+        "source_id": "regression-wire",
+        "url": "https://fixtures.example.com/regression-wire/repost-09-wire",
+        "provider_key": "repost-09-wire",
+        "original_locator": {
+          "locator_type": "fixture",
+          "locator_value": "repost-09-wire"
+        }
+      },
+      "version_pins": {
+        "Ex-1": {
+          "schema_name": "news_fact_candidate",
+          "schema_version": "news_fact_candidate.v1",
+          "contract": "Ex-1",
+          "model_output_version": "news_fact_candidate.output.v1"
+        },
+        "Ex-2": {
+          "schema_name": "news_signal_candidate",
+          "schema_version": "news_signal_candidate.v1",
+          "contract": "Ex-2",
+          "model_output_version": "news_signal_candidate.output.v1"
+        },
+        "Ex-3": {
+          "schema_name": "news_graph_delta_candidate",
+          "schema_version": "news_graph_delta_candidate.v1",
+          "contract": "Ex-3",
+          "model_output_version": "news_graph_delta_candidate.output.v1"
+        }
+      },
+      "baseline_path": "baseline/repost_cluster.json",
+      "raw_inputs": [
+        {
+          "article_id": "article-reg-repost-09-wire",
+          "source_reference": {
+            "source_id": "regression-wire",
+            "url": "https://fixtures.example.com/regression-wire/repost-09-wire",
+            "provider_key": "repost-09-wire",
+            "original_locator": {
+              "locator_type": "fixture",
+              "locator_value": "repost-09-wire"
+            }
+          },
+          "title": "RepostCo 09 contract",
+          "body_text": "RepostCo 09 signed a supply contract with BuyerCo 09.",
+          "published_at": "2026-03-01T00:00:00+00:00",
+          "fetched_at": "2026-03-01T00:05:00+00:00"
+        },
+        {
+          "article_id": "article-reg-repost-09-copy",
+          "source_reference": {
+            "source_id": "regression-partner",
+            "url": "https://fixtures.example.com/regression-partner/repost-09-copy",
+            "provider_key": "repost-09-copy",
+            "original_locator": {
+              "locator_type": "fixture",
+              "locator_value": "repost-09-copy"
+            }
+          },
+          "title": "RepostCo 09 contract copy",
+          "body_text": "RepostCo 09 signed a supply contract with BuyerCo 09.",
+          "published_at": "2026-03-01T00:00:00+00:00",
+          "fetched_at": "2026-03-01T00:05:00+00:00"
+        }
+      ],
+      "normalized_artifacts": [
+        {
+          "article_id": "article-reg-repost-09-wire",
+          "source_id": "regression-wire",
+          "source_reference": {
+            "source_id": "regression-wire",
+            "url": "https://fixtures.example.com/regression-wire/repost-09-wire",
+            "provider_key": "repost-09-wire",
+            "original_locator": {
+              "locator_type": "fixture",
+              "locator_value": "repost-09-wire"
+            }
+          },
+          "title": "RepostCo 09 contract",
+          "body_text": "RepostCo 09 signed a supply contract with BuyerCo 09.",
+          "published_at": "2026-03-01T00:00:00+00:00",
+          "fetched_at": "2026-03-01T00:05:00+00:00",
+          "language": "en",
+          "author_or_channel": "Regression Fixture",
+          "content_hash": "sha256:article-reg-repost-09-wire:content",
+          "article_fingerprint": "sha256:cluster-reg-repost-09:fingerprint",
+          "license_tag": "fixture",
+          "reliability_tier": "A",
+          "cluster_id": "cluster-reg-repost-09"
+        },
+        {
+          "article_id": "article-reg-repost-09-copy",
+          "source_id": "regression-partner",
+          "source_reference": {
+            "source_id": "regression-partner",
+            "url": "https://fixtures.example.com/regression-partner/repost-09-copy",
+            "provider_key": "repost-09-copy",
+            "original_locator": {
+              "locator_type": "fixture",
+              "locator_value": "repost-09-copy"
+            }
+          },
+          "title": "RepostCo 09 contract copy",
+          "body_text": "RepostCo 09 signed a supply contract with BuyerCo 09.",
+          "published_at": "2026-03-01T00:00:00+00:00",
+          "fetched_at": "2026-03-01T00:05:00+00:00",
+          "language": "en",
+          "author_or_channel": "Regression Fixture",
+          "content_hash": "sha256:article-reg-repost-09-copy:content",
+          "article_fingerprint": "sha256:cluster-reg-repost-09:fingerprint",
+          "license_tag": "fixture",
+          "reliability_tier": "A",
+          "cluster_id": "cluster-reg-repost-09"
+        }
+      ],
+      "expected_cluster_id": "cluster-reg-repost-09",
+      "metadata": {
+        "expected_folded_duplicates": 1,
+        "repost_duplicate_folded": true
+      }
+    }
+  ]
+}
