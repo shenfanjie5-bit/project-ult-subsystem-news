@@ -242,6 +242,69 @@ def test_validate_graph_evidence_rejects_reversed_directional_candidates(
         )
 
 
+@pytest.mark.parametrize(
+    ("relation_type", "body_text", "subject_text", "object_text"),
+    [
+        (
+            "acquired",
+            "Acme Corp acquired Beta Ltd after talks with Globex Inc.",
+            "Acme Corp",
+            "Globex Inc",
+        ),
+        (
+            "sanctioned_by",
+            "Atlas Shipping was sanctioned by State Treasury after consultations with Export Board.",
+            "Atlas Shipping",
+            "Export Board",
+        ),
+        (
+            "supplier_of",
+            "Delta Components will supply battery modules to Apex Storage after talks with Zenith Motors.",
+            "Delta Components",
+            "Zenith Motors",
+        ),
+        (
+            "divested",
+            "Harbor Energy divested its pipeline unit to Bay Capital after talks with North Bridge.",
+            "Harbor Energy",
+            "North Bridge",
+        ),
+    ],
+)
+def test_validate_graph_evidence_rejects_trailing_unrelated_object_candidates(
+    relation_type: str,
+    body_text: str,
+    subject_text: str,
+    object_text: str,
+) -> None:
+    article, _, entity_resolution, facts = graph_input(
+        body_text=body_text,
+        subject_text=subject_text,
+        object_text=object_text,
+    )
+    candidate = NewsGraphDeltaCandidate.model_validate(
+        raw_delta(
+            article,
+            relation_type=relation_type,
+            subject=facts[0].involved_entities[0],
+            object_entity=facts[0].involved_entities[1],
+        )
+        | {
+            "candidate_id": "graph-trailing-object",
+            "article_id": article.article_id,
+            "source_reference": article.source_reference.model_dump(mode="json"),
+            "export_contract": "Ex-3",
+        }
+    )
+
+    with pytest.raises(ContractViolationError, match="explicit relation trigger"):
+        validate_graph_evidence(
+            article,
+            candidate,
+            entity_resolution=entity_resolution,
+        )
+
+
 def test_extract_graph_deltas_rejects_malformed_runtime_response() -> None:
     article, cluster, entity_resolution, facts = graph_input()
 
