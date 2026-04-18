@@ -1,0 +1,45 @@
+{
+  "cases": [
+    {
+      "name": "acquired_explicit",
+      "relation_type": "acquired",
+      "fact_type": "m_and_a",
+      "subject_text": "Acme Corp",
+      "object_text": "Globex Inc",
+      "body_text": "Acme Corp acquired Globex Inc in a cash transaction."
+    },
+    {
+      "name": "partner_of_explicit",
+      "relation_type": "partner_of",
+      "fact_type": "contract",
+      "subject_text": "North River Metals",
+      "object_text": "East Power Ltd",
+      "body_text": "North River Metals entered a strategic partnership with East Power Ltd on grid storage."
+    },
+    {
+      "name": "sanctioned_by_explicit",
+      "relation_type": "sanctioned_by",
+      "fact_type": "regulation_impact",
+      "subject_text": "Atlas Shipping",
+      "object_text": "State Treasury",
+      "object_type_hint": "regulator",
+      "body_text": "Atlas Shipping was sanctioned by State Treasury over restricted exports."
+    },
+    {
+      "name": "supplier_of_explicit",
+      "relation_type": "supplier_of",
+      "fact_type": "supply_chain",
+      "subject_text": "Delta Components",
+      "object_text": "Zenith Motors",
+      "body_text": "Delta Components will supply battery modules to Zenith Motors."
+    },
+    {
+      "name": "divested_explicit",
+      "relation_type": "divested",
+      "fact_type": "m_and_a",
+      "subject_text": "Harbor Energy",
+      "object_text": "Bay Capital",
+      "body_text": "Harbor Energy divested its pipeline unit to Bay Capital."
+    }
+  ]
+}

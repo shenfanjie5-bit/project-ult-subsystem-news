@@ -14,7 +14,7 @@ class SchemaPin(BaseModel):
 
     schema_name: str = Field(min_length=1)
     schema_version: str = Field(min_length=1)
-    contract: Literal["Ex-1", "Ex-2"]
+    contract: Literal["Ex-1", "Ex-2", "Ex-3"]
     model_output_version: str = Field(min_length=1)
 
 

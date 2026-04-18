@@ -1,0 +1,264 @@
+{
+  "cases": [
+    {
+      "name": "cooccurrence_expo",
+      "category": "cooccurrence",
+      "relation_type": "partner_of",
+      "subject_text": "Acme Corp",
+      "object_text": "Globex Inc",
+      "body_text": "Acme Corp and Globex Inc attended the same battery expo."
+    },
+    {
+      "name": "cooccurrence_roundup",
+      "category": "cooccurrence",
+      "relation_type": "supplier_of",
+      "subject_text": "North River Metals",
+      "object_text": "East Power Ltd",
+      "body_text": "North River Metals and East Power Ltd were mentioned in a sector roundup."
+    },
+    {
+      "name": "cooccurrence_hearing",
+      "category": "cooccurrence",
+      "relation_type": "sanctioned_by",
+      "subject_text": "Atlas Shipping",
+      "object_text": "State Treasury",
+      "body_text": "Atlas Shipping and State Treasury appeared in the same trade hearing agenda."
+    },
+    {
+      "name": "cooccurrence_panel",
+      "category": "cooccurrence",
+      "relation_type": "partner_of",
+      "subject_text": "Delta Components",
+      "object_text": "Zenith Motors",
+      "body_text": "Delta Components and Zenith Motors joined an industry panel on battery demand."
+    },
+    {
+      "name": "cooccurrence_index",
+      "category": "cooccurrence",
+      "relation_type": "divested",
+      "subject_text": "Harbor Energy",
+      "object_text": "Bay Capital",
+      "body_text": "Harbor Energy and Bay Capital were both added to an infrastructure index."
+    },
+    {
+      "name": "sentiment_same_upgrade",
+      "category": "sentiment_same",
+      "relation_type": "acquired",
+      "subject_text": "Acme Corp",
+      "object_text": "Globex Inc",
+      "body_text": "Acme Corp and Globex Inc both rose after analyst upgrades."
+    },
+    {
+      "name": "sentiment_same_sales",
+      "category": "sentiment_same",
+      "relation_type": "supplier_of",
+      "subject_text": "Delta Components",
+      "object_text": "Zenith Motors",
+      "body_text": "Delta Components and Zenith Motors fell after weak vehicle sales."
+    },
+    {
+      "name": "sentiment_same_rates",
+      "category": "sentiment_same",
+      "relation_type": "partner_of",
+      "subject_text": "North River Metals",
+      "object_text": "East Power Ltd",
+      "body_text": "North River Metals and East Power Ltd gained as rates moved lower."
+    },
+    {
+      "name": "sentiment_same_shipping",
+      "category": "sentiment_same",
+      "relation_type": "sanctioned_by",
+      "subject_text": "Atlas Shipping",
+      "object_text": "State Treasury",
+      "body_text": "Atlas Shipping and State Treasury were cited as shipping shares rallied."
+    },
+    {
+      "name": "sentiment_same_credit",
+      "category": "sentiment_same",
+      "relation_type": "divested",
+      "subject_text": "Harbor Energy",
+      "object_text": "Bay Capital",
+      "body_text": "Harbor Energy and Bay Capital traded lower after credit spreads widened."
+    },
+    {
+      "name": "title_association_battery_race",
+      "category": "title_association",
+      "relation_type": "acquired",
+      "locator": "title",
+      "subject_text": "Acme Corp",
+      "object_text": "Globex Inc",
+      "title": "Acme Corp, Globex Inc in battery race",
+      "body_text": "The article compared market positions."
+    },
+    {
+      "name": "title_association_grid_storage",
+      "category": "title_association",
+      "relation_type": "partner_of",
+      "locator": "title",
+      "subject_text": "North River Metals",
+      "object_text": "East Power Ltd",
+      "title": "North River Metals, East Power Ltd eye grid storage",
+      "body_text": "The article summarized separate company updates."
+    },
+    {
+      "name": "title_association_exports",
+      "category": "title_association",
+      "relation_type": "sanctioned_by",
+      "locator": "title",
+      "subject_text": "Atlas Shipping",
+      "object_text": "State Treasury",
+      "title": "Atlas Shipping, State Treasury named in exports brief",
+      "body_text": "The brief listed public-sector meetings."
+    },
+    {
+      "name": "title_association_supply_chain",
+      "category": "title_association",
+      "relation_type": "supplier_of",
+      "locator": "title",
+      "subject_text": "Delta Components",
+      "object_text": "Zenith Motors",
+      "title": "Delta Components, Zenith Motors and the battery chain",
+      "body_text": "The story discussed sector capacity."
+    },
+    {
+      "name": "title_association_infrastructure",
+      "category": "title_association",
+      "relation_type": "divested",
+      "locator": "title",
+      "subject_text": "Harbor Energy",
+      "object_text": "Bay Capital",
+      "title": "Harbor Energy, Bay Capital in infrastructure watch",
+      "body_text": "The article tracked investor interest."
+    },
+    {
+      "name": "summary_only_buy_rumor",
+      "category": "summary_only",
+      "relation_type": "acquired",
+      "subject_text": "Acme Corp",
+      "object_text": "Globex Inc",
+      "body_text": "Summary: traders discussed whether Acme Corp could buy Globex Inc."
+    },
+    {
+      "name": "summary_only_partnership_chatter",
+      "category": "summary_only",
+      "relation_type": "partner_of",
+      "subject_text": "North River Metals",
+      "object_text": "East Power Ltd",
+      "body_text": "Summary: market chatter linked North River Metals and East Power Ltd to potential partnership talks."
+    },
+    {
+      "name": "summary_only_policy_risk",
+      "category": "summary_only",
+      "relation_type": "sanctioned_by",
+      "subject_text": "Atlas Shipping",
+      "object_text": "State Treasury",
+      "body_text": "Summary: Atlas Shipping could face policy risk from State Treasury reviews."
+    },
+    {
+      "name": "summary_only_supply_rumor",
+      "category": "summary_only",
+      "relation_type": "supplier_of",
+      "subject_text": "Delta Components",
+      "object_text": "Zenith Motors",
+      "body_text": "Summary: Delta Components was rumored as a possible vendor for Zenith Motors."
+    },
+    {
+      "name": "summary_only_asset_rumor",
+      "category": "summary_only",
+      "relation_type": "divested",
+      "subject_text": "Harbor Energy",
+      "object_text": "Bay Capital",
+      "body_text": "Summary: Harbor Energy and Bay Capital were linked to possible asset talks."
+    },
+    {
+      "name": "unresolved_object_acquired",
+      "category": "unresolved_entity",
+      "relation_type": "acquired",
+      "subject_text": "Acme Corp",
+      "object_text": "Globex Inc",
+      "object_status": "unresolved",
+      "body_text": "Acme Corp acquired Globex Inc in a cash transaction."
+    },
+    {
+      "name": "ambiguous_subject_partner",
+      "category": "unresolved_entity",
+      "relation_type": "partner_of",
+      "subject_text": "North River Metals",
+      "subject_status": "ambiguous",
+      "object_text": "East Power Ltd",
+      "body_text": "North River Metals entered a strategic partnership with East Power Ltd."
+    },
+    {
+      "name": "unresolved_regulator_sanction",
+      "category": "unresolved_entity",
+      "relation_type": "sanctioned_by",
+      "subject_text": "Atlas Shipping",
+      "object_text": "State Treasury",
+      "object_status": "unresolved",
+      "body_text": "Atlas Shipping was sanctioned by State Treasury over restricted exports."
+    },
+    {
+      "name": "ambiguous_supplier",
+      "category": "unresolved_entity",
+      "relation_type": "supplier_of",
+      "subject_text": "Delta Components",
+      "subject_status": "ambiguous",
+      "object_text": "Zenith Motors",
+      "body_text": "Delta Components will supply battery modules to Zenith Motors."
+    },
+    {
+      "name": "unresolved_buyer_divested",
+      "category": "unresolved_entity",
+      "relation_type": "divested",
+      "subject_text": "Harbor Energy",
+      "object_text": "Bay Capital",
+      "object_status": "unresolved",
+      "body_text": "Harbor Energy divested its pipeline unit to Bay Capital."
+    },
+    {
+      "name": "secondhand_acquired_repost",
+      "category": "single_secondhand_evidence",
+      "relation_type": "acquired",
+      "reliability_tier": "C",
+      "subject_text": "Acme Corp",
+      "object_text": "Globex Inc",
+      "body_text": "Acme Corp acquired Globex Inc, according to an unverified repost."
+    },
+    {
+      "name": "secondhand_partner_repost",
+      "category": "single_secondhand_evidence",
+      "relation_type": "partner_of",
+      "reliability_tier": "C",
+      "subject_text": "North River Metals",
+      "object_text": "East Power Ltd",
+      "body_text": "North River Metals entered a partnership with East Power Ltd, according to an unverified repost."
+    },
+    {
+      "name": "secondhand_sanction_repost",
+      "category": "single_secondhand_evidence",
+      "relation_type": "sanctioned_by",
+      "reliability_tier": "C",
+      "subject_text": "Atlas Shipping",
+      "object_text": "State Treasury",
+      "body_text": "Atlas Shipping was sanctioned by State Treasury, according to an unverified repost."
+    },
+    {
+      "name": "secondhand_supply_repost",
+      "category": "single_secondhand_evidence",
+      "relation_type": "supplier_of",
+      "reliability_tier": "C",
+      "subject_text": "Delta Components",
+      "object_text": "Zenith Motors",
+      "body_text": "Delta Components will supply battery modules to Zenith Motors, according to an unverified repost."
+    },
+    {
+      "name": "secondhand_divested_repost",
+      "category": "single_secondhand_evidence",
+      "relation_type": "divested",
+      "reliability_tier": "C",
+      "subject_text": "Harbor Energy",
+      "object_text": "Bay Capital",
+      "body_text": "Harbor Energy divested its pipeline unit to Bay Capital, according to an unverified repost."
+    }
+  ]
+}

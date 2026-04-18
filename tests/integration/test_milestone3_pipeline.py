@@ -44,6 +44,8 @@ class FakeReasonerRuntimeClient:
         self.requests.append(request)
         if request.contract == "Ex-1":
             return {"facts": [self._fact_payload(request)]}
+        if request.contract == "Ex-3":
+            return {"graph_deltas": []}
         return {"judgement": self._judgement_payload(request)}
 
     def _fact_payload(self, request: StructuredGenerationRequest) -> dict[str, object]:
@@ -158,7 +160,7 @@ def test_milestone3_pipeline_runs_sources_to_submit_and_trace(tmp_path: Path) ->
     assert result.error_count == 0
     assert result.discovered_count == 5
     assert result.fetched_count == 5
-    assert result.stage_order[:9] == [
+    assert result.stage_order[:10] == [
         "discover",
         "fetch",
         "normalize",
@@ -168,6 +170,7 @@ def test_milestone3_pipeline_runs_sources_to_submit_and_trace(tmp_path: Path) ->
         "entity_resolve",
         "extract",
         "signals",
+        "graph",
     ]
     assert result.stage_order[-3:] == ["validate", "submit", "trace"]
     assert result.submitted_count == len(sdk_client.calls[0])

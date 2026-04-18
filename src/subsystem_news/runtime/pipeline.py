@@ -18,6 +18,7 @@ from subsystem_news.errors import ContractViolationError
 from subsystem_news.extract.fact_extractor import extract_facts
 from subsystem_news.extract.runtime_client import ReasonerRuntimeClient
 from subsystem_news.extract.schema_pin import FACT_SCHEMA_PIN
+from subsystem_news.graph import GRAPH_SCHEMA_PIN, extract_graph_deltas
 from subsystem_news.normalize.pipeline import normalize_article
 from subsystem_news.runtime.artifact_store import ArtifactStore
 from subsystem_news.runtime.models import (
@@ -175,6 +176,16 @@ class Pipeline:
                 stage_order.append("signals")
                 signals = generate_signals(facts, self.reasoner_client)
 
+                error_stage = "graph"
+                stage_order.append("graph")
+                graph_deltas = extract_graph_deltas(
+                    representative,
+                    cluster,
+                    entity_resolution,
+                    facts,
+                    self.reasoner_client,
+                )
+
                 context = PipelineArticleContext(
                     article_id=clustered_artifact.article_id,
                     cluster_id=cluster.cluster_id,
@@ -185,7 +196,12 @@ class Pipeline:
                     entity_resolution=entity_resolution,
                     facts=facts,
                     signals=signals,
-                    schema_pins={"Ex-1": FACT_SCHEMA_PIN, "Ex-2": SIGNAL_SCHEMA_PIN},
+                    graph_deltas=graph_deltas,
+                    schema_pins={
+                        "Ex-1": FACT_SCHEMA_PIN,
+                        "Ex-2": SIGNAL_SCHEMA_PIN,
+                        "Ex-3": GRAPH_SCHEMA_PIN,
+                    },
                     dedupe_metadata={
                         "threshold": self.dedupe_threshold,
                         "cluster_id": cluster.cluster_id,
@@ -211,6 +227,7 @@ class Pipeline:
                         "representative_article_id": representative.article_id,
                     },
                     signal_metadata={"signal_count": len(signals)},
+                    graph_metadata={"graph_delta_count": len(graph_deltas)},
                 )
                 article_results.append(
                     PipelineArticleResult(
@@ -218,7 +235,7 @@ class Pipeline:
                         source_reference=clustered_artifact.source_reference,
                         status="processed",
                         context=context,
-                        candidate_count=len(facts) + len(signals),
+                        candidate_count=len(facts) + len(signals) + len(graph_deltas),
                     )
                 )
             except Exception as exc:  # noqa: BLE001 - continue and trace per-article failures.
@@ -282,7 +299,11 @@ class Pipeline:
         for index, result in enumerate(article_results):
             if result.context is None:
                 continue
-            for candidate in [*result.context.facts, *result.context.signals]:
+            for candidate in [
+                *result.context.facts,
+                *result.context.signals,
+                *result.context.graph_deltas,
+            ]:
                 key = candidate_idempotency_key(candidate)
                 if key in prior_keys or key in seen_keys:
                     skipped_by_article.setdefault(index, []).append(key)
