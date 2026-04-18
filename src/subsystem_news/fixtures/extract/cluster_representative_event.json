@@ -1,0 +1,36 @@
+{
+  "article": {
+    "article_id": "article-pacific-rep",
+    "source_id": "industrial-wire",
+    "source_reference": {
+      "source_id": "industrial-wire",
+      "url": "https://industrial.example.com/pacific-accident",
+      "provider_key": "industrial-pacific-accident",
+      "original_locator": {
+        "locator_type": "api_id",
+        "locator_value": "industrial-pacific-accident"
+      }
+    },
+    "title": "Pacific Steel reports mill accident",
+    "body_text": "Pacific Steel reported lower output after a power accident at its mill. Management said shipments will resume next week.",
+    "published_at": "2026-04-07T08:30:00Z",
+    "fetched_at": "2026-04-07T08:31:00Z",
+    "language": "en",
+    "author_or_channel": "Industrial Desk",
+    "content_hash": "sha256:pacific-accident",
+    "article_fingerprint": "sha256:pacific-accident-fp",
+    "license_tag": "licensed-wire",
+    "reliability_tier": "B",
+    "cluster_id": "cluster-pacific-accident"
+  },
+  "cluster": {
+    "cluster_id": "cluster-pacific-accident",
+    "representative_article_id": "article-pacific-rep",
+    "member_article_ids": ["article-pacific-rep", "article-pacific-repost"],
+    "canonical_headline": "Pacific Steel reports mill accident",
+    "first_published_at": "2026-04-07T08:30:00Z",
+    "source_count": 2,
+    "fingerprint_family": "sha256:pacific-accident-family",
+    "cluster_confidence": 0.91
+  }
+}

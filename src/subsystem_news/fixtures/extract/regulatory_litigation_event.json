@@ -1,0 +1,64 @@
+{
+  "article": {
+    "article_id": "article-northwind-1",
+    "source_id": "reg-watch-api",
+    "source_reference": {
+      "source_id": "reg-watch-api",
+      "url": "https://reg.example.com/northwind-lawsuit",
+      "provider_key": "reg-northwind-lawsuit",
+      "original_locator": {
+        "locator_type": "api_id",
+        "locator_value": "reg-northwind-lawsuit"
+      }
+    },
+    "title": "Northwind Motors faces disclosure lawsuit",
+    "body_text": "Northwind Motors said regulators opened a lawsuit over battery disclosures. The company said it will contest the allegations in court.",
+    "published_at": "2026-02-03T09:00:00Z",
+    "fetched_at": "2026-02-03T09:02:00Z",
+    "language": "en",
+    "author_or_channel": "Regulatory Desk",
+    "content_hash": "sha256:northwind-lawsuit",
+    "article_fingerprint": "sha256:northwind-lawsuit-fp",
+    "license_tag": "licensed-api",
+    "reliability_tier": "B",
+    "cluster_id": "cluster-northwind-lawsuit"
+  },
+  "cluster": {
+    "cluster_id": "cluster-northwind-lawsuit",
+    "representative_article_id": "article-northwind-1",
+    "member_article_ids": ["article-northwind-1"],
+    "canonical_headline": "Northwind Motors faces disclosure lawsuit",
+    "first_published_at": "2026-02-03T09:00:00Z",
+    "source_count": 1,
+    "fingerprint_family": "sha256:northwind-lawsuit-family",
+    "cluster_confidence": 1.0
+  },
+  "runtime_response": {
+    "facts": [
+      {
+        "candidate_id": "fact-northwind-litigation-1",
+        "fact_type": "litigation",
+        "summary": "Regulators opened a lawsuit against Northwind Motors over battery disclosures.",
+        "involved_entities": [
+          {
+            "mention_text": "Northwind Motors",
+            "canonical_id": "entity:northwind-motors",
+            "resolution_status": "resolved",
+            "type_hint": "company"
+          }
+        ],
+        "event_time": null,
+        "evidence_spans": [
+          {
+            "article_id": "article-northwind-1",
+            "start_char": 0,
+            "end_char": 75,
+            "quote": "Northwind Motors said regulators opened a lawsuit over battery disclosures.",
+            "locator": "body"
+          }
+        ],
+        "confidence": 0.74
+      }
+    ]
+  }
+}
