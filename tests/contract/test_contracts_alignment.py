@@ -598,6 +598,217 @@ class TestUnresolvedEntitiesAreNotFabricatedAsCanonical:
             _normalize_for_sdk(candidate.model_dump(mode="json"), "Ex-3")
 
 
+class TestDefaultSdkClientPartitionsUnresolvedAtWireBoundary:
+    """Stage 2.9 follow-up #2 (codex review #2 P1): the news upstream
+    extract path intentionally produces unresolved Ex-1/Ex-2 candidates
+    for traceability (locked in by
+    ``test_all_unresolved_boundary_emits_traceable_ex1_fact`` in
+    tests/extract). The canonical wire boundary
+    (``DefaultSubsystemSdkClient`` -> ``_normalize_for_sdk``) MUST NOT
+    fabricate canonical IDs for those (CLAUDE.md #6), but it also
+    MUST NOT abort the entire batch. Instead, partition: submittable
+    candidates flow through the SDK; skipped candidates are recorded
+    as rejected in the receipt without crossing the canonical wire
+    boundary.
+    """
+
+    def test_partition_separates_resolved_and_unresolved(self) -> None:
+        from subsystem_news.contracts.candidates import (
+            InvolvedEntity,
+            NewsFactCandidate,
+        )
+        from subsystem_news.contracts.evidence import EvidenceSpan
+        from subsystem_news.contracts.source_reference import (
+            SourceReference,
+            SourceReferenceLocator,
+        )
+        from subsystem_news.runtime.submit import _partition_for_submit
+
+        unresolved = NewsFactCandidate(
+            candidate_id="partition-unresolved-ex1",
+            article_id="partition-art-1",
+            cluster_id=None,
+            source_reference=SourceReference(
+                source_id="partition-src",
+                url="https://example-approved-news.com/p/1",
+                provider_key=None,
+                original_locator=SourceReferenceLocator(
+                    locator_type="rss_guid",
+                    locator_value="partition-locator-1",
+                ),
+            ),
+            fact_type="contract",
+            summary="placeholder",
+            involved_entities=[
+                InvolvedEntity(
+                    mention_text="Mystery Co",
+                    canonical_id=None,
+                    resolution_status="unresolved",
+                    type_hint="company",
+                ),
+            ],
+            event_time=datetime(2026, 1, 1, tzinfo=UTC),
+            confidence=0.5,
+            source_reliability_tier="A",
+            evidence_spans=[
+                EvidenceSpan(
+                    article_id="partition-art-1",
+                    start_char=0,
+                    end_char=11,
+                    quote="placeholder",
+                    locator="title",
+                ),
+            ],
+        )
+        resolved = NewsFactCandidate(
+            candidate_id="partition-resolved-ex1",
+            article_id="partition-art-2",
+            cluster_id=None,
+            source_reference=SourceReference(
+                source_id="partition-src",
+                url="https://example-approved-news.com/p/2",
+                provider_key=None,
+                original_locator=SourceReferenceLocator(
+                    locator_type="rss_guid",
+                    locator_value="partition-locator-2",
+                ),
+            ),
+            fact_type="contract",
+            summary="placeholder",
+            involved_entities=[
+                InvolvedEntity(
+                    mention_text="Real Co",
+                    canonical_id="ENT_PARTITION_RESOLVED",
+                    resolution_status="resolved",
+                    type_hint="company",
+                ),
+            ],
+            event_time=datetime(2026, 1, 1, tzinfo=UTC),
+            confidence=0.5,
+            source_reliability_tier="A",
+            evidence_spans=[
+                EvidenceSpan(
+                    article_id="partition-art-2",
+                    start_char=0,
+                    end_char=11,
+                    quote="placeholder",
+                    locator="title",
+                ),
+            ],
+        )
+
+        submittable, skipped = _partition_for_submit([unresolved, resolved])
+
+        assert [c.candidate_id for c in submittable] == [
+            "partition-resolved-ex1"
+        ]
+        assert len(skipped) == 1
+        skipped_candidate, reason = skipped[0]
+        assert skipped_candidate.candidate_id == "partition-unresolved-ex1"
+        assert "Mystery Co" in reason
+        assert "unresolved" in reason
+
+    def test_default_sdk_client_skips_unresolved_records_as_rejected(
+        self, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """End-to-end via ``DefaultSubsystemSdkClient.submit``: the
+        receipt records the unresolved candidate as rejected, but the
+        SDK call only happens for the resolved candidate.
+        """
+
+        from subsystem_news.contracts.candidates import (
+            InvolvedEntity,
+            NewsFactCandidate,
+        )
+        from subsystem_news.contracts.evidence import EvidenceSpan
+        from subsystem_news.contracts.source_reference import (
+            SourceReference,
+            SourceReferenceLocator,
+        )
+        from subsystem_news.runtime.submit import DefaultSubsystemSdkClient
+        from subsystem_sdk.submit.receipt import SubmitReceipt as SdkReceipt
+
+        # Build candidates (one unresolved, one resolved). Reuse minimal
+        # builder logic by inlining; tests here are self-contained.
+        def _ex1(*, candidate_id: str, entity: InvolvedEntity) -> NewsFactCandidate:
+            return NewsFactCandidate(
+                candidate_id=candidate_id,
+                article_id=f"art-{candidate_id}",
+                cluster_id=None,
+                source_reference=SourceReference(
+                    source_id="end-to-end-src",
+                    url=f"https://example-approved-news.com/e/{candidate_id}",
+                    provider_key=None,
+                    original_locator=SourceReferenceLocator(
+                        locator_type="rss_guid",
+                        locator_value=f"loc-{candidate_id}",
+                    ),
+                ),
+                fact_type="contract",
+                summary="placeholder",
+                involved_entities=[entity],
+                event_time=datetime(2026, 1, 1, tzinfo=UTC),
+                confidence=0.5,
+                source_reliability_tier="A",
+                evidence_spans=[
+                    EvidenceSpan(
+                        article_id=f"art-{candidate_id}",
+                        start_char=0,
+                        end_char=11,
+                        quote="placeholder",
+                        locator="title",
+                    ),
+                ],
+            )
+
+        unresolved = _ex1(
+            candidate_id="end-to-end-unresolved",
+            entity=InvolvedEntity(
+                mention_text="Mystery Co",
+                canonical_id=None,
+                resolution_status="unresolved",
+                type_hint="company",
+            ),
+        )
+        resolved = _ex1(
+            candidate_id="end-to-end-resolved",
+            entity=InvolvedEntity(
+                mention_text="Real Co",
+                canonical_id="ENT_END_TO_END_RESOLVED",
+                resolution_status="resolved",
+                type_hint="company",
+            ),
+        )
+
+        # Stub SDK to record only the resolved call + return accepted.
+        sdk_calls: list[Any] = []
+
+        def fake_sdk_submit(payload: Any) -> SdkReceipt:
+            sdk_calls.append(payload)
+            return SdkReceipt(
+                accepted=True,
+                receipt_id="receipt-end-to-end",
+                backend_kind="mock",
+                validator_version="end-to-end",
+            )
+
+        import subsystem_sdk.submit as sdk_submit_pkg
+
+        monkeypatch.setattr(sdk_submit_pkg, "submit", fake_sdk_submit)
+
+        receipt = DefaultSubsystemSdkClient().submit([unresolved, resolved])
+
+        # Only the resolved candidate reached the SDK.
+        assert len(sdk_calls) == 1
+        assert sdk_calls[0]["fact_id"] == "end-to-end-resolved"
+
+        # Receipt: 1 accepted (resolved), 1 rejected (unresolved skipped).
+        assert receipt.accepted_count == 1
+        assert receipt.rejected_count == 1
+        assert receipt.submitted_candidate_ids == ["end-to-end-resolved"]
+        assert receipt.rejected_candidate_ids == ["end-to-end-unresolved"]
+
+
 class TestNewsDirectionMixedDoesNotLoseInformation:
     """News ``Direction`` has 4 values (positive/negative/neutral/mixed);
     contracts only has 3 (bullish/bearish/neutral). Mapper preserves

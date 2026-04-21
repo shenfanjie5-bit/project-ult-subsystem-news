@@ -31,6 +31,24 @@ def main(argv: Sequence[str] | None = None) -> int:
     ingest.add_argument("--trace-dir", required=True)
     ingest.add_argument("--cursor-json")
     ingest.add_argument("--dry-run", action="store_true")
+    # Stage 2.9 follow-up #2 (codex review #2 P2): non-dry-run requires
+    # an explicit SDK backend (orchestrator's _sdk_client_for_config
+    # rejects implicit construction). The CLI exposes the choice. For
+    # now the only available option is ``mock`` (in-memory
+    # MockSubmitBackend, suitable for end-to-end smoke / development).
+    # Real Lite-PG / Full-Kafka backends are phase-4 work per
+    # CLAUDE.md §21; expand this enum when they land.
+    ingest.add_argument(
+        "--sdk-backend",
+        choices=["mock"],
+        default=None,
+        help=(
+            "SDK submit backend wiring for non-dry-run mode. "
+            "'mock' uses an in-memory MockSubmitBackend (no Layer B "
+            "contact; suitable for end-to-end smoke / dev). Required "
+            "for non-dry-run runs; ignored when --dry-run is set."
+        ),
+    )
 
     replay = subparsers.add_parser("replay")
     replay_input = replay.add_mutually_exclusive_group(required=True)
@@ -71,11 +89,40 @@ def main(argv: Sequence[str] | None = None) -> int:
         dry_run=args.dry_run,
     )
 
-    result = run_once(
-        config,
-        source_cursor=source_cursor,
-        transport=_sample_fixture_transport() if args.dry_run else None,
-    )
+    if args.dry_run:
+        result = run_once(
+            config,
+            source_cursor=source_cursor,
+            transport=_sample_fixture_transport(),
+        )
+    else:
+        # Stage 2.9 follow-up #2 (codex review #2 P2): non-dry-run path
+        # explicitly wires SDK runtime + sdk_client per orchestrator
+        # contract. configure_runtime() is a context manager scoped to
+        # the pipeline run.
+        if args.sdk_backend is None:
+            parser.error(
+                "non-dry-run ingest requires --sdk-backend (currently "
+                "'mock' supported; real backends are phase-4 work)"
+            )
+        from subsystem_sdk.base.runtime import configure_runtime
+
+        from subsystem_news.runtime.submit import (
+            DefaultSubsystemSdkClient,
+            default_news_subsystem_context,
+        )
+
+        if args.sdk_backend == "mock":
+            context = default_news_subsystem_context()  # MockSubmitBackend default
+        else:  # pragma: no cover - argparse choices guards this
+            parser.error(f"unsupported sdk-backend: {args.sdk_backend}")
+
+        with configure_runtime(context):
+            result = run_once(
+                config,
+                source_cursor=source_cursor,
+                sdk_client=DefaultSubsystemSdkClient(),
+            )
     if result.trace_path is not None:
         print(result.trace_path)
     return 1 if result.error_count else 0

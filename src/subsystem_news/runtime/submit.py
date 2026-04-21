@@ -119,11 +119,28 @@ class DefaultSubsystemSdkClient:
         # the pipeline execution.
         from subsystem_sdk.base.runtime import RuntimeNotConfiguredError
 
+        # Stage 2.9 follow-up #2 (codex review #2 P1): partition the
+        # batch at the canonical wire boundary. The news upstream
+        # extract path intentionally produces unresolved Ex-1 / Ex-2
+        # candidates for local traceability (see
+        # ``test_all_unresolved_boundary_emits_traceable_ex1_fact``);
+        # those reach this adapter as part of the validated batch. The
+        # canonical mapper REJECTS unresolved entities at canonical
+        # wire positions (CLAUDE.md #6 — never fabricate canonical
+        # IDs), so we partition here: submittable candidates go through
+        # the SDK; unresolved ones are recorded as rejected in the
+        # receipt without crossing the wire boundary. This preserves
+        # the upstream traceability contract AND the canonical-ID
+        # invariant simultaneously.
+        submittable, skipped_unresolved = _partition_for_submit(batch)
+
         accepted_ids: list[str] = []
-        rejected_ids: list[str] = []
+        rejected_ids: list[str] = [
+            candidate.candidate_id for candidate, _ in skipped_unresolved
+        ]
         last_receipt_id: str | None = None
 
-        for candidate in batch:
+        for candidate in submittable:
             wire_payload = _validated_payload(candidate)
             try:
                 sdk_receipt = sdk_submit(wire_payload)
@@ -184,13 +201,157 @@ def validate_candidate_batch(batch: Sequence[CandidatePayload]) -> list[Candidat
     return validated
 
 
+def _unresolved_canonical_position_reason(
+    candidate: CandidatePayload,
+) -> str | None:
+    """Return a reason string if the candidate has unresolved entities at
+    a canonical wire position (Ex-1 primary, Ex-2 affected_entities, Ex-3
+    subject/object); ``None`` if all canonical-position entities are
+    resolved.
+
+    Stage 2.9 follow-up #2 (codex review #2 P1): the canonical wire
+    boundary REJECTS unresolved entities (CLAUDE.md #6 — never
+    fabricate canonical IDs). But the upstream extract path
+    intentionally produces unresolved Ex-1/Ex-2 candidates for local
+    traceability (see ``test_all_unresolved_boundary_emits_traceable_ex1_fact``
+    in tests/extract). The submit boundary therefore needs a per-
+    candidate skip path: rather than abort the entire batch on the
+    first unresolved candidate, partition the batch into submittable
+    (all canonical-position entities resolved) and
+    skipped_unresolved (one or more canonical-position entities
+    unresolved/ambiguous). The skipped candidates are recorded in the
+    receipt as rejected with their reason; the rest of the batch
+    proceeds to the SDK.
+    """
+
+    if isinstance(candidate, NewsFactCandidate):
+        primary = (
+            candidate.involved_entities[0]
+            if candidate.involved_entities
+            else None
+        )
+        if primary is None:
+            return "Ex-1 candidate has no involved_entities"
+        if (
+            primary.resolution_status != "resolved"
+            or not primary.canonical_id
+        ):
+            return (
+                "Ex-1 primary involved_entities[0] is "
+                f"{primary.resolution_status} "
+                f"(mention_text={primary.mention_text!r}); "
+                "canonical wire entity_id requires resolved entity"
+            )
+        return None
+
+    if isinstance(candidate, NewsSignalCandidate):
+        for idx, entity in enumerate(candidate.affected_entities):
+            if (
+                entity.resolution_status != "resolved"
+                or not entity.canonical_id
+            ):
+                return (
+                    f"Ex-2 affected_entities[{idx}] is "
+                    f"{entity.resolution_status} "
+                    f"(mention_text={entity.mention_text!r}); "
+                    "canonical wire affected_entities require resolved entities"
+                )
+        return None
+
+    if isinstance(candidate, NewsGraphDeltaCandidate):
+        # Ex-3 is already filtered by ``_require_graph_fields`` in
+        # ``_validate_candidate``, so this is belt-and-suspenders.
+        for role, entity in (
+            ("subject_entity", candidate.subject_entity),
+            ("object_entity", candidate.object_entity),
+        ):
+            if (
+                entity.resolution_status != "resolved"
+                or not entity.canonical_id
+            ):
+                return (
+                    f"Ex-3 {role} is {entity.resolution_status} "
+                    f"(mention_text={entity.mention_text!r}); "
+                    "canonical wire source_node/target_node require "
+                    "resolved entities"
+                )
+        return None
+
+    return None
+
+
+def _partition_for_submit(
+    batch: Sequence[CandidatePayload],
+) -> tuple[
+    list[CandidatePayload],
+    list[tuple[CandidatePayload, str]],
+]:
+    """Partition a validated batch into (submittable, skipped_unresolved).
+
+    Skipped candidates are paired with a reason string so the receipt
+    + downstream tracing can record exactly why each one was rejected.
+    Stage 2.9 follow-up #2 (codex review #2 P1): preserves the upstream
+    "produce unresolved Ex-1/Ex-2 candidates for traceability" path
+    by deferring the wire-boundary rejection to a per-candidate skip
+    rather than a whole-batch abort.
+    """
+
+    submittable: list[CandidatePayload] = []
+    skipped_unresolved: list[tuple[CandidatePayload, str]] = []
+    for candidate in batch:
+        reason = _unresolved_canonical_position_reason(candidate)
+        if reason is None:
+            submittable.append(candidate)
+        else:
+            skipped_unresolved.append((candidate, reason))
+    return submittable, skipped_unresolved
+
+
+def _merge_skipped_into_receipt(
+    client_receipt: SubmitReceipt,
+    skipped_unresolved: Sequence[tuple[CandidatePayload, str]],
+) -> SubmitReceipt:
+    """Fold skipped-at-wire-boundary candidates into a client receipt.
+
+    Skipped candidates count as rejected (they did NOT reach Layer B).
+    The candidate_id partition of the merged receipt covers the union
+    of (client-submitted accepted + client-submitted rejected + skipped).
+    """
+
+    if not skipped_unresolved:
+        return client_receipt
+    skipped_ids = [candidate.candidate_id for candidate, _ in skipped_unresolved]
+    return SubmitReceipt(
+        accepted_count=client_receipt.accepted_count,
+        rejected_count=client_receipt.rejected_count + len(skipped_unresolved),
+        submitted_candidate_ids=list(client_receipt.submitted_candidate_ids),
+        rejected_candidate_ids=[
+            *client_receipt.rejected_candidate_ids,
+            *skipped_ids,
+        ],
+        receipt_id=client_receipt.receipt_id,
+    )
+
+
 def submit_candidates(
     batch: Sequence[CandidatePayload],
     client: SubsystemSdkClient,
     *,
     max_retries: int = 2,
 ) -> SubmitReceipt:
-    """Validate and submit a candidate batch, retrying transient client failures."""
+    """Validate and submit a candidate batch, retrying transient client failures.
+
+    Stage 2.9 follow-up #2 (codex review #2 P1) deliberately does NOT
+    partition unresolved candidates here. The news pipeline contract
+    (locked in by ``test_pipeline_submits_unresolved_ex1_only_without_ex2_promotion``)
+    is that ``SubsystemSdkClient.submit`` receives the FULL batch
+    including unresolved Ex-1 candidates — the SDK adapter
+    (``DefaultSubsystemSdkClient``) is responsible for the canonical
+    wire boundary partition (CLAUDE.md #6: never fabricate canonical
+    IDs from unresolved entities). Test SDK clients (recording fakes)
+    and other transports may handle unresolved candidates differently;
+    the protocol stays neutral here.
+    """
 
     if max_retries < 0:
         raise ValueError("max_retries must be non-negative")
@@ -653,6 +814,55 @@ def _normalize_for_sdk(
         "producer_context": producer_context,
         "produced_at": produced_at,
     }
+
+
+def default_news_subsystem_context(*, backend: Any | None = None) -> Any:
+    """Build a ready-to-use ``BaseSubsystemContext`` for news.
+
+    Stage 2.9 follow-up #2 (codex review #2 P2): the CLI / orchestrator
+    non-dry-run path requires a wired SDK runtime. This helper builds
+    a context with sensible defaults so callers can do::
+
+        with configure_runtime(default_news_subsystem_context()):
+            run_once(config, sdk_client=DefaultSubsystemSdkClient())
+
+    Default ``backend=None`` → ``MockSubmitBackend`` (in-memory, no
+    Layer B contact). This is suitable for development / smoke /
+    end-to-end testing where backend wiring is not yet productionized.
+    Real Lite-PG / Full-Kafka backends are phase-4 work per
+    CLAUDE.md §21; pass them explicitly when they exist.
+
+    Returned as ``Any`` to keep this helper importable from CLI without
+    forcing subsystem-sdk into the eager import graph (the actual
+    type is ``subsystem_sdk.base.context.BaseSubsystemContext``).
+    """
+
+    from subsystem_sdk.backends.heartbeat import (
+        SubmitBackendHeartbeatAdapter,
+    )
+    from subsystem_sdk.backends.mock import MockSubmitBackend
+    from subsystem_sdk.base import (
+        BaseSubsystemContext,
+        SubsystemRegistrationSpec,
+    )
+    from subsystem_sdk.heartbeat.client import HeartbeatClient
+    from subsystem_sdk.submit.client import SubmitClient
+
+    if backend is None:
+        backend = MockSubmitBackend()
+    registration = SubsystemRegistrationSpec(
+        subsystem_id=MODULE_ID,
+        version=_NEWS_VERSION,
+        domain="news",
+        supported_ex_types=["Ex-0", "Ex-1", "Ex-2", "Ex-3"],
+        owner="subsystem-news",
+        heartbeat_policy_ref="interval:60s",
+    )
+    return BaseSubsystemContext(
+        registration=registration,
+        submit_client=SubmitClient(backend),
+        heartbeat_client=HeartbeatClient(SubmitBackendHeartbeatAdapter(backend)),
+    )
 
 
 def _validated_payload(candidate: CandidatePayload) -> dict[str, Any]:
