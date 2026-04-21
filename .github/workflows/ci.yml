@@ -1,5 +1,23 @@
 name: CI
 
+# stage-2.9 plan canonical 5-lane CI (sibling of subsystem-announcement
+# Stage 2.8 follow-up #3 ci.yml). Per stage-2 plan iron rule #6 the
+# pinned tags MUST be release tags (no @main allowed):
+#   - contracts @v0.1.3   (subsystem-sdk's base dep)
+#   - subsystem-sdk @v0.1.2 (news's base dep, transitively pulls
+#     contracts >=0.1.3)
+#   - audit-eval @v0.2.2  ([shared-fixtures] extra; case_ex3_negative
+#     baseline used by both announcement + news)
+#
+# Plan A 3-step preinstall on EVERY lane (NOT split into bootstrap-* +
+# install-*) so the install order is enforced by lane shape:
+#   1. pip install contracts@v0.1.3 (subsystem-sdk's base dep, not on PyPI)
+#   2. pip install subsystem-sdk@v0.1.2 (news's base dep, not on PyPI)
+#   3. pip install -e ".[<lane extras>]"
+# Step 1 is mandatory even if the lane only needs [dev] — pip cannot
+# resolve subsystem-sdk's `project-ult-contracts>=0.1.3` constraint
+# from PyPI.
+
 on:
   push:
     branches: [main]
@@ -7,14 +25,86 @@ on:
     branches: [main]
 
 jobs:
+  # full(ci) lane — all extras, full pytest collection (includes
+  # tests/regression which hard-imports audit_eval_fixtures per iron
+  # rule #1, and tests/contract which hard-imports contracts.schemas
+  # per iron rule #4).
   ci:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
-          python-version: "3.11"
-      - name: Install
-        run: pip install -e ".[dev]"
+          python-version: "3.12"
+      - name: Step 1 — Install contracts@v0.1.3 (subsystem-sdk's base dep)
+        run: pip install "git+https://github.com/shenfanjie5-bit/project-ult-contracts.git@v0.1.3"
+      - name: Step 2 — Install subsystem-sdk@v0.1.2 (news's base dep)
+        run: pip install "git+https://github.com/shenfanjie5-bit/project-ult-subsystem-sdk.git@v0.1.2"
+      - name: Step 3 — Install (full(ci) lane — all extras)
+        run: pip install -e ".[dev,contracts-schemas,shared-fixtures]"
       - name: Tests
         run: python -m pytest
+
+  test-fast:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Step 1 — Install contracts@v0.1.3
+        run: pip install "git+https://github.com/shenfanjie5-bit/project-ult-contracts.git@v0.1.3"
+      - name: Step 2 — Install subsystem-sdk@v0.1.2
+        run: pip install "git+https://github.com/shenfanjie5-bit/project-ult-subsystem-sdk.git@v0.1.2"
+      - name: Step 3 — Install (offline-first dev only)
+        run: pip install -e ".[dev]"
+      - name: test-fast (unit + boundary)
+        run: python -m pytest tests/unit tests/boundary -q
+
+  smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Step 1 — Install contracts@v0.1.3
+        run: pip install "git+https://github.com/shenfanjie5-bit/project-ult-contracts.git@v0.1.3"
+      - name: Step 2 — Install subsystem-sdk@v0.1.2
+        run: pip install "git+https://github.com/shenfanjie5-bit/project-ult-subsystem-sdk.git@v0.1.2"
+      - name: Step 3 — Install (offline-first dev only)
+        run: pip install -e ".[dev]"
+      - name: smoke
+        run: python -m pytest tests/smoke -q
+
+  contract:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Step 1 — Install contracts@v0.1.3
+        run: pip install "git+https://github.com/shenfanjie5-bit/project-ult-contracts.git@v0.1.3"
+      - name: Step 2 — Install subsystem-sdk@v0.1.2
+        run: pip install "git+https://github.com/shenfanjie5-bit/project-ult-subsystem-sdk.git@v0.1.2"
+      - name: Step 3 — Install (with cross-repo contracts-schemas extra)
+        run: pip install -e ".[dev,contracts-schemas]"
+      - name: contract (incl. cross-repo alignment)
+        run: python -m pytest tests/contract -q
+
+  regression:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Step 1 — Install contracts@v0.1.3
+        run: pip install "git+https://github.com/shenfanjie5-bit/project-ult-contracts.git@v0.1.3"
+      - name: Step 2 — Install subsystem-sdk@v0.1.2
+        run: pip install "git+https://github.com/shenfanjie5-bit/project-ult-subsystem-sdk.git@v0.1.2"
+      - name: Step 3 — Install (with shared-fixtures git extra @v0.2.2)
+        run: pip install -e ".[dev,shared-fixtures]"
+      - name: regression (must really consume audit_eval_fixtures)
+        run: python -m pytest tests/regression -q

@@ -1,9 +1,42 @@
-"""Candidate validation and subsystem-sdk submit boundary."""
+"""Candidate validation and subsystem-sdk submit boundary.
+
+Stage 2.9 cross-repo reconciliation (sibling of subsystem-announcement
+follow-up #3): adds ``_normalize_for_sdk(local_payload, ex_type)``, the
+production canonical mapper that converts a news-local candidate's
+``model_dump`` shape to the canonical ``contracts.schemas.Ex1/2/3``
+wire shape. Without this normalizer the real SDK link
+(``BaseSubsystemContext.submit -> SubmitClient.submit ->
+validate_then_dispatch -> validate_payload ->
+contracts.Ex*.model_validate``) would reject news payloads via
+``extra='forbid'`` because of cross-repo schema mismatches:
+
+  - news ``candidate_id`` vs canonical ``fact_id``/``signal_id``/``delta_id``
+  - news ``involved_entities``/``subject_entity``/``object_entity``
+    (rich ``InvolvedEntity`` objects) vs canonical
+    ``entity_id``/``source_node``/``target_node`` (string IDs)
+  - news ``Direction`` (``positive``/``negative``/``neutral``/``mixed``)
+    vs canonical ``contracts.Direction``
+    (``bullish``/``bearish``/``neutral``)
+  - news ``magnitude`` (``str | float``) vs canonical ``Magnitude``
+    (strict float, ge=0.0)
+  - news ``evidence_spans`` (full ``EvidenceSpan`` objects) vs canonical
+    ``evidence: list[EvidenceRef]`` (deterministic ref strings)
+  - news has no ``produced_at`` field on the candidate; canonical
+    requires SDK-routing ``produced_at`` (added by mapper at submit time)
+  - many news-local fields (``article_id``, ``cluster_id``, ``summary``,
+    ``rationale``, ``impact_scope``, ``source_reliability_tier``,
+    ``involved_entities`` original, etc.) have no canonical wire slot
+    and go into ``producer_context`` (contracts v0.1.3 extension slot).
+
+The mapper output is what ``contracts.Ex*.model_validate`` accepts
+directly after ``_strip_sdk_envelope``.
+"""
 
 from __future__ import annotations
 
 from collections.abc import Mapping, Sequence
-from typing import Protocol
+from datetime import UTC, datetime
+from typing import Any, Final, Protocol
 
 from pydantic import BaseModel, ConfigDict, Field, ValidationError
 
@@ -14,6 +47,22 @@ from subsystem_news.contracts.candidates import (
 )
 from subsystem_news.errors import ContractViolationError
 from subsystem_news.runtime.models import CandidatePayload
+from subsystem_news.version import __version__ as _NEWS_VERSION
+
+
+MODULE_ID: Final[str] = "subsystem-news"
+
+# news ``Direction`` (``positive``/``negative``/``neutral``/``mixed``) →
+# contracts ``Direction`` (``bullish``/``bearish``/``neutral``). News's
+# ``mixed`` has no canonical equivalent; mapped to ``neutral`` and the
+# original value preserved in ``producer_context["original_direction"]``
+# so Layer B replay/audit can reconstruct the news-local intent.
+_NEWS_DIRECTION_TO_CONTRACTS_DIRECTION: dict[str, str] = {
+    "positive": "bullish",
+    "negative": "bearish",
+    "neutral": "neutral",
+    "mixed": "neutral",
+}
 
 
 class SubmitReceipt(BaseModel):
@@ -36,32 +85,65 @@ class SubsystemSdkClient(Protocol):
 
 
 class DefaultSubsystemSdkClient:
-    """Lazy adapter around ``subsystem_sdk.submit``."""
+    """Lazy adapter around ``subsystem_sdk.submit``.
+
+    Stage 2.9 canonical-mapper rewrite: the SDK submit API takes ONE
+    canonical wire payload per call (``submit_sdk(payload: Mapping)``);
+    news's local protocol takes a batch. This adapter iterates per-
+    candidate, runs each through the canonical mapper
+    (``_validated_payload``), and aggregates the per-call SDK
+    ``SubmitReceipt`` (an SDK-shape receipt with single-payload fields)
+    into news's batch-shape ``SubmitReceipt`` (with accepted_count /
+    rejected_count / partitioned candidate_id lists).
+    """
 
     def submit(self, batch: Sequence[CandidatePayload]) -> SubmitReceipt:
-        from subsystem_sdk import submit as sdk_submit
+        # ``subsystem_sdk.submit`` (top-level attribute) is the SUBMODULE,
+        # not the function. Import the function explicitly to avoid the
+        # ``'module' object is not callable`` trap.
+        from subsystem_sdk.submit import submit as sdk_submit
 
-        payload = [candidate.model_dump(mode="json") for candidate in batch]
-        response = sdk_submit(payload)
-        if isinstance(response, SubmitReceipt):
-            receipt = response
-            _require_receipt_partitions_batch(receipt, batch)
-            return receipt
-        if isinstance(response, Mapping):
-            try:
-                receipt = SubmitReceipt.model_validate(response)
-            except (ValidationError, ValueError, TypeError) as exc:
+        accepted_ids: list[str] = []
+        rejected_ids: list[str] = []
+        last_receipt_id: str | None = None
+
+        for candidate in batch:
+            wire_payload = _validated_payload(candidate)
+            sdk_receipt = sdk_submit(wire_payload)
+            # SDK SubmitReceipt has ``accepted: bool`` + ``receipt_id``
+            # + ``backend_kind`` + per-call error/warning lists. Reject
+            # ``None`` and shapes that don't expose ``accepted`` so we
+            # don't silently treat ambiguous SDK responses as accepted
+            # candidates (preserves the safety guarantee tests around
+            # ``DefaultSubsystemSdkClient`` originally enforced).
+            if sdk_receipt is None:
                 raise ContractViolationError(
-                    "subsystem-sdk submit returned invalid receipt"
-                ) from exc
-            _require_receipt_partitions_batch(receipt, batch)
-            return receipt
-        if response is None:
-            raise ContractViolationError(
-                "subsystem-sdk submit returned no receipt; accepted candidate IDs "
-                "are ambiguous"
+                    "subsystem-sdk submit returned no receipt; accepted "
+                    "candidate IDs are ambiguous"
+                )
+            if not hasattr(sdk_receipt, "accepted"):
+                raise ContractViolationError(
+                    "subsystem-sdk submit returned unsupported receipt; "
+                    f"expected SubmitReceipt-like object with .accepted, "
+                    f"got {type(sdk_receipt).__name__}"
+                )
+            if sdk_receipt.accepted:
+                accepted_ids.append(candidate.candidate_id)
+            else:
+                rejected_ids.append(candidate.candidate_id)
+            last_receipt_id = (
+                getattr(sdk_receipt, "receipt_id", None) or last_receipt_id
             )
-        raise ContractViolationError("subsystem-sdk submit returned unsupported receipt")
+
+        receipt = SubmitReceipt(
+            accepted_count=len(accepted_ids),
+            rejected_count=len(rejected_ids),
+            submitted_candidate_ids=accepted_ids,
+            rejected_candidate_ids=rejected_ids,
+            receipt_id=last_receipt_id,
+        )
+        _require_receipt_partitions_batch(receipt, batch)
+        return receipt
 
 
 def validate_candidate_batch(batch: Sequence[CandidatePayload]) -> list[CandidatePayload]:
@@ -240,3 +322,279 @@ def _require_receipt_partitions_batch(
         raise ContractViolationError(
             "submit receipt candidate IDs must partition the submitted batch"
         )
+
+
+# ── Stage 2.9 canonical wire mapper ──────────────────────────────────
+
+
+def _serialize_evidence_ref(span: Mapping[str, Any]) -> str:
+    """Deterministic wire-ref string for an EvidenceSpan.
+
+    Format: ``"{article_id}#{locator}:{start_char}-{end_char}"``
+    Each ref is self-contained (Layer B can correlate back to
+    ``producer_context.evidence_spans_detail`` for quote detail without
+    a side-channel lookup). Each ref is min_length=1 (well above
+    contracts.EvidenceRef requirement; article_id + locator are
+    themselves min_length=1).
+    """
+
+    article_id = str(span.get("article_id", ""))
+    locator = str(span.get("locator", "body"))
+    start_char = span.get("start_char", 0)
+    end_char = span.get("end_char", 0)
+    return f"{article_id}#{locator}:{start_char}-{end_char}"
+
+
+def _coerce_canonical_id(entity: Mapping[str, Any] | None) -> str:
+    """Extract a canonical entity_id string from an InvolvedEntity dict.
+
+    Resolved entities -> ``canonical_id`` (non-empty). Unresolved /
+    ambiguous entities -> a synthetic placeholder
+    ``"UNRESOLVED:{mention_text}"`` so contracts.Ex* (which requires
+    non-empty entity_id strings) accepts the wire payload while Layer
+    B can route the candidate to the unresolved-entity reconciliation
+    queue. The full entity object is preserved in
+    ``producer_context.involved_entities`` for audit / replay.
+    """
+
+    if entity is None:
+        return "UNRESOLVED:none"
+    canonical = entity.get("canonical_id")
+    if isinstance(canonical, str) and canonical.strip():
+        return canonical
+    mention = str(entity.get("mention_text", "unknown")).strip() or "unknown"
+    return f"UNRESOLVED:{mention}"
+
+
+def _coerce_magnitude(magnitude: Any) -> float:
+    """Coerce news ``magnitude`` (``str | float``) to canonical
+    ``Magnitude`` (strict float, ge=0.0).
+
+    Numeric values pass through. String values try float() conversion
+    first; if that fails (e.g. ``"high"``/``"low"``/``"medium"`` string
+    levels), map to a stable proxy: ``high=0.8`` / ``medium=0.5`` /
+    ``low=0.2``. Unknown string values raise ``ContractViolationError``
+    rather than silently emitting nonsense to the wire.
+    """
+
+    if isinstance(magnitude, (int, float)):
+        return float(magnitude)
+    if isinstance(magnitude, str):
+        text = magnitude.strip().lower()
+        try:
+            return float(text)
+        except ValueError:
+            pass
+        proxy_map = {"high": 0.8, "medium": 0.5, "low": 0.2}
+        if text in proxy_map:
+            return proxy_map[text]
+        raise ContractViolationError(
+            f"Ex-2 magnitude string {magnitude!r} not coercible to "
+            f"contracts.Magnitude (numeric or one of {sorted(proxy_map)})"
+        )
+    raise ContractViolationError(
+        f"Ex-2 magnitude must be float or str, got {type(magnitude)!r}"
+    )
+
+
+def _now_iso() -> str:
+    """UTC-now as ISO string. Used for ``produced_at`` SDK envelope
+    field — news candidate models have no production timestamp field, so
+    the mapper stamps the wire payload at submit time. SDK strips this
+    before contracts validation.
+    """
+
+    return datetime.now(UTC).isoformat()
+
+
+def _normalize_for_sdk(
+    local_payload: dict[str, Any], ex_type: str
+) -> dict[str, Any]:
+    """Map a news-local candidate wire dict to the canonical
+    ``contracts.schemas.Ex1 / Ex2 / Ex3`` wire shape.
+
+    Output is what ``contracts.Ex*.model_validate`` accepts directly
+    (after ``_strip_sdk_envelope`` removes ``ex_type`` /
+    ``semantic`` / ``produced_at``).
+
+    Critical mapping notes (mirrors announcement follow-up #3):
+
+    - **``ex_type`` stays at top-level** for SDK envelope routing
+      (``_identify_ex_type`` requires it on dict payloads). SDK strips
+      before contracts validation.
+    - **``produced_at`` stays at top-level** for SDK envelope routing
+      (current UTC ISO string; news has no candidate-side production
+      timestamp). SDK strips before contracts validation.
+    - **Ex-1 ``source_reference`` STAYS at top-level** (contracts.Ex1
+      REQUIRED). Ex-2/Ex-3 contracts have NO ``source_reference`` slot,
+      so it goes into ``producer_context`` for those.
+    - **InvolvedEntity → canonical entity_id strings** —
+      ``involved_entities[0]`` becomes Ex-1 ``entity_id``;
+      ``affected_entities`` (Ex-2) become a list of canonical_id
+      strings; ``subject_entity``/``object_entity`` (Ex-3) become
+      ``source_node``/``target_node``. Full ``InvolvedEntity`` objects
+      preserved in ``producer_context``.
+    - **news ``Direction`` → contracts ``Direction`` enum mapping**
+      (positive→bullish, negative→bearish, neutral→neutral; mixed→
+      neutral with original preserved in producer_context).
+    - **news ``magnitude`` (str|float) → contracts ``Magnitude`` (float)**
+      via ``_coerce_magnitude`` (numeric passthrough; high/medium/low
+      string proxy; unknown string raises).
+    - **evidence_spans → canonical evidence ref strings**
+      (``{article_id}#{locator}:{start_char}-{end_char}``); full
+      ``EvidenceSpan`` objects preserved in
+      ``producer_context.evidence_spans_detail``.
+    """
+
+    if ex_type not in {"Ex-1", "Ex-2", "Ex-3"}:
+        raise ContractViolationError(
+            f"_normalize_for_sdk only supports Ex-1/Ex-2/Ex-3; got {ex_type!r}"
+        )
+
+    evidence_spans_local = list(local_payload.get("evidence_spans") or [])
+    evidence_refs = [_serialize_evidence_ref(span) for span in evidence_spans_local]
+    produced_at = _now_iso()
+
+    if ex_type == "Ex-1":
+        involved_entities = list(local_payload.get("involved_entities") or [])
+        primary_entity = involved_entities[0] if involved_entities else None
+        producer_context: dict[str, Any] = {
+            "article_id": local_payload.get("article_id"),
+            "cluster_id": local_payload.get("cluster_id"),
+            "summary": local_payload.get("summary"),
+            "involved_entities": involved_entities,
+            "event_time": local_payload.get("event_time"),
+            "source_reliability_tier": local_payload.get(
+                "source_reliability_tier"
+            ),
+            "evidence_spans_detail": evidence_spans_local,
+            "export_contract": local_payload.get("export_contract"),
+        }
+        return {
+            # SDK envelope routing — stripped before contracts
+            # model_validate and again before backend dispatch.
+            "ex_type": "Ex-1",
+            "subsystem_id": MODULE_ID,
+            "fact_id": local_payload["candidate_id"],
+            "entity_id": _coerce_canonical_id(primary_entity),
+            "fact_type": str(local_payload["fact_type"]),
+            "fact_content": {
+                "summary": local_payload.get("summary"),
+                "event_time": local_payload.get("event_time"),
+            },
+            "confidence": float(local_payload["confidence"]),
+            # contracts.Ex1.source_reference is REQUIRED top-level.
+            "source_reference": dict(local_payload["source_reference"]),
+            # news has no extracted_at; stamp at submit time.
+            "extracted_at": produced_at,
+            "evidence": evidence_refs,
+            "producer_context": producer_context,
+            "produced_at": produced_at,
+        }
+
+    if ex_type == "Ex-2":
+        affected = list(local_payload.get("affected_entities") or [])
+        affected_ids = [_coerce_canonical_id(entity) for entity in affected]
+        direction_local = str(local_payload.get("direction", ""))
+        try:
+            direction_canonical = _NEWS_DIRECTION_TO_CONTRACTS_DIRECTION[
+                direction_local
+            ]
+        except KeyError as exc:
+            raise ContractViolationError(
+                f"unknown news Direction value {direction_local!r}; expected "
+                f"one of {sorted(_NEWS_DIRECTION_TO_CONTRACTS_DIRECTION)}"
+            ) from exc
+        producer_context = {
+            "article_id": local_payload.get("article_id"),
+            "cluster_id": local_payload.get("cluster_id"),
+            "source_reference": dict(
+                local_payload.get("source_reference") or {}
+            ),
+            "impact_scope": local_payload.get("impact_scope"),
+            "rationale": local_payload.get("rationale"),
+            "affected_entities": affected,  # full InvolvedEntity objects
+            "evidence_spans_detail": evidence_spans_local,
+            "export_contract": local_payload.get("export_contract"),
+        }
+        # Preserve news's "mixed" direction in producer_context (lossy
+        # canonical mapping requires audit-trail recovery path).
+        if direction_local == "mixed":
+            producer_context["original_direction"] = direction_local
+        return {
+            "ex_type": "Ex-2",
+            "subsystem_id": MODULE_ID,
+            "signal_id": local_payload["candidate_id"],
+            "signal_type": str(local_payload["signal_type"]),
+            "direction": direction_canonical,
+            "magnitude": _coerce_magnitude(local_payload["magnitude"]),
+            "affected_entities": affected_ids,
+            # contracts v0.1.3 allows []. News operates at article level,
+            # not sector; sector enrichment is graph-engine downstream.
+            "affected_sectors": [],
+            "time_horizon": str(local_payload["time_horizon"]),
+            "evidence": evidence_refs,
+            "confidence": float(local_payload["confidence"]),
+            "producer_context": producer_context,
+            "produced_at": produced_at,
+        }
+
+    # Ex-3
+    subject = local_payload.get("subject_entity") or {}
+    obj = local_payload.get("object_entity") or {}
+    producer_context = {
+        "article_id": local_payload.get("article_id"),
+        "source_reference": dict(
+            local_payload.get("source_reference") or {}
+        ),
+        "subject_entity": subject,  # full InvolvedEntity
+        "object_entity": obj,  # full InvolvedEntity
+        "valid_from": local_payload.get("valid_from"),
+        "requires_manual_review": local_payload.get("requires_manual_review"),
+        # contracts.Ex3 has no canonical confidence slot — preserve here
+        # for downstream Layer B replay/audit.
+        "confidence": float(local_payload["confidence"]),
+        "evidence_spans_detail": evidence_spans_local,
+        "export_contract": local_payload.get("export_contract"),
+    }
+    return {
+        "ex_type": "Ex-3",
+        "subsystem_id": MODULE_ID,
+        "delta_id": local_payload["candidate_id"],
+        # news DeltaAction (add/update/deactivate) is meaningful enough
+        # for Layer B routing; pass through directly (contracts.Ex3
+        # delta_type is `str` with no enum constraint).
+        "delta_type": str(local_payload["delta_action"]),
+        "source_node": _coerce_canonical_id(subject),
+        "target_node": _coerce_canonical_id(obj),
+        "relation_type": str(local_payload["relation_type"]),
+        "properties": {},
+        "evidence": evidence_refs,
+        "producer_context": producer_context,
+        "produced_at": produced_at,
+    }
+
+
+def _validated_payload(candidate: CandidatePayload) -> dict[str, Any]:
+    """Run news-local revalidation then map to canonical wire shape.
+
+    This is the single boundary news code goes through to produce a
+    payload acceptable to ``subsystem_sdk.SubmitClient.submit`` (which
+    in turn passes it to ``contracts.Ex*.model_validate`` via SDK
+    ``validate_payload``). Use this in adapters / smoke / integration —
+    do NOT call ``candidate.model_dump()`` directly into the SDK; the
+    raw dump is news-local shape and contracts will reject it.
+    """
+
+    revalidated = _validate_candidate(candidate)
+    if isinstance(revalidated, NewsFactCandidate):
+        ex_type = "Ex-1"
+    elif isinstance(revalidated, NewsSignalCandidate):
+        ex_type = "Ex-2"
+    elif isinstance(revalidated, NewsGraphDeltaCandidate):
+        ex_type = "Ex-3"
+    else:  # pragma: no cover - guarded by _validate_candidate
+        raise ContractViolationError(
+            "validated candidate is not a known News*Candidate"
+        )
+    return _normalize_for_sdk(revalidated.model_dump(mode="json"), ex_type)

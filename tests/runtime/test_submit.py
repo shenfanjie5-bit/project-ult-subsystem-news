@@ -212,25 +212,50 @@ def test_submit_candidates_raises_after_final_retry_failure() -> None:
 
 
 def test_default_sdk_client_rejects_missing_receipt(monkeypatch: pytest.MonkeyPatch) -> None:
-    sdk_module = types.ModuleType("subsystem_sdk")
-    sdk_module.submit = lambda _payload: None  # type: ignore[attr-defined]
-    monkeypatch.setitem(sys.modules, "subsystem_sdk", sdk_module)
+    """Stage 2.9 canonical-mapper rewrite: SDK ``submit(payload)`` is now
+    invoked per-candidate via ``subsystem_sdk.submit.submit``, which
+    delegates to the runtime singleton's ``submit``. Returning ``None``
+    from the SDK leaves accepted/rejected ambiguous, so the news
+    adapter raises rather than silently treating the candidate as
+    accepted or rejected.
+
+    Patch the runtime-resolved submit function (NOT sys.modules — the
+    submodule import path bypasses top-level monkeypatching).
+    """
+
+    import subsystem_sdk.submit as sdk_submit_pkg
+
+    # Patch the binding news's `from subsystem_sdk.submit import submit
+    # as sdk_submit` actually resolves to (the package-level re-export,
+    # not the source `client.submit`).
+    monkeypatch.setattr(sdk_submit_pkg, "submit", lambda _payload: None)
 
     with pytest.raises(ContractViolationError, match="returned no receipt"):
         DefaultSubsystemSdkClient().submit([fact_candidate()])
 
 
-def test_default_sdk_client_requires_receipt_candidate_id_partition(
+def test_default_sdk_client_rejects_unsupported_receipt_shape(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    sdk_module = types.ModuleType("subsystem_sdk")
-    sdk_module.submit = lambda _payload: {  # type: ignore[attr-defined]
-        "accepted_count": 1,
-        "submitted_candidate_ids": [],
-    }
-    monkeypatch.setitem(sys.modules, "subsystem_sdk", sdk_module)
+    """Stage 2.9 canonical-mapper rewrite: SDK now returns SDK-shape
+    ``SubmitReceipt`` objects with an ``.accepted`` attribute, NOT the
+    old news-shape dicts (``accepted_count`` / ``submitted_candidate_ids``).
+    A return value missing ``.accepted`` is unsupported — the news
+    adapter raises instead of silently mis-classifying the candidate.
+    """
 
-    with pytest.raises(ContractViolationError, match="submitted_candidate_ids"):
+    import subsystem_sdk.submit as sdk_submit_pkg
+
+    monkeypatch.setattr(
+        sdk_submit_pkg,
+        "submit",
+        lambda _payload: {
+            "accepted_count": 1,
+            "submitted_candidate_ids": [],
+        },
+    )
+
+    with pytest.raises(ContractViolationError, match="unsupported receipt"):
         DefaultSubsystemSdkClient().submit([fact_candidate()])
 
 
