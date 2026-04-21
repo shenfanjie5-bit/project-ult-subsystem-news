@@ -8,9 +8,13 @@ version = "0.1.1"
 description = "News understanding subsystem (Ex-1 / Ex-2 / Ex-3 candidate emission via subsystem-sdk) for project-ult."
 readme = "README.md"
 # Capped lower at 3.11 (subsystem-sdk + contracts both support 3.11+); upper
-# cap matches subsystem-sdk@v0.1.2 (>=3.11,<3.13) so news inherits dagster
-# wheel compatibility for assembly e2e.
-requires-python = ">=3.11"
+# cap MUST match subsystem-sdk@v0.1.2 (>=3.11,<3.13) so news inherits the
+# dagster wheel compatibility window for assembly e2e. Stage 2.9 follow-up
+# #1 (codex review #1 P2 #4): aligned the metadata with the SDK pin —
+# previously the comment claimed inheritance but the actual constraint
+# was just ">=3.11", which advertised compatibility on 3.13/3.14 that a
+# clean install can't satisfy (subsystem-sdk wheel rejects).
+requires-python = ">=3.11,<3.13"
 dependencies = [
     # Lightweight runtime deps.
     "pydantic>=2.6",

@@ -406,6 +406,198 @@ class TestProductionWirePayloadPassesRealContractsValidation:
         assert "generated_at" not in wire
 
 
+class TestUnresolvedEntitiesAreNotFabricatedAsCanonical:
+    """Stage 2.9 follow-up #1 (codex review #1 P1 #2): the canonical
+    mapper MUST NOT synthesize entity_id strings for unresolved or
+    ambiguous entities. CLAUDE.md #6: canonical IDs come from
+    entity-registry only — news must NEVER fabricate them at the
+    submit boundary. Each Ex-1/Ex-2/Ex-3 wire-emission path raises
+    ContractViolationError when it sees an unresolved entity at a
+    canonical position.
+    """
+
+    def test_ex1_unresolved_primary_entity_rejected(self) -> None:
+        from subsystem_news.contracts.candidates import (
+            InvolvedEntity,
+            NewsFactCandidate,
+        )
+        from subsystem_news.contracts.evidence import EvidenceSpan
+        from subsystem_news.contracts.source_reference import (
+            SourceReference,
+            SourceReferenceLocator,
+        )
+        from subsystem_news.errors import ContractViolationError
+        from subsystem_news.runtime.submit import _validated_payload
+
+        candidate = NewsFactCandidate(
+            candidate_id="unresolved-primary-ex1",
+            article_id="unresolved-art",
+            cluster_id=None,
+            source_reference=SourceReference(
+                source_id="unresolved-src",
+                url="https://example-approved-news.com/u/1",
+                provider_key=None,
+                original_locator=SourceReferenceLocator(
+                    locator_type="rss_guid",
+                    locator_value="unresolved-locator",
+                ),
+            ),
+            fact_type="contract",
+            summary="placeholder",
+            involved_entities=[
+                InvolvedEntity(
+                    mention_text="Mystery Co",
+                    canonical_id=None,
+                    resolution_status="unresolved",
+                    type_hint="company",
+                ),
+            ],
+            event_time=datetime(2026, 1, 1, tzinfo=UTC),
+            confidence=0.9,
+            source_reliability_tier="A",
+            evidence_spans=[
+                EvidenceSpan(
+                    article_id="unresolved-art",
+                    start_char=0,
+                    end_char=11,
+                    quote="placeholder",
+                    locator="title",
+                ),
+            ],
+        )
+
+        with pytest.raises(ContractViolationError, match="entity_id"):
+            _validated_payload(candidate)
+
+    def test_ex2_unresolved_affected_entity_rejected(self) -> None:
+        from subsystem_news.contracts.candidates import (
+            InvolvedEntity,
+            NewsSignalCandidate,
+        )
+        from subsystem_news.contracts.evidence import EvidenceSpan
+        from subsystem_news.contracts.source_reference import (
+            SourceReference,
+            SourceReferenceLocator,
+        )
+        from subsystem_news.errors import ContractViolationError
+        from subsystem_news.runtime.submit import _normalize_for_sdk
+
+        candidate = NewsSignalCandidate(
+            candidate_id="unresolved-affected-ex2",
+            article_id="unresolved-art",
+            cluster_id=None,
+            source_reference=SourceReference(
+                source_id="unresolved-src",
+                url="https://example-approved-news.com/u/1",
+                provider_key=None,
+                original_locator=SourceReferenceLocator(
+                    locator_type="rss_guid",
+                    locator_value="unresolved-locator",
+                ),
+            ),
+            signal_type="event_impact",
+            direction="positive",
+            magnitude=0.5,
+            affected_entities=[
+                InvolvedEntity(
+                    mention_text="Mystery Co",
+                    canonical_id=None,
+                    resolution_status="unresolved",
+                    type_hint="company",
+                ),
+            ],
+            impact_scope="company",
+            time_horizon="short",
+            rationale="placeholder",
+            confidence=0.5,
+            evidence_spans=[
+                EvidenceSpan(
+                    article_id="unresolved-art",
+                    start_char=0,
+                    end_char=11,
+                    quote="placeholder",
+                    locator="body",
+                ),
+            ],
+        )
+
+        # Use _normalize_for_sdk directly so this test stays independent
+        # of any future _validate_candidate filtering for Ex-2.
+        with pytest.raises(
+            ContractViolationError, match="affected_entities"
+        ):
+            _normalize_for_sdk(candidate.model_dump(mode="json"), "Ex-2")
+
+    def test_ex3_unresolved_object_entity_rejected_at_mapper(self) -> None:
+        """Ex-3 has a redundant guard at ``_require_graph_fields``
+        already; this test asserts the canonical mapper itself ALSO
+        rejects (defense-in-depth: callers that bypass _validate_candidate
+        and call _normalize_for_sdk directly still can't fabricate IDs).
+        """
+
+        from subsystem_news.contracts.candidates import (
+            InvolvedEntity,
+            NewsGraphDeltaCandidate,
+        )
+        from subsystem_news.contracts.evidence import EvidenceSpan
+        from subsystem_news.contracts.source_reference import (
+            SourceReference,
+            SourceReferenceLocator,
+        )
+        from subsystem_news.errors import ContractViolationError
+        from subsystem_news.runtime.submit import _normalize_for_sdk
+
+        candidate = NewsGraphDeltaCandidate(
+            candidate_id="unresolved-object-ex3",
+            article_id="unresolved-art",
+            source_reference=SourceReference(
+                source_id="unresolved-src",
+                url="https://example-approved-news.com/u/1",
+                provider_key=None,
+                original_locator=SourceReferenceLocator(
+                    locator_type="rss_guid",
+                    locator_value="unresolved-locator",
+                ),
+            ),
+            subject_entity=InvolvedEntity(
+                mention_text="Resolved Co",
+                canonical_id="ENT_STOCK_RESOLVED_001",
+                resolution_status="resolved",
+                type_hint="company",
+            ),
+            relation_type="supplier_of",
+            object_entity=InvolvedEntity(
+                mention_text="Mystery Counterparty",
+                canonical_id=None,
+                resolution_status="unresolved",
+                type_hint="company",
+            ),
+            delta_action="add",
+            valid_from=datetime(2026, 1, 1, tzinfo=UTC),
+            confidence=0.9,
+            requires_manual_review=True,
+            evidence_spans=[
+                EvidenceSpan(
+                    article_id="unresolved-art",
+                    start_char=0,
+                    end_char=11,
+                    quote="placeholder",
+                    locator="title",
+                ),
+                EvidenceSpan(
+                    article_id="unresolved-art",
+                    start_char=20,
+                    end_char=35,
+                    quote="dual_evidence!!",
+                    locator="body",
+                ),
+            ],
+        )
+
+        with pytest.raises(ContractViolationError, match="target_node"):
+            _normalize_for_sdk(candidate.model_dump(mode="json"), "Ex-3")
+
+
 class TestNewsDirectionMixedDoesNotLoseInformation:
     """News ``Direction`` has 4 values (positive/negative/neutral/mixed);
     contracts only has 3 (bullish/bearish/neutral). Mapper preserves

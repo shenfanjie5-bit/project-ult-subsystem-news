@@ -103,13 +103,42 @@ class DefaultSubsystemSdkClient:
         # ``'module' object is not callable`` trap.
         from subsystem_sdk.submit import submit as sdk_submit
 
+        # Stage 2.9 follow-up #1 (codex review #1 P1 #1): the SDK's
+        # top-level ``submit()`` delegates to ``get_runtime().submit()``,
+        # which raises ``RuntimeNotConfiguredError`` if no
+        # ``BaseSubsystemContext`` was bound via
+        # ``configure_runtime(...)``. The original orchestrator default
+        # constructed ``DefaultSubsystemSdkClient()`` without any
+        # surrounding ``configure_runtime`` scope — so the first real
+        # non-dry-run submission would crash with a cryptic SDK error.
+        # Catch the SDK-internal RuntimeNotConfiguredError and re-raise
+        # with news-specific guidance pointing at the orchestrator
+        # contract: callers MUST either (a) pass an ``sdk_client=`` to
+        # ``run_once`` for non-dry-run mode, or (b) configure the SDK
+        # runtime explicitly via ``configure_runtime(context)`` around
+        # the pipeline execution.
+        from subsystem_sdk.base.runtime import RuntimeNotConfiguredError
+
         accepted_ids: list[str] = []
         rejected_ids: list[str] = []
         last_receipt_id: str | None = None
 
         for candidate in batch:
             wire_payload = _validated_payload(candidate)
-            sdk_receipt = sdk_submit(wire_payload)
+            try:
+                sdk_receipt = sdk_submit(wire_payload)
+            except RuntimeNotConfiguredError as exc:
+                raise ContractViolationError(
+                    "DefaultSubsystemSdkClient.submit requires the "
+                    "subsystem_sdk runtime to be bound via "
+                    "configure_runtime(BaseSubsystemContext(...)) "
+                    "before .submit() is called. For non-dry-run "
+                    "pipelines, either pass sdk_client= to run_once "
+                    "(with your wired backend), or wrap the pipeline "
+                    "call in configure_runtime(...). For tests / smoke, "
+                    "see tests/integration/test_sdk_wire_shape_integration.py "
+                    "for the canonical wiring pattern."
+                ) from exc
             # SDK SubmitReceipt has ``accepted: bool`` + ``receipt_id``
             # + ``backend_kind`` + per-call error/warning lists. Reject
             # ``None`` and shapes that don't expose ``accepted`` so we
@@ -345,25 +374,54 @@ def _serialize_evidence_ref(span: Mapping[str, Any]) -> str:
     return f"{article_id}#{locator}:{start_char}-{end_char}"
 
 
-def _coerce_canonical_id(entity: Mapping[str, Any] | None) -> str:
+def _require_canonical_id(
+    entity: Mapping[str, Any] | None, *, role: str
+) -> str:
     """Extract a canonical entity_id string from an InvolvedEntity dict.
 
-    Resolved entities -> ``canonical_id`` (non-empty). Unresolved /
-    ambiguous entities -> a synthetic placeholder
-    ``"UNRESOLVED:{mention_text}"`` so contracts.Ex* (which requires
-    non-empty entity_id strings) accepts the wire payload while Layer
-    B can route the candidate to the unresolved-entity reconciliation
-    queue. The full entity object is preserved in
-    ``producer_context.involved_entities`` for audit / replay.
+    Stage 2.9 follow-up #1 (codex review #1 P1 #2): the canonical wire
+    boundary MUST NOT fabricate canonical IDs for unresolved or
+    ambiguous entities. CLAUDE.md #6 (subsystem-news) is explicit:
+    实体 canonical ID 来源必须来自 entity-registry，禁止本模块自造 ID.
+    The earlier design synthesized ``"UNRESOLVED:{mention_text}"`` and
+    emitted those at top-level (``entity_id`` / ``affected_entities`` /
+    ``source_node`` / ``target_node``), which violated the contract by
+    letting unresolved entities masquerade as canonical at the Layer B
+    ingest boundary.
+
+    Now: if ``canonical_id`` is missing or non-string-non-empty, raise
+    ``ContractViolationError``. The full ``InvolvedEntity`` (with
+    ``canonical_id=None`` + ``resolution_status='unresolved'`` /
+    ``ambiguous``) is still preserved in ``producer_context`` for audit
+    / replay; the candidate must be filtered earlier in the pipeline
+    (e.g. ``_require_graph_fields`` already does this for Ex-3) or
+    held back from submission entirely.
+
+    ``role`` describes the wire field for the error message
+    (``entity_id`` / ``affected_entities[i]`` / ``source_node`` /
+    ``target_node``).
     """
 
     if entity is None:
-        return "UNRESOLVED:none"
+        raise ContractViolationError(
+            f"canonical wire field {role!r} requires a resolved "
+            "InvolvedEntity; got None. Filter unresolved candidates "
+            "before they reach _normalize_for_sdk; see CLAUDE.md #6 "
+            "(canonical IDs must come from entity-registry, never "
+            "fabricated)."
+        )
     canonical = entity.get("canonical_id")
-    if isinstance(canonical, str) and canonical.strip():
-        return canonical
-    mention = str(entity.get("mention_text", "unknown")).strip() or "unknown"
-    return f"UNRESOLVED:{mention}"
+    if not isinstance(canonical, str) or not canonical.strip():
+        mention = str(entity.get("mention_text", "<unknown>")).strip() or "<unknown>"
+        status = entity.get("resolution_status", "<unknown>")
+        raise ContractViolationError(
+            f"canonical wire field {role!r} requires a resolved "
+            f"InvolvedEntity with non-empty canonical_id; got "
+            f"resolution_status={status!r}, mention_text={mention!r}, "
+            "canonical_id missing. CLAUDE.md #6: canonical IDs come "
+            "from entity-registry only; do not fabricate."
+        )
+    return canonical
 
 
 def _coerce_magnitude(magnitude: Any) -> float:
@@ -470,13 +528,22 @@ def _normalize_for_sdk(
             "evidence_spans_detail": evidence_spans_local,
             "export_contract": local_payload.get("export_contract"),
         }
+        # Ex-1 emits the FIRST involved entity as canonical entity_id at
+        # the wire boundary. Per CLAUDE.md #6 it MUST be resolved (the
+        # full involved_entities list — including any unresolved /
+        # ambiguous siblings — is preserved in producer_context for
+        # audit). Ex-1 candidates with an unresolved primary entity must
+        # be filtered upstream of _normalize_for_sdk; we fail-fast here
+        # rather than fabricate an UNRESOLVED:* synthetic ID.
         return {
             # SDK envelope routing — stripped before contracts
             # model_validate and again before backend dispatch.
             "ex_type": "Ex-1",
             "subsystem_id": MODULE_ID,
             "fact_id": local_payload["candidate_id"],
-            "entity_id": _coerce_canonical_id(primary_entity),
+            "entity_id": _require_canonical_id(
+                primary_entity, role="entity_id"
+            ),
             "fact_type": str(local_payload["fact_type"]),
             "fact_content": {
                 "summary": local_payload.get("summary"),
@@ -494,7 +561,14 @@ def _normalize_for_sdk(
 
     if ex_type == "Ex-2":
         affected = list(local_payload.get("affected_entities") or [])
-        affected_ids = [_coerce_canonical_id(entity) for entity in affected]
+        # Per CLAUDE.md #6 every entity emitted at the canonical
+        # affected_entities wire field MUST be resolved. Full
+        # InvolvedEntity objects are preserved in
+        # producer_context.affected_entities for audit/replay.
+        affected_ids = [
+            _require_canonical_id(entity, role=f"affected_entities[{idx}]")
+            for idx, entity in enumerate(affected)
+        ]
         direction_local = str(local_payload.get("direction", ""))
         try:
             direction_canonical = _NEWS_DIRECTION_TO_CONTRACTS_DIRECTION[
@@ -565,8 +639,14 @@ def _normalize_for_sdk(
         # for Layer B routing; pass through directly (contracts.Ex3
         # delta_type is `str` with no enum constraint).
         "delta_type": str(local_payload["delta_action"]),
-        "source_node": _coerce_canonical_id(subject),
-        "target_node": _coerce_canonical_id(obj),
+        # Per CLAUDE.md #6 source_node / target_node MUST be canonical
+        # entity_ids. ``_require_graph_fields`` already rejects Ex-3
+        # candidates with unresolved subject/object earlier in
+        # ``_validate_candidate``; this is the wire-boundary
+        # belt-and-suspenders check (defends against direct
+        # ``_normalize_for_sdk`` callers that bypass _validate_candidate).
+        "source_node": _require_canonical_id(subject, role="source_node"),
+        "target_node": _require_canonical_id(obj, role="target_node"),
         "relation_type": str(local_payload["relation_type"]),
         "properties": {},
         "evidence": evidence_refs,

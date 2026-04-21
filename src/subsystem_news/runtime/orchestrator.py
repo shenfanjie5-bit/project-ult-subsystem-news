@@ -60,8 +60,7 @@ def run_once(
                 reasoner_client,
                 reasoner_factories,
             ),
-            sdk_client=sdk_client
-            or (_NoopSubsystemSdkClient() if config.dry_run else DefaultSubsystemSdkClient()),
+            sdk_client=_sdk_client_for_config(config, sdk_client),
             trace_dir=config.trace_root,
             submit_batch_size=config.submit_batch_size,
             dedupe_threshold=config.dedupe_threshold,
@@ -96,6 +95,48 @@ def _heartbeat(
 ) -> None:
     if heartbeat is not None:
         heartbeat(status, payload)
+
+
+def _sdk_client_for_config(
+    config: PipelineConfig,
+    sdk_client: SubsystemSdkClient | None,
+) -> SubsystemSdkClient:
+    """Pick the SDK submit client for the current run.
+
+    Stage 2.9 follow-up #1 (codex review #1 P1 #1): the original
+    default for non-dry-run mode was ``DefaultSubsystemSdkClient()``
+    constructed inline, which delegates to ``subsystem_sdk.submit ->
+    get_runtime()`` — and crashes with ``RuntimeNotConfiguredError``
+    unless the caller separately wraps execution in
+    ``configure_runtime(BaseSubsystemContext(...))``. That left the
+    first real non-dry-run submission path silently broken until
+    Layer B traffic actually hit it.
+
+    Now: non-dry-run mode REQUIRES an explicit ``sdk_client`` argument
+    (raise ``ContractViolationError`` otherwise) — same eager-failure
+    pattern as ``_entity_client_for_config``. Dry-run still defaults
+    to the in-memory ``_NoopSubsystemSdkClient`` (no Layer B contact).
+
+    The DefaultSubsystemSdkClient itself remains available for tests
+    and for callers that wire ``configure_runtime`` themselves; but
+    it is no longer auto-instantiated here, so misconfigured
+    non-dry-run runs fail at orchestrator setup rather than mid-batch.
+    """
+
+    if sdk_client is not None:
+        return sdk_client
+    if config.dry_run:
+        return _NoopSubsystemSdkClient()
+    raise ContractViolationError(
+        "non-dry-run runtime requires an explicit sdk_client; news "
+        "must not silently auto-construct DefaultSubsystemSdkClient "
+        "(it depends on subsystem_sdk.configure_runtime(...) being "
+        "wired by the caller). Pass a configured sdk_client to "
+        "run_once() — see tests/integration/test_sdk_wire_shape_integration.py "
+        "for the canonical SubmitClient + MockSubmitBackend wiring "
+        "pattern, and follow that shape with a real Lite-PG / "
+        "Full-Kafka backend in production."
+    )
 
 
 def _entity_client_for_config(
