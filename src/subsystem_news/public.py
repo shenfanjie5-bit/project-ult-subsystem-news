@@ -39,12 +39,26 @@ from subsystem_news.version import __version__ as _NEWS_VERSION
 
 _HEALTHY: Final[str] = "healthy"
 _DEGRADED: Final[str] = "degraded"
-_DOWN: Final[str] = "down"
+_DOWN: Final[str] = "blocked"
 
 # Ex types this subsystem produces. Ex-0 (heartbeat) is provided by
 # subsystem-sdk's own heartbeat client, NOT by news, so it's not in
 # this list.
 _SUPPORTED_EX_TYPES: Final[tuple[str, ...]] = ("Ex-1", "Ex-2", "Ex-3")
+
+# Stage 4 §4.1.5: contract_version is the canonical contracts schema version
+# this module is bound against (NOT this module's own package version, which
+# stays in module_version). Harmonized to v0.1.3 across all 11 active
+# subsystem modules so assembly's ContractsVersionCheck (strict equality vs
+# matrix.contract_version) succeeds at the cross-project compat audit.
+# Previously this was derived dynamically via subsystem_sdk._contracts
+# .get_schema_version, which returns "unknown" today (contracts Ex models
+# don't expose a `schema_version` class attribute), and assembly's
+# VersionInfo regex `^v\d+\.\d+\.\d+$` rejects "unknown". Per Stage 4 §4.1.5
+# we hardcode the canonical value matching the contracts package version
+# news is pinned against.
+_CONTRACT_VERSION: Final[str] = "v0.1.3"
+_COMPATIBLE_CONTRACT_RANGE: Final[str] = ">=0.1.3,<0.2.0"
 
 
 def _probe_sdk_envelope_strip() -> dict[str, Any]:
@@ -131,35 +145,93 @@ class _HealthProbe:
     do IO.
     """
 
+    _PROBE_NAME: Final[str] = "subsystem_news.health"
+
     def check(self, *, timeout_sec: float) -> dict[str, Any]:
+        # Stage 4 §4.3 Lite-stack e2e fix: assembly's
+        # ``HealthResult.model_validate`` requires ``module_id`` /
+        # ``probe_name`` / ``latency_ms`` / ``message`` plus the status
+        # enum value in {healthy, degraded, blocked}.
+        from time import perf_counter
+
+        started_at = perf_counter()
         details: dict[str, Any] = {
             "supported_ex_types": list(_SUPPORTED_EX_TYPES),
+            "timeout_sec": timeout_sec,
         }
 
         # Invariant 1: SDK envelope strip wire-shape boundary (铁律 #7).
         sdk_probe = _probe_sdk_envelope_strip()
         details["sdk_envelope_strip"] = sdk_probe
         if not sdk_probe["available"]:
-            return {
-                "status": _DOWN,
-                "details": details,
-                "timeout_sec": timeout_sec,
-            }
+            return self._build_result(
+                started_at,
+                status=_DOWN,
+                message=(
+                    "subsystem-news SDK envelope strip wire-shape "
+                    "boundary unavailable (铁律 #7 broken)"
+                ),
+                details=details,
+            )
 
         # Invariant 2: news candidate models + canonical mapper importable.
+        # Treat ``ModuleNotFoundError`` for transitive runtime deps as
+        # ``degraded`` — offline-first dev venvs without heavy news-source
+        # adapters or reasoner-runtime are allowed (per master plan
+        # iron rule #3 ``[dev]`` vs ``[runtime]`` extra split). Real
+        # invariant violations (model rename / removal) stay ``blocked``.
         runtime_probe = _probe_news_runtime_imports()
         details["news_runtime"] = runtime_probe
         if not runtime_probe["available"]:
-            return {
-                "status": _DOWN,
-                "details": details,
-                "timeout_sec": timeout_sec,
-            }
+            reason = runtime_probe.get("reason", "")
+            if "ModuleNotFoundError" in reason:
+                return self._build_result(
+                    started_at,
+                    status=_DEGRADED,
+                    message=(
+                        "subsystem-news running offline-first — "
+                        "transitive runtime dep missing in this venv: "
+                        f"{reason}"
+                    ),
+                    details=details,
+                )
+            return self._build_result(
+                started_at,
+                status=_DOWN,
+                message=(
+                    "subsystem-news candidate runtime + canonical mapper "
+                    "imports failed"
+                ),
+                details=details,
+            )
+
+        return self._build_result(
+            started_at,
+            status=_HEALTHY,
+            message=(
+                "subsystem-news invariants verified (SDK envelope strip + "
+                "news runtime + canonical mapper all available)"
+            ),
+            details=details,
+        )
+
+    def _build_result(
+        self,
+        started_at: float,
+        *,
+        status: str,
+        message: str,
+        details: dict[str, Any],
+    ) -> dict[str, Any]:
+        from time import perf_counter
 
         return {
-            "status": _HEALTHY,
+            "module_id": "subsystem-news",
+            "probe_name": self._PROBE_NAME,
+            "status": status,
+            "latency_ms": max(0.0, (perf_counter() - started_at) * 1000.0),
+            "message": message,
             "details": details,
-            "timeout_sec": timeout_sec,
         }
 
 
@@ -401,14 +473,14 @@ class _VersionDeclaration:
 
     def declare(self) -> dict[str, Any]:
         sdk_envelope = self._safe_sdk_envelope()
-        contract_version = self._safe_contract_version()
 
         return {
             "module_id": "subsystem-news",
             "module_version": _NEWS_VERSION,
+            "contract_version": _CONTRACT_VERSION,
+            "compatible_contract_range": _COMPATIBLE_CONTRACT_RANGE,
             "supported_ex_types": list(_SUPPORTED_EX_TYPES),
             "sdk_envelope_fields": sdk_envelope,
-            "contract_version": contract_version,
             # CLAUDE.md §19: Ex-3 false positive rate <= 1%; the
             # high-threshold guard (NewsGraphDeltaCandidate
             # requires_manual_review=True + resolved subject/object)
@@ -425,18 +497,6 @@ class _VersionDeclaration:
             return sorted(SDK_ENVELOPE_FIELDS)
         except Exception:
             return []
-
-    @staticmethod
-    def _safe_contract_version() -> str:
-        try:
-            from subsystem_sdk._contracts import (
-                get_ex_schema,
-                get_schema_version,
-            )
-
-            return get_schema_version(get_ex_schema("Ex-1"))
-        except Exception:
-            return "unknown"
 
 
 class _Cli:
