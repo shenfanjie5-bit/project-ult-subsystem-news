@@ -41,6 +41,34 @@ _HEALTHY: Final[str] = "healthy"
 _DEGRADED: Final[str] = "degraded"
 _DOWN: Final[str] = "blocked"
 
+#: External heavy-dependency module names that the news runtime imports
+#: transitively but that offline-first dev venvs may legitimately omit.
+#: Same pattern as ``subsystem-announcement``'s
+#: ``_OFFLINE_FIRST_OPTIONAL_DEPS``. Anything under
+#: ``subsystem_news.*`` (or other internal namespaces) staying missing
+#: indicates a real source-side regression and must stay ``blocked``,
+#: not silently treated as offline-first benign state.
+_OFFLINE_FIRST_OPTIONAL_DEPS: Final[frozenset[str]] = frozenset(
+    {
+        "httpx",
+        "feedparser",
+        "trafilatura",
+        "reasoner_runtime",
+    }
+)
+
+
+def _extract_missing_module_name(reason: str) -> str | None:
+    """Same helper as subsystem-announcement; extract top-level missing
+    module name from a ``ModuleNotFoundError`` repr in a probe reason.
+    """
+    import re
+
+    match = re.search(r"No module named '([^']+)'", reason)
+    if match is None:
+        return None
+    return match.group(1).split(".", 1)[0]
+
 # Ex types this subsystem produces. Ex-0 (heartbeat) is provided by
 # subsystem-sdk's own heartbeat client, NOT by news, so it's not in
 # this list.
@@ -175,23 +203,29 @@ class _HealthProbe:
             )
 
         # Invariant 2: news candidate models + canonical mapper importable.
-        # Treat ``ModuleNotFoundError`` for transitive runtime deps as
-        # ``degraded`` — offline-first dev venvs without heavy news-source
-        # adapters or reasoner-runtime are allowed (per master plan
-        # iron rule #3 ``[dev]`` vs ``[runtime]`` extra split). Real
-        # invariant violations (model rename / removal) stay ``blocked``.
+        # Codex review #11 P2 fix: only **whitelisted external optional
+        # deps** (``httpx``, ``feedparser``, ``trafilatura``,
+        # ``reasoner_runtime``) downgrade to ``degraded``. Any other
+        # ``ModuleNotFoundError`` — especially ``subsystem_news.*``
+        # namespace imports failing (e.g. ``subsystem_news.contracts``,
+        # ``subsystem_news.runtime.submit``) — must surface as
+        # ``blocked`` so source-side regressions can't masquerade as
+        # offline-first benign state. The previous
+        # ``"ModuleNotFoundError" in reason`` matcher was too broad.
         runtime_probe = _probe_news_runtime_imports()
         details["news_runtime"] = runtime_probe
         if not runtime_probe["available"]:
-            reason = runtime_probe.get("reason", "")
-            if "ModuleNotFoundError" in reason:
+            missing_module = _extract_missing_module_name(
+                runtime_probe.get("reason", "")
+            )
+            details["missing_module"] = missing_module
+            if missing_module in _OFFLINE_FIRST_OPTIONAL_DEPS:
                 return self._build_result(
                     started_at,
                     status=_DEGRADED,
                     message=(
                         "subsystem-news running offline-first — "
-                        "transitive runtime dep missing in this venv: "
-                        f"{reason}"
+                        f"optional external dep missing: {missing_module}"
                     ),
                     details=details,
                 )
@@ -200,7 +234,9 @@ class _HealthProbe:
                 status=_DOWN,
                 message=(
                     "subsystem-news candidate runtime + canonical mapper "
-                    "imports failed"
+                    f"imports failed (missing_module={missing_module!r}); "
+                    "not in the offline-first optional-dep whitelist — "
+                    "investigate as a source-side regression"
                 ),
                 details=details,
             )
