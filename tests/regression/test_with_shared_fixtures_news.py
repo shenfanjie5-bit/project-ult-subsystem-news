@@ -91,11 +91,11 @@ class _RecordingReasonerRuntimeClient:
 
 def _build_subject_entity() -> InvolvedEntity:
     """The single resolved entity in the fixture scenario (announcement-
-    side ENT_STOCK_300750_SZ → news-side resolved subject)."""
+    side ENT_STOCK_300750.SZ → news-side resolved subject)."""
 
     return InvolvedEntity(
         mention_text="宁德时代",
-        canonical_id="ENT_STOCK_300750_SZ",
+        canonical_id="ENT_STOCK_300750.SZ",
         resolution_status="resolved",
         type_hint="company",
     )
