@@ -9,6 +9,8 @@ from __future__ import annotations
 
 import time
 
+import pytest
+
 from subsystem_news import public
 
 
@@ -24,13 +26,38 @@ class TestSmokeFastPath:
     def test_smoke_hook_passes_for_lite_local(self) -> None:
         result = public.smoke_hook.run(profile_id="lite-local")
         assert result["passed"], result.get("failure_reason")
+        assert set(result) == {
+            "module_id",
+            "hook_name",
+            "passed",
+            "duration_ms",
+            "failure_reason",
+        }
+        assert result["module_id"] == "subsystem-news"
+        assert result["hook_name"] == "subsystem_news.smoke"
 
     def test_smoke_hook_passes_for_full_dev(self) -> None:
         result = public.smoke_hook.run(profile_id="full-dev")
         assert result["passed"], result.get("failure_reason")
+        assert set(result) == {
+            "module_id",
+            "hook_name",
+            "passed",
+            "duration_ms",
+            "failure_reason",
+        }
+        assert result["module_id"] == "subsystem-news"
+        assert result["hook_name"] == "subsystem_news.smoke"
 
     def test_smoke_hook_rejects_unknown_profile(self) -> None:
         result = public.smoke_hook.run(profile_id="bogus-profile")
+        assert set(result) == {
+            "module_id",
+            "hook_name",
+            "passed",
+            "duration_ms",
+            "failure_reason",
+        }
         assert not result["passed"]
         assert "unknown profile_id" in result["failure_reason"]
 
@@ -44,6 +71,25 @@ class TestSmokeFastPath:
         assert decl["supported_ex_types"] == ["Ex-1", "Ex-2", "Ex-3"]
         assert "produced_at" in decl["sdk_envelope_fields"]
         assert decl["ex3_high_threshold_marker"] is True
+
+    def test_public_entrypoints_validate_against_assembly_models(self) -> None:
+        assembly_models = pytest.importorskip("assembly.contracts.models")
+
+        assembly_models.HealthResult.model_validate(
+            public.health_probe.check(timeout_sec=1.0)
+        )
+        assembly_models.SmokeResult.model_validate(
+            public.smoke_hook.run(profile_id="lite-local")
+        )
+        assembly_models.SmokeResult.model_validate(
+            public.smoke_hook.run(profile_id="full-dev")
+        )
+        assembly_models.SmokeResult.model_validate(
+            public.smoke_hook.run(profile_id="bogus-profile")
+        )
+        assembly_models.VersionInfo.model_validate(
+            public.version_declaration.declare()
+        )
 
     def test_cli_version_under_1s(self) -> None:
         start = time.monotonic()
