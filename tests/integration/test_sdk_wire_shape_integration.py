@@ -41,7 +41,9 @@ it: the unstripped envelope reaches the recording backend.
 
 from __future__ import annotations
 
+from collections.abc import Iterable, Mapping
 from datetime import UTC, datetime
+from typing import Any
 
 from subsystem_sdk.backends.heartbeat import SubmitBackendHeartbeatAdapter
 from subsystem_sdk.backends.mock import MockSubmitBackend
@@ -71,7 +73,11 @@ from subsystem_news.runtime.submit import DefaultSubsystemSdkClient
 # ── Helpers ────────────────────────────────────────────────────────
 
 
-def _build_context_with_recording_backend() -> tuple[
+def _build_context_with_recording_backend(
+    *,
+    entity_lookup: Any | None = None,
+    preflight_policy: str = "skip",
+) -> tuple[
     BaseSubsystemContext, MockSubmitBackend
 ]:
     """Build a BaseSubsystemContext whose SubmitClient is wired to a
@@ -97,10 +103,25 @@ def _build_context_with_recording_backend() -> tuple[
     )
     context = BaseSubsystemContext(
         registration=registration,
-        submit_client=SubmitClient(backend),
+        submit_client=SubmitClient(
+            backend,
+            entity_lookup=entity_lookup,
+            preflight_policy=preflight_policy,
+        ),
         heartbeat_client=HeartbeatClient(SubmitBackendHeartbeatAdapter(backend)),
     )
     return context, backend
+
+
+class RecordingLookup:
+    def __init__(self, resolved_refs: Iterable[str] = ()) -> None:
+        self._resolved_refs = set(resolved_refs)
+        self.calls: list[tuple[str, ...]] = []
+
+    def lookup(self, refs: Iterable[str]) -> Mapping[str, bool]:
+        refs_tuple = tuple(refs)
+        self.calls.append(refs_tuple)
+        return {ref: ref in self._resolved_refs for ref in refs_tuple}
 
 
 def _source_ref() -> SourceReference:
@@ -203,6 +224,38 @@ class TestEx1FactCandidateThroughRealSdkAdapter:
 
         # Defense in depth: round-trip the wire through real contracts.
         Ex1CandidateFact.model_validate(wire)
+
+    def test_ex1_news_adapter_honors_sdk_block_preflight_before_backend(
+        self,
+    ) -> None:
+        candidate = NewsFactCandidate(
+            candidate_id="integ-preflight-news-ex1",
+            article_id="integ-art-001",
+            cluster_id="integ-cluster-001",
+            source_reference=_source_ref(),
+            fact_type="contract",
+            summary="placeholder integ summary",
+            involved_entities=[_entity("ENT_STOCK_PREFLIGHT_NEWS")],
+            event_time=datetime(2026, 1, 1, tzinfo=UTC),
+            confidence=0.91,
+            source_reliability_tier="A",
+            evidence_spans=[_evidence_span()],
+        )
+        lookup = RecordingLookup()
+        context, backend = _build_context_with_recording_backend(
+            entity_lookup=lookup,
+            preflight_policy="block",
+        )
+
+        with configure_runtime(context):
+            receipt = DefaultSubsystemSdkClient().submit([candidate])
+
+        assert lookup.calls == [("ENT_STOCK_PREFLIGHT_NEWS",)]
+        assert receipt.accepted_count == 0
+        assert receipt.rejected_count == 1
+        assert receipt.submitted_candidate_ids == []
+        assert receipt.rejected_candidate_ids == [candidate.candidate_id]
+        assert backend.submitted_payloads == ()
 
 
 # ── Ex-2 ──────────────────────────────────────────────────────────
