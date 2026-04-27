@@ -46,6 +46,15 @@ def entity() -> InvolvedEntity:
     )
 
 
+def unresolved_entity(mention_text: str = "Unknown Corp") -> InvolvedEntity:
+    return InvolvedEntity(
+        mention_text=mention_text,
+        canonical_id=None,
+        resolution_status="unresolved",
+        type_hint="company",
+    )
+
+
 def evidence() -> EvidenceSpan:
     return EvidenceSpan(
         article_id="article-1",
@@ -257,6 +266,44 @@ def test_default_sdk_client_rejects_unsupported_receipt_shape(
 
     with pytest.raises(ContractViolationError, match="unsupported receipt"):
         DefaultSubsystemSdkClient().submit([fact_candidate()])
+
+
+def test_default_sdk_client_blocks_unresolved_ex2_entity_before_sdk_call(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    import subsystem_sdk.submit as sdk_submit_pkg
+
+    sdk_calls: list[object] = []
+    monkeypatch.setattr(sdk_submit_pkg, "submit", sdk_calls.append)
+    candidate = signal_candidate().model_copy(
+        update={"affected_entities": [unresolved_entity("Unresolved Supplier")]}
+    )
+
+    receipt = DefaultSubsystemSdkClient().submit([candidate])
+
+    assert sdk_calls == []
+    assert receipt.accepted_count == 0
+    assert receipt.rejected_count == 1
+    assert receipt.rejected_candidate_ids == [candidate.candidate_id]
+
+
+def test_default_sdk_client_blocks_unresolved_ex3_endpoint_before_sdk_call(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    import subsystem_sdk.submit as sdk_submit_pkg
+
+    sdk_calls: list[object] = []
+    monkeypatch.setattr(sdk_submit_pkg, "submit", sdk_calls.append)
+    candidate = graph_candidate().model_copy(
+        update={"object_entity": unresolved_entity("Unresolved Target")}
+    )
+
+    receipt = DefaultSubsystemSdkClient().submit([candidate])
+
+    assert sdk_calls == []
+    assert receipt.accepted_count == 0
+    assert receipt.rejected_count == 1
+    assert receipt.rejected_candidate_ids == [candidate.candidate_id]
 
 
 def test_submit_candidates_requires_direct_client_receipt_partition() -> None:
