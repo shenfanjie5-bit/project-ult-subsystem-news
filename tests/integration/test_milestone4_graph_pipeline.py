@@ -2,7 +2,6 @@ from __future__ import annotations
 
 from collections.abc import Mapping
 from pathlib import Path
-from typing import Any
 
 from subsystem_news.contracts import load_allowlist
 from subsystem_news.dedupe.store import DedupeStore
@@ -93,6 +92,9 @@ def test_milestone4_pipeline_submits_graph_delta_and_traces_schema_pin(
     result = pipeline.run()
 
     submitted: list[CandidatePayload] = sdk_client.calls[0]
+    assert {candidate.export_contract for candidate in submitted}.issuperset(
+        {"Ex-1", "Ex-2", "Ex-3"}
+    )
     graph_deltas = [
         candidate for candidate in submitted if candidate.export_contract == "Ex-3"
     ]
